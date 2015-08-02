@@ -5,8 +5,8 @@
  *      Author: Matia Pizzoli
  */
 
-#ifndef REMODE_CU_MATRIX_CUH_
-#define REMODE_CU_MATRIX_CUH_
+#ifndef RMD_MATRIX_CUH_
+#define RMD_MATRIX_CUH_
 
 #include <cuda_runtime.h>
 #include <ostream>
@@ -94,4 +94,4 @@ Matrix<Type, 2, 2> inv(const Matrix<Type, 2, 2> & in)
 
 } // namespace rmd
 
-#endif // REMODE_CU_MATRIX_CUH_
+#endif // RMD_MATRIX_CUH_

@@ -5,8 +5,8 @@
  *      Author: Matia Pizzoli
  */
 
-#ifndef REMODE_CU_SE3_CUH_
-#define REMODE_CU_SE3_CUH_
+#ifndef RMD_SE3_CUH_
+#define RMD_SE3_CUH_
 
 #include <cuda_toolkit/helper_math.h>
 #include <rmd/matrix.cuh>
@@ -159,4 +159,4 @@ float3 operator*(const SE3<float> &se3, const float3 &p)
 
 } // namespace rmd
 
-#endif // REMODE_CU_SE3_CUH_
+#endif // RMD_SE3_CUH_
