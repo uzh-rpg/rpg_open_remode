@@ -10,6 +10,7 @@
 
 #include <cuda_runtime.h>
 #include <ostream>
+#include <iomanip>
 
 namespace rmd
 {
@@ -48,7 +49,7 @@ struct Matrix
     {
       for(size_t col=0; col<C; ++col)
       {
-        out << m(row, col);
+        out << std::setprecision(9) << m(row, col) << " ";
       }
       out << std::endl;
     }
