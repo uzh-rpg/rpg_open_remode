@@ -23,7 +23,7 @@ rmd::SeedMatrix::SeedMatrix(
   m_host_data.height = height;
 
   cudaMalloc(&m_dev_ptr, sizeof(m_host_data));
-  cudaMemcpy(m_dev_ptr, &m_host_data, sizeof(m_host_data), cudaMemcpyHostToDevice);
+  // cudaMemcpy(m_dev_ptr, &m_host_data, sizeof(m_host_data), cudaMemcpyHostToDevice);
 
   m_dim_block.x = 16;
   m_dim_block.y = 16;
@@ -44,22 +44,32 @@ rmd::SeedMatrix::~SeedMatrix()
 
 bool rmd::SeedMatrix::setReferenceImage(
     float *host_ref_img_align_row_maj,
-    const SE3<float> &T_curr_world)
+    const SE3<float> &T_curr_world,
+    const float &min_depth,
+    const float &max_depth)
 {
-  const cudaError err = cudaMemcpy2D(
+  if(cudaSuccess != cudaMemcpy2D(
         m_host_data.ref_img.data,
         m_host_data.ref_img.pitch,
         host_ref_img_align_row_maj,
         m_width*sizeof(float),
         m_width*sizeof(float),
         m_height,
-        cudaMemcpyHostToDevice);
-  if(err != cudaSuccess)
+        cudaMemcpyHostToDevice))
     return false;
+
+  m_host_data.scene.min_depth = min_depth;
+  m_host_data.scene.max_depth = max_depth;
+  m_host_data.scene.avg_depth = (min_depth+max_depth)/2.0f;
+  m_host_data.scene.depth_range = max_depth - min_depth;
+  m_host_data.scene.sigma_sq_max = m_host_data.scene.depth_range * m_host_data.scene.depth_range / 36.0f;
+
+  cudaMemcpy(m_dev_ptr, &m_host_data, sizeof(m_host_data), cudaMemcpyHostToDevice);
 
   m_T_world_ref = T_curr_world.inv();
 
-  rmd::bindTexture(img_ref_tex, *m_ref_img);
+  if(cudaSuccess != rmd::bindTexture(img_ref_tex, *m_ref_img))
+    return false;
 
   rmd::seedInitKernel<<<m_dim_grid, m_dim_block>>>(m_dev_ptr);
 

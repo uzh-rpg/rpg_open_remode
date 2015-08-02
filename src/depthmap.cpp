@@ -31,12 +31,16 @@ void rmd::Depthmap::initUndistortionMap(
 
 bool rmd::Depthmap::setReferenceImage(
     const cv::Mat &img_curr,
-    const SE3<float> &T_curr_world)
+    const SE3<float> &T_curr_world,
+    const float &min_depth,
+    const float &max_depth)
 {
   inputImage(img_curr);
   return m_seeds.setReferenceImage(
         reinterpret_cast<float*>(m_img_undistorted_32fc1.data),
-        T_curr_world);
+        T_curr_world,
+        min_depth,
+        max_depth);
 }
 
 void rmd::Depthmap::update(

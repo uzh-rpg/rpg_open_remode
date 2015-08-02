@@ -20,7 +20,9 @@ public:
   ~SeedMatrix();
   bool setReferenceImage(
       float *host_ref_img_align_row_maj,
-      const SE3<float> &T_curr_world);
+      const SE3<float> &T_curr_world,
+      const float &min_depth,
+      const float &max_depth);
 private:
   size_t m_width;
   size_t m_height;

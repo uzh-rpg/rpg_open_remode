@@ -29,10 +29,12 @@ public:
 
   bool setReferenceImage(
       const cv::Mat &img_curr,
-      const SE3<float> &T_curr_world);
+      const SE3<float> &T_curr_world,
+      const float &min_depth,
+      const float &max_depth);
 
   void update(const cv::Mat &img_curr,
-      const SE3<float> &T_curr_world);
+              const SE3<float> &T_curr_world);
 
 private:
   void inputImage(const cv::Mat &img_8uc1);

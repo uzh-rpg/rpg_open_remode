@@ -6,6 +6,15 @@
 namespace rmd
 {
 
+struct DeviceSceneData
+{
+  float min_depth;
+  float max_depth;
+  float avg_depth;
+  float depth_range;
+  float sigma_sq_max;
+};
+
 struct Device2DData
 {
   float  *data;
@@ -25,6 +34,8 @@ struct DeviceData
   PinholeCamera cam;
   size_t width;
   size_t height;
+
+  DeviceSceneData scene;
 };
 
 } // rmd namespace
