@@ -26,3 +26,12 @@
 *.exe
 *.out
 *.app
+
+# Build folder
+build
+
+# Temp file
+*~
+
+# QTCreator project
+CMakeLists.txt.user
