@@ -9,6 +9,7 @@
 #define REMODE_CU_MATRIX_CUH_
 
 #include <cuda_runtime.h>
+#include <ostream>
 
 namespace rmd
 {
@@ -38,6 +39,20 @@ struct Matrix
   Type & operator[](int ind)
   {
     return data[ind];
+  }
+
+  __host__
+  friend std::ostream & operator<<(std::ostream &out, const Matrix<Type, R, C> &m)
+  {
+    for(size_t row=0; row<R; ++row)
+    {
+      for(size_t col=0; col<C; ++col)
+      {
+        out << m(row, col);
+      }
+      out << std::endl;
+    }
+    return out;
   }
 
   Type data[R*C];

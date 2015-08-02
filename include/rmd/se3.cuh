@@ -121,6 +121,13 @@ struct SE3
                        data(2,3));
   }
 
+  __host__
+  friend std::ostream & operator<<(std::ostream &out, const SE3 &m)
+  {
+    out << m.data;
+    return out;
+  }
+
   Matrix<Type, 3, 4> data;
 };
 
