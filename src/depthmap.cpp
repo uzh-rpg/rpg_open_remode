@@ -10,7 +10,7 @@ rmd::Depthmap::Depthmap(
   : m_width(width)
   , m_height(height)
   , m_is_distorted(false)
-  , seeds(width, height, rmd::PinholeCamera(fx, fy, cx, cy))
+  , m_seeds(width, height, rmd::PinholeCamera(fx, fy, cx, cy))
 {
   m_cv_K = (cv::Mat_<float>(3, 3) << fx, 0.0f, cx, 0.0f, fy, cy, 0.0f, 0.0f, 1.0f);
 }
@@ -29,10 +29,14 @@ void rmd::Depthmap::initUndistortionMap(
   m_is_distorted = true;
 }
 
-void rmd::Depthmap::setReferenceImage(const cv::Mat &img_curr,
+bool rmd::Depthmap::setReferenceImage(
+    const cv::Mat &img_curr,
     const SE3<float> &T_curr_world)
 {
   inputImage(img_curr);
+  return m_seeds.setReferenceImage(
+        reinterpret_cast<float*>(m_img_undistorted_32fc1.data),
+        T_curr_world);
 }
 
 void rmd::Depthmap::update(

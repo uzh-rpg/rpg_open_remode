@@ -11,6 +11,12 @@ namespace rmd
 
 struct DeviceData
 {
+  // Image data
+  float *ref_img;
+  size_t ref_img_pitch;
+  float *curr_img;
+  size_t curr_img_pitch;
+  // Seed data
   float *mu;
   size_t mu_pitch;
   float *sigma;
@@ -30,9 +36,16 @@ public:
       const size_t &height,
       const PinholeCamera &cam);
   ~SeedMatrix();
+  bool setReferenceImage(
+      float *host_ref_img_align_row_maj,
+      const SE3<float> &T_curr_world);
 private:
+  size_t m_width;
+  size_t m_height;
+  PaddedMemory *m_ref_img, *m_curr_img;
   PaddedMemory *m_mu, *m_sigma, *m_a, *m_b;
   DeviceData m_host_data, *m_dev_ptr;
+  SE3<float> m_T_world_ref;
 };
 
 } // rmd namespace

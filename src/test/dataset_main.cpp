@@ -88,19 +88,22 @@ int main(int argc, char **argv)
           data.translation.z()
           );
 
-    // T_world_curr.block<3, 3>(0, 0) = data.quaternion.toRotationMatrix();
-    // T_world_curr.block<3, 1>(0, 3) = data.translation;
-    // T_world_curr.row(3) = Eigen::Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
-
-    // std::cout << "RUN EXPERIMENT: inputting image " << img_file_path.string() <<  std::endl;
-    // std::cout << "T_world_curr:" << std::endl;
-    // std::cout << T_world_curr << std::endl;
+    std::cout << "RUN EXPERIMENT: inputting image " << img_file_path.string() <<  std::endl;
+    std::cout << "T_world_curr:" << std::endl;
+    std::cout << T_world_curr << std::endl;
 
     // process
     if(first_img)
     {
-      depthmap.setReferenceImage(img, T_world_curr.inv());
-      first_img = false;
+      if(depthmap.setReferenceImage(img, T_world_curr.inv()))
+      {
+        first_img = false;
+      }
+      else
+      {
+        std::cerr << "ERROR: could not set reference image" << std::endl;
+        return -1;
+      }
     }
     else
     {

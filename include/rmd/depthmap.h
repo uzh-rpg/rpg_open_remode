@@ -27,7 +27,7 @@ public:
       float d3,
       float d4);
 
-  void setReferenceImage(
+  bool setReferenceImage(
       const cv::Mat &img_curr,
       const SE3<float> &T_curr_world);
 
@@ -37,7 +37,7 @@ public:
 private:
   void inputImage(const cv::Mat &img_8uc1);
 
-  SeedMatrix seeds;
+  SeedMatrix m_seeds;
 
   size_t m_width;
   size_t m_height;
