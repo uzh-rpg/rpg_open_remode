@@ -10,13 +10,8 @@ rmd::Depthmap::Depthmap(
   : m_width(width)
   , m_height(height)
   , m_is_distorted(false)
-  , seeds(width, height)
+  , seeds(width, height, rmd::PinholeCamera(fx, fy, cx, cy))
 {
-  m_intrinsics[0] = fx;
-  m_intrinsics[1] = cx;
-  m_intrinsics[2] = fy;
-  m_intrinsics[3] = cy;
-
   m_cv_K = (cv::Mat_<float>(3, 3) << fx, 0.0f, cx, 0.0f, fy, cy, 0.0f, 0.0f, 1.0f);
 }
 

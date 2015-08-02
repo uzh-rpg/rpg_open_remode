@@ -19,7 +19,7 @@ struct DeviceData
   size_t a_pitch;
   float *b;
   size_t b_pitch;
-
+  PinholeCamera cam;
 };
 
 class SeedMatrix
@@ -27,7 +27,8 @@ class SeedMatrix
 public:
   SeedMatrix(
       const size_t &width,
-      const size_t &height);
+      const size_t &height,
+      const PinholeCamera &cam);
   ~SeedMatrix();
 private:
   PaddedMemory *m_mu, *m_sigma, *m_a, *m_b;

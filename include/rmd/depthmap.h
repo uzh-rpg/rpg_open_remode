@@ -41,7 +41,6 @@ private:
 
   size_t m_width;
   size_t m_height;
-  float m_intrinsics[4];  // K matrix stored row-major
 
   cv::Mat m_cv_K, m_cv_D;
   cv::Mat m_undist_map1, m_undist_map2;
