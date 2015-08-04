@@ -23,6 +23,9 @@ public:
       const SE3<float> &T_curr_world,
       const float &min_depth,
       const float &max_depth);
+  bool update(
+      float *host_curr_img_align_row_maj,
+      const SE3<float> &T_curr_world);
 private:
   size_t m_width;
   size_t m_height;

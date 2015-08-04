@@ -32,6 +32,7 @@ struct DeviceData
   Device2DData b;
 
   PinholeCamera cam;
+  float one_pix_angle;
   size_t width;
   size_t height;
 

@@ -11,18 +11,17 @@ class PaddedMemory
 public:
   PaddedMemory(
       const size_t &width,
-      const size_t &height,
-      rmd::Device2DData &dev_data);
+      const size_t &height);
 
   ~PaddedMemory();
 
+  void getDevData(Device2DData &dev_data) const;
+
 // TODO: define copy constructor and assignment operator
 
-  float * getDevDataPtr() { return m_dev_mem; }
   cudaChannelFormatDesc getChannelFormatDesc() const { return m_channel_format_desc; }
   size_t getWidth()  const { return m_width;  }
   size_t getHeight() const { return m_height; }
-  size_t getPitch()  const { return m_pitch;  }
 
 private:
   size_t m_width;
