@@ -37,7 +37,6 @@ ADD_DEFINITIONS(-DMAX_EXTENT_EPIPOLAR_SEARCH=100)
 
 CUDA_ADD_LIBRARY(
     remode
-    src/padded_memory.cu
     src/seed_matrix.cu
 #    src/tvl1.cpp
 #    src/depth_map.cu

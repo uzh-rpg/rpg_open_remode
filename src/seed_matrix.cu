@@ -10,18 +10,18 @@ rmd::SeedMatrix::SeedMatrix(
   : m_width(width)
   , m_height(height)
 {
-  m_ref_img  = new PaddedMemory(width, height);
+  m_ref_img  = new PaddedMemory<float>(width, height);
   m_ref_img->getDevData(m_host_data.ref_img);
-  m_curr_img = new PaddedMemory(width, height);
+  m_curr_img = new PaddedMemory<float>(width, height);
   m_curr_img->getDevData(m_host_data.curr_img);
 
-  m_mu = new PaddedMemory(width, height);
+  m_mu = new PaddedMemory<float>(width, height);
   m_mu->getDevData(m_host_data.mu);
-  m_sigma = new PaddedMemory(width, height);
+  m_sigma = new PaddedMemory<float>(width, height);
   m_sigma->getDevData(m_host_data.sigma);
-  m_a = new PaddedMemory(width, height);
+  m_a = new PaddedMemory<float>(width, height);
   m_a->getDevData(m_host_data.a);
-  m_b = new PaddedMemory(width, height);
+  m_b = new PaddedMemory<float>(width, height);
   m_b->getDevData(m_host_data.b);
 
   m_host_data.cam    = cam;
@@ -54,15 +54,11 @@ bool rmd::SeedMatrix::setReferenceImage(
     const float &min_depth,
     const float &max_depth)
 {
-  if(cudaSuccess != cudaMemcpy2D(
-        m_host_data.ref_img.data,
-        m_host_data.ref_img.pitch,
-        host_ref_img_align_row_maj,
-        m_width*sizeof(float),
-        m_width*sizeof(float),
-        m_height,
-        cudaMemcpyHostToDevice))
+
+  if(!m_ref_img->setDevData(host_ref_img_align_row_maj))
+  {
     return false;
+  }
 
   m_host_data.scene.min_depth = min_depth;
   m_host_data.scene.max_depth = max_depth;
@@ -86,15 +82,11 @@ bool rmd::SeedMatrix::update(
     float *host_curr_img_align_row_maj,
     const SE3<float> &T_curr_world)
 {
-  if(cudaSuccess != cudaMemcpy2D(
-       m_host_data.curr_img.data,
-       m_host_data.curr_img.pitch,
-       host_curr_img_align_row_maj,
-       m_width*sizeof(float),
-       m_width*sizeof(float),
-       m_height,
-       cudaMemcpyHostToDevice))
+  if(!m_curr_img->setDevData(host_curr_img_align_row_maj))
+  {
     return false;
+  }
+
   const rmd::SE3<float> T_curr_ref = T_curr_world * m_T_world_ref;
 
   if(cudaSuccess != rmd::bindTexture(curr_img_tex, *m_curr_img))

@@ -18,7 +18,7 @@ texture<float, cudaTextureType2D, cudaReadModeElementType> b_tex;
 template<typename ElementType>
 inline bool bindTexture(
     texture<ElementType, cudaTextureType2D> &tex,
-    PaddedMemory &mem,
+    PaddedMemory<ElementType> &mem,
     cudaTextureFilterMode filter_mode=cudaFilterModeLinear)
 {
   tex.addressMode[0] = cudaAddressModeClamp; // Neumann Boundary Conditions
@@ -26,7 +26,7 @@ inline bool bindTexture(
   tex.filterMode = filter_mode;
   tex.normalized = false;
 
-  Device2DData dev_data;
+  Device2DData<ElementType> dev_data;
   mem.getDevData(dev_data);
 
   const cudaError bindStatus =

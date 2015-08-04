@@ -15,21 +15,22 @@ struct DeviceSceneData
   float sigma_sq_max;
 };
 
+template<typename ElementType>
 struct Device2DData
 {
-  float  *data;
+  ElementType  *data;
   size_t pitch;
   size_t stride;
 };
 
 struct DeviceData
 {
-  Device2DData ref_img;
-  Device2DData curr_img;
-  Device2DData mu;
-  Device2DData sigma;
-  Device2DData a;
-  Device2DData b;
+  Device2DData<float> ref_img;
+  Device2DData<float> curr_img;
+  Device2DData<float> mu;
+  Device2DData<float> sigma;
+  Device2DData<float> a;
+  Device2DData<float> b;
 
   PinholeCamera cam;
   float one_pix_angle;

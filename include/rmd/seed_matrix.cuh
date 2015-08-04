@@ -29,8 +29,8 @@ public:
 private:
   size_t m_width;
   size_t m_height;
-  PaddedMemory *m_ref_img, *m_curr_img;
-  PaddedMemory *m_mu, *m_sigma, *m_a, *m_b;
+  PaddedMemory<float> *m_ref_img, *m_curr_img;
+  PaddedMemory<float> *m_mu, *m_sigma, *m_a, *m_b;
   DeviceData m_host_data, *m_dev_ptr;
   SE3<float> m_T_world_ref;
   // kernel config
