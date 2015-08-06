@@ -18,7 +18,16 @@ struct DeviceSceneData
 template<typename ElementType>
 struct Device2DData
 {
-  ElementType  *data;
+  void set(
+      ElementType *data,
+      const size_t &pitch,
+      const size_t &stride)
+  {
+    this->data   = data;
+    this->pitch  = pitch;
+    this->stride = stride;
+  }
+  ElementType *data;
   size_t pitch;
   size_t stride;
 };

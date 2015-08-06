@@ -16,6 +16,41 @@ rmd::SeedMatrix::SeedMatrix(
   , a_(width, height)
   , b_(width, height)
 {
+  m_host_data.ref_img.set(
+        ref_img_.getDevDataPtr(),
+        ref_img_.getPitch(),
+        ref_img_.getStride()
+        );
+
+  m_host_data.curr_img.set(
+        curr_img_.getDevDataPtr(),
+        curr_img_.getPitch(),
+        curr_img_.getStride()
+        );
+
+  m_host_data.mu.set(
+        mu_.getDevDataPtr(),
+        mu_.getPitch(),
+        mu_.getStride()
+        );
+
+  m_host_data.sigma.set(
+        sigma_.getDevDataPtr(),
+        sigma_.getPitch(),
+        sigma_.getStride()
+        );
+
+  m_host_data.a.set(
+        a_.getDevDataPtr(),
+        a_.getPitch(),
+        a_.getStride()
+        );
+
+  m_host_data.b.set(
+        b_.getDevDataPtr(),
+        b_.getPitch(),
+        b_.getStride()
+        );
 
   m_host_data.cam    = cam;
   m_host_data.one_pix_angle = cam.getOnePixAngle();
@@ -42,30 +77,6 @@ bool rmd::SeedMatrix::setReferenceImage(
     const float &max_depth)
 {
   ref_img_.setDevData(host_ref_img_align_row_maj);
-
-  m_host_data.ref_img.data   = ref_img_.getDevDataPtr();
-  m_host_data.ref_img.pitch  = ref_img_.getPitch();
-  m_host_data.ref_img.stride = ref_img_.getStride();
-
-  m_host_data.curr_img.data   = curr_img_.getDevDataPtr();
-  m_host_data.curr_img.pitch  = curr_img_.getPitch();
-  m_host_data.curr_img.stride = curr_img_.getStride();
-
-  m_host_data.mu.data   = mu_.getDevDataPtr();
-  m_host_data.mu.pitch  = mu_.getPitch();
-  m_host_data.mu.stride = mu_.getStride();
-
-  m_host_data.sigma.data   = sigma_.getDevDataPtr();
-  m_host_data.sigma.pitch  = sigma_.getPitch();
-  m_host_data.sigma.stride = sigma_.getStride();
-
-  m_host_data.a.data   = a_.getDevDataPtr();
-  m_host_data.a.pitch  = a_.getPitch();
-  m_host_data.a.stride = a_.getStride();
-
-  m_host_data.b.data   = b_.getDevDataPtr();
-  m_host_data.b.pitch  = b_.getPitch();
-  m_host_data.b.stride = b_.getStride();
 
   m_host_data.scene.min_depth = min_depth;
   m_host_data.scene.max_depth = max_depth;
