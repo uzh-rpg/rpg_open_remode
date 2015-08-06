@@ -56,6 +56,7 @@ struct DeviceData
   {
     cudaFree(dev_ptr);
   }
+  __host__
   void setDevData()
   {
     // Copy data to device memory

@@ -17,17 +17,17 @@ rmd::SeedMatrix::SeedMatrix(
   , b_(width, height)
 {
   // Save image details to be uploaded to device memory
-  m_host_data.ref_img.set(ref_img_);
-  m_host_data.curr_img.set(curr_img_);
-  m_host_data.mu.set(mu_);
-  m_host_data.sigma.set(sigma_);
-  m_host_data.a.set(a_);
-  m_host_data.b.set(b_);
+  dev_data.ref_img.set(ref_img_);
+  dev_data.curr_img.set(curr_img_);
+  dev_data.mu.set(mu_);
+  dev_data.sigma.set(sigma_);
+  dev_data.a.set(a_);
+  dev_data.b.set(b_);
   // Save camera parameters
-  m_host_data.cam    = cam;
-  m_host_data.one_pix_angle = cam.getOnePixAngle();
-  m_host_data.width  = width;
-  m_host_data.height = height;
+  dev_data.cam    = cam;
+  dev_data.one_pix_angle = cam.getOnePixAngle();
+  dev_data.width  = width;
+  dev_data.height = height;
   // Kernel configuration
   m_dim_block.x = 16;
   m_dim_block.y = 16;
@@ -44,19 +44,19 @@ bool rmd::SeedMatrix::setReferenceImage(
   // Upload reference image to device memory
   ref_img_.setDevData(host_ref_img_align_row_maj);
   // Set scene parameters
-  m_host_data.scene.min_depth = min_depth;
-  m_host_data.scene.max_depth = max_depth;
-  m_host_data.scene.avg_depth = (min_depth+max_depth)/2.0f;
-  m_host_data.scene.depth_range = max_depth - min_depth;
-  m_host_data.scene.sigma_sq_max = m_host_data.scene.depth_range * m_host_data.scene.depth_range / 36.0f;
+  dev_data.scene.min_depth = min_depth;
+  dev_data.scene.max_depth = max_depth;
+  dev_data.scene.avg_depth = (min_depth+max_depth)/2.0f;
+  dev_data.scene.depth_range = max_depth - min_depth;
+  dev_data.scene.sigma_sq_max = dev_data.scene.depth_range * dev_data.scene.depth_range / 36.0f;
   // Copy data to device memory
-  m_host_data.setDevData();
+  dev_data.setDevData();
 
   m_T_world_ref = T_curr_world.inv();
 
   rmd::bindTexture(ref_img_tex, ref_img_);
 
-  rmd::seedInitKernel<<<m_dim_grid, m_dim_block>>>(m_host_data.dev_ptr);
+  rmd::seedInitKernel<<<m_dim_grid, m_dim_block>>>(dev_data.dev_ptr);
 
   return true;
 }
