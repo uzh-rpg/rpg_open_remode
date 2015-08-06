@@ -17,7 +17,6 @@ public:
       const size_t &width,
       const size_t &height,
       const PinholeCamera &cam);
-  ~SeedMatrix();
   bool setReferenceImage(
       float *host_ref_img_align_row_maj,
       const SE3<float> &T_curr_world,
@@ -31,7 +30,7 @@ private:
   size_t m_height;
   Image<float> ref_img_, curr_img_;
   Image<float> mu_, sigma_, a_, b_;
-  DeviceData m_host_data, *m_dev_ptr;
+  DeviceData m_host_data;
   SE3<float> m_T_world_ref;
   // kernel config
   dim3 m_dim_block;

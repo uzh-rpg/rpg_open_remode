@@ -2,6 +2,7 @@
 #define RMD_DEVICE_DATA_CUH
 
 #include <rmd/pinhole_camera.cuh>
+#include <rmd/image.cuh>
 
 namespace rmd
 {
@@ -27,6 +28,14 @@ struct Device2DData
     this->pitch  = pitch;
     this->stride = stride;
   }
+  void set(const Image<ElementType> &img)
+  {
+    set(
+          img.getDevDataPtr(),
+          img.getPitch(),
+          img.getStride()
+          );
+  }
   ElementType *data;
   size_t pitch;
   size_t stride;
@@ -34,6 +43,25 @@ struct Device2DData
 
 struct DeviceData
 {
+  DeviceData()
+  {
+    // Allocate device memory
+    const cudaError err = cudaMalloc(&dev_ptr, sizeof(*this));
+    if(err != cudaSuccess)
+      throw CudaException("DeviceData, cannot allocate device memory to store image parameters.", err);
+  }
+  ~DeviceData()
+  {
+    cudaFree(dev_ptr);
+  }
+  void setDevData()
+  {
+    // Copy data to device memory
+    const cudaError err = cudaMemcpy(dev_ptr, this, sizeof(*this), cudaMemcpyHostToDevice);
+    if(err != cudaSuccess)
+      throw CudaException("DeviceData, cannot copy image parameters to device memory.", err);
+  }
+
   Device2DData<float> ref_img;
   Device2DData<float> curr_img;
   Device2DData<float> mu;
@@ -47,6 +75,8 @@ struct DeviceData
   size_t height;
 
   DeviceSceneData scene;
+
+  DeviceData *dev_ptr;
 };
 
 } // rmd namespace
