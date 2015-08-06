@@ -2,7 +2,7 @@
 #define SEED_MATRIX_CUH
 
 #include <cuda_runtime.h>
-#include <rmd/padded_memory.cuh>
+#include <rmd/image.cuh>
 #include <rmd/pinhole_camera.cuh>
 #include <rmd/device_data.cuh>
 #include <rmd/se3.cuh>
@@ -29,8 +29,8 @@ public:
 private:
   size_t m_width;
   size_t m_height;
-  PaddedMemory<float> *m_ref_img, *m_curr_img;
-  PaddedMemory<float> *m_mu, *m_sigma, *m_a, *m_b;
+  Image<float> ref_img_, curr_img_;
+  Image<float> mu_, sigma_, a_, b_;
   DeviceData m_host_data, *m_dev_ptr;
   SE3<float> m_T_world_ref;
   // kernel config
