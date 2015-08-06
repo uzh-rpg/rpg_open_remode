@@ -43,6 +43,7 @@ struct Device2DData
 
 struct DeviceData
 {
+  __host__
   DeviceData()
   {
     // Allocate device memory
@@ -50,6 +51,7 @@ struct DeviceData
     if(err != cudaSuccess)
       throw CudaException("DeviceData, cannot allocate device memory to store image parameters.", err);
   }
+  __host__
   ~DeviceData()
   {
     cudaFree(dev_ptr);
