@@ -61,7 +61,7 @@ int main(int argc, char **argv)
   std::vector<DatasetEntry> dataset;
   if (!readDataSequence(sequence_file_path.string(), dataset))
   {
-    std::cout << "ERROR: could not read dataset" << std::endl;
+    std::cerr << "ERROR: could not read dataset" << std::endl;
     return -1;
   }
 
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     cv::Mat img = cv::imread(img_file_path.string(), CV_LOAD_IMAGE_GRAYSCALE);
     if(img.data == NULL)
     {
-      std::cout << "ERROR: could not read image " << img_file_path.string() << std::endl;
+      std::cerr << "ERROR: could not read image " << img_file_path.string() << std::endl;
       continue;
     }
     rmd::SE3<float> T_world_curr(
