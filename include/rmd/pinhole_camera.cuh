@@ -16,13 +16,15 @@ namespace rmd
 
 struct PinholeCamera
 {
-  __host__ PinholeCamera()
-  : fx(0.0f), fy(0.0f), cx(0.0f), cy(0.0f)
+  __host__
+  PinholeCamera()
+    : fx(0.0f), fy(0.0f), cx(0.0f), cy(0.0f)
   { }
 
-  __host__ PinholeCamera(float fx, float fy,
-                         float cx, float cy)
-  : fx(fx), fy(fy), cx(cx), cy(cy)
+  __host__
+  PinholeCamera(float fx, float fy,
+                float cx, float cy)
+    : fx(fx), fy(fy), cx(cx), cy(cy)
   { }
 
   __host__ __device__ __forceinline__
@@ -40,7 +42,8 @@ struct PinholeCamera
                        fy*xyz.y / xyz.z + cy);
   }
 
-  __host__ float getOnePixAngle() const
+  __host__
+  float getOnePixAngle() const
   {
     return atan2f(1.0f, 2.0f*fx)*2.0f;
   }

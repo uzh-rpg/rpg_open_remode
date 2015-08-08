@@ -6,7 +6,8 @@
 namespace rmd
 {
 
-__global__ void seedInitKernel(DeviceData *dev_ptr)
+__global__
+void seedInitKernel(DeviceData *dev_ptr)
 {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;

@@ -19,6 +19,7 @@ struct DeviceSceneData
 template<typename ElementType>
 struct Device2DData
 {
+  __host__
   void set(
       ElementType *data,
       const size_t &pitch,
@@ -28,6 +29,7 @@ struct Device2DData
     this->pitch  = pitch;
     this->stride = stride;
   }
+  __host__
   void set(const Image<ElementType> &img)
   {
     set(
@@ -41,6 +43,8 @@ struct Device2DData
   size_t stride;
 };
 
+// DeviceData struct stores pointers to dev memory.
+// It is allocated and set from host.
 struct DeviceData
 {
   __host__

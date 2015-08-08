@@ -11,8 +11,8 @@ namespace rmd
 template<typename ElementType>
 struct Image
 {
-
-  __host__ Image(size_t width, size_t height)
+  __host__
+  Image(size_t width, size_t height)
     : width(width),
       height(height),
       is_externally_allocated(false)
@@ -27,7 +27,8 @@ struct Image
     channel_format_desc = cudaCreateChannelDesc<ElementType>();
   }
 
-  __host__ __device__ Image(const Image<ElementType>& src_img)
+  __host__ __device__
+  Image(const Image<ElementType>& src_img)
     : width(src_img.getWidth())
     , height(src_img.getHeight())
     , pitch(src_img.getPitch())
@@ -38,7 +39,8 @@ struct Image
   {
   }
 
-  __host__ ~Image()
+  __host__
+  ~Image()
   {
     if(!is_externally_allocated)
     {
@@ -49,7 +51,8 @@ struct Image
   }
 
   /// Set all the device data to zero
-  __host__ void zero()
+  __host__
+  void zero()
   {
     const cudaError err = cudaMemset2D(dev_data, pitch, 0,
                                        width*sizeof(ElementType), height);
@@ -58,7 +61,8 @@ struct Image
   }
 
   /// Set the device data to the values in the array
-  __host__ void setDevData(const ElementType * aligned_data_row_major)
+  __host__
+  void setDevData(const ElementType * aligned_data_row_major)
   {
     const cudaError err = cudaMemcpy2D(dev_data, pitch,
                                        aligned_data_row_major,
@@ -71,7 +75,8 @@ struct Image
   }
 
   /// Download the data from the device data to a preallocated array on host
-  __host__ void getDevData(ElementType* aligned_data_row_major)
+  __host__
+  void getDevData(ElementType* aligned_data_row_major)
   {
     const cudaError err = cudaMemcpy2D(aligned_data_row_major,       // destination memory address
                                        width*sizeof(ElementType),   // pitch of destination memory
@@ -86,7 +91,8 @@ struct Image
 
   /// Copy assignment operator
   /// fill this image with content from another image
-  __host__ Image<ElementType>& operator=(const Image<ElementType>& other_image)
+  __host__
+  Image<ElementType>& operator=(const Image<ElementType>& other_image)
   {
     if(&other_image != this)
     {
@@ -105,20 +111,27 @@ struct Image
     return *this;
   }
 
-  __host__ __device__ __forceinline__ size_t getWidth()  const { return width;  }
+  __host__ __device__ __forceinline__
+  size_t getWidth()  const { return width;  }
 
-  __host__ __device__ __forceinline__ size_t getHeight() const { return height; }
+  __host__ __device__ __forceinline__
+  size_t getHeight() const { return height; }
 
-  __host__ __device__ __forceinline__ size_t getPitch()  const { return pitch;  }
+  __host__ __device__ __forceinline__
+  size_t getPitch()  const { return pitch;  }
 
-  __host__ __device__ __forceinline__ size_t getStride() const { return stride; }
+  __host__ __device__ __forceinline__
+  size_t getStride() const { return stride; }
 
-  __host__ __device__ __forceinline__ cudaChannelFormatDesc getChannelFormatDesc() const { return channel_format_desc; }
+  __host__ __device__ __forceinline__
+  cudaChannelFormatDesc getChannelFormatDesc() const { return channel_format_desc; }
 
   /// return ptr to dev data
-  __host__ __device__ __forceinline__ ElementType * getDevDataPtr() const { return dev_data; }
+  __host__ __device__ __forceinline__
+  ElementType * getDevDataPtr() const { return dev_data; }
 
-  __device__ __forceinline__ ElementType & operator()(int x, int y)
+  __device__ __forceinline__
+  ElementType & operator()(int x, int y)
   {
     return dev_data[stride*y+x];
   }

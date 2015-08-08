@@ -39,7 +39,7 @@ struct SE3
     const Type yy = y*qy;
     const Type yz = z*qy;
     const Type zz = z*qz;
-  
+
     data(0, 0) = 1-(yy+zz);
     data(0, 1) = xy-wz;
     data(0, 2) = xz+wy;
@@ -49,7 +49,7 @@ struct SE3
     data(2, 0) = xz-wy;
     data(2, 1) = yz+wx;
     data(2, 2) = 1-(xx+yy);
-  
+
     data(0, 3) = tx;
     data(1, 3) = ty;
     data(2, 3) = tz;
