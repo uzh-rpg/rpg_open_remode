@@ -29,6 +29,9 @@ private:
   size_t m_width;
   size_t m_height;
   Image<float> ref_img_, curr_img_;
+  // Template statistics for NCC (pre)computation
+  Image<float> sum_templ_, const_templ_denom_;
+  // measurement parameters
   Image<float> mu_, sigma_, a_, b_;
   DeviceData dev_data;
   SE3<float> m_T_world_ref;

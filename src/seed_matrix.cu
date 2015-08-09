@@ -11,6 +11,8 @@ rmd::SeedMatrix::SeedMatrix(
   , m_height(height)
   , ref_img_(width, height)
   , curr_img_(width, height)
+  , sum_templ_(width, height)
+  , const_templ_denom_(width, height)
   , mu_(width, height)
   , sigma_(width, height)
   , a_(width, height)
@@ -19,6 +21,8 @@ rmd::SeedMatrix::SeedMatrix(
   // Save image details to be uploaded to device memory
   dev_data.ref_img.set(ref_img_);
   dev_data.curr_img.set(curr_img_);
+  dev_data.sum_templ.set(sum_templ_);
+  dev_data.const_templ_denom.set(const_templ_denom_);
   dev_data.mu.set(mu_);
   dev_data.sigma.set(sigma_);
   dev_data.a.set(a_);

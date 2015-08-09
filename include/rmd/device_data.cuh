@@ -43,6 +43,20 @@ struct Device2DData
   size_t stride;
 };
 
+// Information on template patch
+struct TemplatePatch
+{
+#ifndef RMD_TEMPLATE_PATCH_SIDE
+#define RMD_TEMPLATE_PATCH_SIDE 5
+#endif
+  TemplatePatch()
+    : side(RMD_TEMPLATE_PATCH_SIDE)
+    , offset(make_int2(-side/2, -side/2))
+  { }
+  const int  side;
+  const int2 offset;
+};
+
 // DeviceData struct stores pointers to dev memory.
 // It is allocated and set from host.
 struct DeviceData
@@ -71,6 +85,8 @@ struct DeviceData
 
   Device2DData<float> ref_img;
   Device2DData<float> curr_img;
+  Device2DData<float> sum_templ;
+  Device2DData<float> const_templ_denom;
   Device2DData<float> mu;
   Device2DData<float> sigma;
   Device2DData<float> a;
@@ -82,6 +98,7 @@ struct DeviceData
   size_t height;
 
   DeviceSceneData scene;
+  TemplatePatch patch;
 
   DeviceData *dev_ptr;
 };
