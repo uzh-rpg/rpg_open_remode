@@ -26,18 +26,18 @@ public:
       float *host_curr_img_align_row_maj,
       const SE3<float> &T_curr_world);
 private:
-  size_t m_width;
-  size_t m_height;
+  size_t width_;
+  size_t height_;
   Image<float> ref_img_, curr_img_;
   // Template statistics for NCC (pre)computation
   Image<float> sum_templ_, const_templ_denom_;
   // measurement parameters
   Image<float> mu_, sigma_, a_, b_;
-  DeviceData dev_data;
-  SE3<float> m_T_world_ref;
+  DeviceData dev_data_;
+  SE3<float> T_world_ref_;
   // kernel config
-  dim3 m_dim_block;
-  dim3 m_dim_grid;
+  dim3 dim_block_;
+  dim3 dim_grid_;
 };
 
 } // rmd namespace

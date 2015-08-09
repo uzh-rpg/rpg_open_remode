@@ -100,6 +100,11 @@ struct DeviceData
   DeviceSceneData scene;
   TemplatePatch patch;
 
+  // Algorithm parameters
+  float eta_inlier;
+  float eta_outlier;
+  float epsilon;
+
   DeviceData *dev_ptr;
 };
 
