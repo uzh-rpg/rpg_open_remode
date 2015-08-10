@@ -10,6 +10,18 @@
 namespace rmd
 {
 
+namespace ConvergenceStates
+{
+enum ConvergenceState
+{
+  UPDATING = 0,
+  CONVERGED,
+  BORDER,
+  DIVERGED
+};
+}
+typedef ConvergenceStates::ConvergenceState ConvergenceState;
+
 class SeedMatrix
 {
 public:

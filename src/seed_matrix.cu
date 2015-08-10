@@ -3,6 +3,7 @@
 
 #include "seed_init.cu"
 #include "seed_update.cu"
+#include "seed_check.cu"
 
 rmd::SeedMatrix::SeedMatrix(
     const size_t &width,
@@ -82,13 +83,18 @@ bool rmd::SeedMatrix::update(
   curr_img_.setDevData(host_curr_img_align_row_maj);
 
   const rmd::SE3<float> T_curr_ref = T_curr_world * T_world_ref_;
-
+  // Bind texture memory for the current image
   rmd::bindTexture(curr_img_tex, curr_img_);
+  // ... and model parameters
   rmd::bindTexture(mu_tex, mu_);
   rmd::bindTexture(sigma_tex, sigma_);
   rmd::bindTexture(a_tex, a_);
   rmd::bindTexture(b_tex, b_);
+  // Assest current convergence status
+  rmd::seedCheckKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
   rmd::bindTexture(convergence_tex, convergence_);
+  // Establish epipolar correspondences
+  // call epipola matching kernel
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);

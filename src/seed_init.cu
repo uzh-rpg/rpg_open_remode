@@ -12,7 +12,7 @@ void seedInitKernel(DeviceData *dev_ptr)
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-  if (x > dev_ptr->width || y > dev_ptr->height)
+  if(x >= dev_ptr->width || y >= dev_ptr->height)
     return;
 
   // Compute template statistics for NCC
