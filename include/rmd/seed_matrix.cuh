@@ -31,8 +31,12 @@ private:
   Image<float> ref_img_, curr_img_;
   // Template statistics for NCC (pre)computation
   Image<float> sum_templ_, const_templ_denom_;
-  // measurement parameters
+  // Measurement parameters
   Image<float> mu_, sigma_, a_, b_;
+  // Convergence state
+  Image<unsigned char> convergence_;
+  // Epipolar matches
+  Image<float2> epipolar_matches_;
   DeviceData dev_data_;
   SE3<float> T_world_ref_;
   // kernel config

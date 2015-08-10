@@ -15,6 +15,9 @@ texture<float, cudaTextureType2D, cudaReadModeElementType> sigma_tex;
 texture<float, cudaTextureType2D, cudaReadModeElementType> a_tex;
 texture<float, cudaTextureType2D, cudaReadModeElementType> b_tex;
 
+texture<unsigned char, cudaTextureType2D, cudaReadModeElementType> convergence_tex;
+texture<float2, cudaTextureType2D, cudaReadModeElementType> epipolar_matches_tex;
+
 template<typename ElementType>
 inline void bindTexture(
     texture<ElementType, cudaTextureType2D> &tex,

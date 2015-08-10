@@ -18,6 +18,8 @@ rmd::SeedMatrix::SeedMatrix(
   , sigma_(width, height)
   , a_(width, height)
   , b_(width, height)
+  , convergence_(width, height)
+  , epipolar_matches_(width, height)
 {
   // Save image details to be uploaded to device memory
   dev_data_.ref_img.set(ref_img_);
@@ -28,6 +30,8 @@ rmd::SeedMatrix::SeedMatrix(
   dev_data_.sigma.set(sigma_);
   dev_data_.a.set(a_);
   dev_data_.b.set(b_);
+  dev_data_.convergence.set(convergence_);
+  dev_data_.epipolar_matches.set(epipolar_matches_);
   // Save camera parameters
   dev_data_.cam    = cam;
   dev_data_.one_pix_angle = cam.getOnePixAngle();
@@ -84,6 +88,8 @@ bool rmd::SeedMatrix::update(
   rmd::bindTexture(sigma_tex, sigma_);
   rmd::bindTexture(a_tex, a_);
   rmd::bindTexture(b_tex, b_);
+  rmd::bindTexture(convergence_tex, convergence_);
+  rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
 

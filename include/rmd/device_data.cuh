@@ -91,6 +91,8 @@ struct DeviceData
   Device2DData<float> sigma;
   Device2DData<float> a;
   Device2DData<float> b;
+  Device2DData<unsigned char> convergence;
+  Device2DData<float2> epipolar_matches;
 
   PinholeCamera cam;
   float one_pix_angle;
