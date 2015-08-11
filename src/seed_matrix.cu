@@ -4,6 +4,7 @@
 #include "seed_init.cu"
 #include "seed_update.cu"
 #include "seed_check.cu"
+#include "epipolar_match.cu"
 
 rmd::SeedMatrix::SeedMatrix(
     const size_t &width,
@@ -94,8 +95,9 @@ bool rmd::SeedMatrix::update(
   rmd::seedCheckKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
   rmd::bindTexture(convergence_tex, convergence_);
   // Establish epipolar correspondences
-  // call epipola matching kernel
+  // call epipolar matching kernel
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
+  rmd::seedEpipolarMatch<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
 

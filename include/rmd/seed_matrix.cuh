@@ -14,10 +14,12 @@ namespace ConvergenceStates
 {
 enum ConvergenceState
 {
-  UPDATING = 0,
+  UPDATE = 0,
   CONVERGED,
   BORDER,
-  DIVERGED
+  DIVERGED,
+  NO_MATCH,
+  NOT_VISIBLE
 };
 }
 typedef ConvergenceStates::ConvergenceState ConvergenceState;

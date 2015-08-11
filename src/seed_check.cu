@@ -12,9 +12,6 @@ void seedCheckKernel(DeviceData *dev_ptr)
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-  if(x >= dev_ptr->width || y >= dev_ptr->height)
-    return;
-
   if(x > dev_ptr->width-dev_ptr->patch.side-1 || y > dev_ptr->height-dev_ptr->patch.side-1 ||
      x < dev_ptr->patch.side || y < dev_ptr->patch.side)
   {
@@ -43,7 +40,7 @@ void seedCheckKernel(DeviceData *dev_ptr)
   }
   else
   {
-    dev_ptr->convergence.data[y*dev_ptr->convergence.stride+x] = ConvergenceStates::UPDATING;
+    dev_ptr->convergence.data[y*dev_ptr->convergence.stride+x] = ConvergenceStates::UPDATE;
   }
 }
 

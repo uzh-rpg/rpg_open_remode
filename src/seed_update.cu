@@ -19,7 +19,7 @@ void seedUpdateKernel(DeviceData *dev_ptr)
   const float yy = y+0.5f;
 
   // Check convergence status of seed
-  if(ConvergenceStates::UPDATING != tex2D(convergence_tex, xx, yy))
+  if(ConvergenceStates::UPDATE != tex2D(convergence_tex, xx, yy))
     return;
 
   // Retrieve current estimations of parameters
