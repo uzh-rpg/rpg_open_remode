@@ -42,7 +42,7 @@ struct PinholeCamera
                        fy*xyz.y / xyz.z + cy);
   }
 
-  __host__
+  __host__ __device__ __forceinline__
   float getOnePixAngle() const
   {
     return atan2f(1.0f, 2.0f*fx)*2.0f;

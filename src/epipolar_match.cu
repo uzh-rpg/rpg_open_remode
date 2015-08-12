@@ -8,13 +8,6 @@
 namespace rmd
 {
 
-template<typename VectorType>
-__device__ __forceinline__
-float norm(const VectorType & v)
-{
-  return sqrtf(dot(v, v));
-}
-
 __global__
 void seedEpipolarMatch(
     DeviceData *dev_ptr,

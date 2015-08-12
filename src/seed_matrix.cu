@@ -1,5 +1,6 @@
 #include <rmd/seed_matrix.cuh>
 #include <rmd/texture_memory.cuh>
+#include <rmd/helper_vector_types.cuh>
 
 #include "seed_init.cu"
 #include "seed_update.cu"
@@ -80,26 +81,33 @@ bool rmd::SeedMatrix::update(
     float *host_curr_img_align_row_maj,
     const SE3<float> &T_curr_world)
 {
+  const rmd::SE3<float> T_curr_ref = T_curr_world * T_world_ref_;
+
   // Upload current image to device memory
   curr_img_.setDevData(host_curr_img_align_row_maj);
-
-  const rmd::SE3<float> T_curr_ref = T_curr_world * T_world_ref_;
   // Bind texture memory for the current image
   rmd::bindTexture(curr_img_tex, curr_img_);
+
   // ... and model parameters
   rmd::bindTexture(mu_tex, mu_);
   rmd::bindTexture(sigma_tex, sigma_);
   rmd::bindTexture(a_tex, a_);
   rmd::bindTexture(b_tex, b_);
+
   // Assest current convergence status
   rmd::seedCheckKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
   rmd::bindTexture(convergence_tex, convergence_);
+
   // Establish epipolar correspondences
   // call epipolar matching kernel
+  rmd::seedEpipolarMatch<<<dim_grid_, dim_block_>>>(
+                                                    dev_data_.dev_ptr,
+                                                    T_curr_ref);
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
-  rmd::seedEpipolarMatch<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref);
 
-  rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
+  rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(
+                                                   dev_data_.dev_ptr,
+                                                   T_curr_ref.inv());
 
   return true;
 }
