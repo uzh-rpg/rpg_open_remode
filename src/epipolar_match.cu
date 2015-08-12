@@ -66,6 +66,9 @@ void seedEpipolarMatch(
   const float  half_length = 0.5f * fminf(norm(epi_line), MAX_EXTENT_EPIPOLAR_SEARCH);
   float2 px_curr, best_px_curr;
 
+  const int  &side   = dev_ptr->patch.side;
+  const int2 &offset = dev_ptr->patch.offset;
+
   // Retrieve template statistics for NCC matching
   const float sum_templ =
       dev_ptr->sum_templ.data[y*dev_ptr->sum_templ.stride+x];
@@ -87,9 +90,6 @@ void seedEpipolarMatch(
     float sum_img       = 0.0f;
     float sum_img_sq    = 0.0f;
     float sum_img_templ = 0.0f;
-
-    const int  &side   = dev_ptr->patch.side;
-    const int2 &offset = dev_ptr->patch.offset;
 
     for(int patch_y=0; patch_y<side; ++patch_y)
     {
