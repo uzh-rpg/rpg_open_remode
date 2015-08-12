@@ -108,9 +108,9 @@ void seedEpipolarMatch(
         sum_img_templ += img*templ;
       }
     }
-    const float ncc_numerator = side*side*sum_img_templ - sum_img*sum_templ;
-    const float ncc_denominator = ((float)side*(float)side*(float)sum_img_sq -
-                                   (float)sum_img*(float)sum_img)*const_templ_denom;
+    const float ncc_numerator = (float)side*(float)side*sum_img_templ - sum_img*sum_templ;
+    const float ncc_denominator = ((float)side*(float)side*sum_img_sq -
+                                   sum_img*sum_img)*const_templ_denom;
     const float ncc = ncc_numerator * rsqrtf(ncc_denominator + FLT_MIN);
 
     if(ncc > best_ncc)
