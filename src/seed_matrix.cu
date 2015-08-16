@@ -108,6 +108,10 @@ bool rmd::SeedMatrix::update(
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(
                                                    dev_data_.dev_ptr,
                                                    T_curr_ref.inv());
-
   return true;
+}
+
+void rmd::SeedMatrix::downloadDepthmap(float *host_depthmap_align_row_maj)
+{
+  mu_.getDevData(host_depthmap_align_row_maj);
 }

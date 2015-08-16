@@ -36,6 +36,8 @@ public:
   void update(const cv::Mat &img_curr,
               const SE3<float> &T_curr_world);
 
+  void outputDepthmap(cv::Mat &depth_32fc1);
+
 private:
   void inputImage(const cv::Mat &img_8uc1);
 

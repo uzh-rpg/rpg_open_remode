@@ -48,6 +48,9 @@ void rmd::Depthmap::update(
     const SE3<float> &T_curr_world)
 {
   inputImage(img_curr);
+  m_seeds.update(
+        reinterpret_cast<float*>(m_img_undistorted_32fc1.data),
+        T_curr_world);
 }
 
 void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
@@ -62,4 +65,10 @@ void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
     img_undistorted_8uc1 = img_8uc1;
   }
   img_undistorted_8uc1.convertTo(m_img_undistorted_32fc1, CV_32F, 1.0f/255.0f);
+}
+
+void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1)
+{
+  depth_32fc1.create(m_height, m_width, CV_32FC1);
+  m_seeds.downloadDepthmap(reinterpret_cast<float*>(depth_32fc1.data));
 }

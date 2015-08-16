@@ -39,6 +39,7 @@ public:
   bool update(
       float *host_curr_img_align_row_maj,
       const SE3<float> &T_curr_world);
+  void downloadDepthmap(float *host_depthmap_align_row_maj);
 private:
   size_t width_;
   size_t height_;

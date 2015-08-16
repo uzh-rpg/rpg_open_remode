@@ -113,5 +113,19 @@ int main(int argc, char **argv)
 
   // denoise
 
-  return 0;
+  // Download current depth estimation
+  cv::Mat curr_depth_estimation, displayable;
+  depthmap.outputDepthmap(curr_depth_estimation);
+
+  double min_val, max_val;
+  cv::minMaxLoc(curr_depth_estimation, &min_val, &max_val);
+  curr_depth_estimation = (curr_depth_estimation - min_val) * 1 / (max_val - min_val);
+  curr_depth_estimation.convertTo(displayable, CV_8UC1, 255);
+
+  cv::imshow("depth", displayable);
+  cv::waitKey();
+
+  std::cout << "DEBUG: min depth " << min_val << ", max depth " << max_val << std::endl;
+
+  return EXIT_SUCCESS;
 }
