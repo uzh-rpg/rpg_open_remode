@@ -11,7 +11,7 @@ template<typename ElementType>
 struct DeviceImage
 {
   __host__
-  Image(size_t width, size_t height)
+  DeviceImage(size_t width, size_t height)
     : width(width),
       height(height)
   {
@@ -26,7 +26,7 @@ struct DeviceImage
   }
 
   __host__
-  ~Image()
+  ~DeviceImage()
   {
     const cudaError err = cudaFree(data);
     if(err != cudaSuccess)

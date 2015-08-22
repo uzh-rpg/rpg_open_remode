@@ -59,14 +59,19 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_executable(device_image_test test/device_image_test.cpp)
+add_executable(all_tests
+  test/device_image_test.cpp
+  test/main_test.cpp
+)
 
 target_link_libraries(
-  device_image_test
+  all_tests
   remode
   ${GTEST_BOTH_LIBRARIES}
   pthread)
 
-add_test(test/test_main.cpp
-  device_image_test
-)
+# The following is to run make test
+# add_test(
+#  RMDCuTests
+#  all_tests
+#)
