@@ -1,6 +1,9 @@
 #ifndef RMD_TRIANGULATION_CU
 #define RMD_TRIANGULATION_CU
 
+#include <rmd/se3.cuh>
+#include <rmd/helper_vector_types.cuh>
+
 namespace rmd
 {
 

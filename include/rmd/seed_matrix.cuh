@@ -40,6 +40,14 @@ public:
       float *host_curr_img_align_row_maj,
       const SE3<float> &T_curr_world);
   void downloadDepthmap(float *host_depthmap_align_row_maj);
+
+#ifdef RMD_DEBUG
+  void downloadDisparity(
+      float *host_disp_x_align_row_maj,
+      float *host_disp_y_align_row_maj);
+  void downloadConvergence(
+      unsigned char *host_conv_align_row_maj);
+#endif
 private:
   size_t width_;
   size_t height_;

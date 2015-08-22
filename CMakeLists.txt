@@ -26,6 +26,10 @@ include_directories(
   ${Eigen_INCLUDE_DIRS}
 )
 
+if(RMD_DEBUG)
+  ADD_DEFINITIONS(-DRMD_DEBUG)
+endif()
+
 # Maximum extent of epipolar line search in pixels
 ADD_DEFINITIONS(-DMAX_EXTENT_EPIPOLAR_SEARCH=100)
 
@@ -48,4 +52,21 @@ target_link_libraries(
     boost_system
     boost_filesystem
     ${OpenCV_LIBS}
+)
+
+# GTest
+enable_testing()
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
+
+add_executable(device_image_test test/device_image_test.cpp)
+
+target_link_libraries(
+  device_image_test
+  remode
+  ${GTEST_BOTH_LIBRARIES}
+  pthread)
+
+add_test(test/test_main.cpp
+  device_image_test
 )

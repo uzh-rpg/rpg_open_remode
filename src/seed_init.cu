@@ -2,6 +2,7 @@
 #define RMD_SEED_INIT_CU
 
 #include <rmd/device_data.cuh>
+#include <rmd/texture_memory.cuh>
 
 namespace rmd
 {

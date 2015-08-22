@@ -3,7 +3,10 @@
 
 #include <float.h>
 #include <rmd/se3.cuh>
+#include <rmd/seed_matrix.cuh>
 #include <rmd/device_data.cuh>
+#include <rmd/texture_memory.cuh>
+#include <rmd/helper_vector_types.cuh>
 
 namespace rmd
 {
@@ -16,11 +19,21 @@ void seedEpipolarMatch(
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
 
+  float2 &ref = dev_ptr->epipolar_matches.data[y*dev_ptr->epipolar_matches.stride+x];
+  //dev_ptr->epipolar_matches.data[y*dev_ptr->epipolar_matches.stride+x] = make_float2(333.0f,444.0f);
+  ref.x = 23.0f;
+  ref.y = 33.0f;
+  return;
+
   if(x >= dev_ptr->width || y >= dev_ptr->height)
     return;
 
+
+
   const float xx = x+0.5f;
   const float yy = y+0.5f;
+
+
 
   const unsigned char seed_state = tex2D(convergence_tex, xx, yy);
   if( (ConvergenceStates::BORDER    == seed_state) ||
@@ -48,6 +61,8 @@ void seedEpipolarMatch(
         ConvergenceStates::NOT_VISIBLE;
     return;
   }
+
+
 
   const float2 px_min_curr =
       dev_ptr->cam.world2cam( T_curr_ref * (f_ref * fmaxf( mu - 3.0f*sqrtf(sigma), 0.01f)) );

@@ -2,6 +2,8 @@
 #define RMD_SEED_CHECK_CU
 
 #include <rmd/device_data.cuh>
+#include <rmd/texture_memory.cuh>
+#include <rmd/seed_matrix.cuh>
 
 namespace rmd
 {

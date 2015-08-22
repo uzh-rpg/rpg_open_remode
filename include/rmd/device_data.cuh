@@ -63,20 +63,29 @@ struct DeviceData
 {
   __host__
   DeviceData()
+    : is_dev_allocated(false)
   {
-    // Allocate device memory
-    const cudaError err = cudaMalloc(&dev_ptr, sizeof(*this));
-    if(err != cudaSuccess)
-      throw CudaException("DeviceData, cannot allocate device memory to store image parameters.", err);
   }
   __host__
   ~DeviceData()
   {
-    cudaFree(dev_ptr);
+    if(is_dev_allocated)
+      cudaFree(dev_ptr);
   }
   __host__
   void setDevData()
   {
+    if(!is_dev_allocated)
+    {
+      // Allocate device memory
+      const cudaError err = cudaMalloc(&dev_ptr, sizeof(*this));
+      if(err != cudaSuccess)
+        throw CudaException("DeviceData, cannot allocate device memory to store image parameters.", err);
+      else
+      {
+        is_dev_allocated = true;
+      }
+    }
     // Copy data to device memory
     const cudaError err = cudaMemcpy(dev_ptr, this, sizeof(*this), cudaMemcpyHostToDevice);
     if(err != cudaSuccess)
@@ -108,6 +117,7 @@ struct DeviceData
   float epsilon;
 
   DeviceData *dev_ptr;
+  bool is_dev_allocated;
 };
 
 } // rmd namespace

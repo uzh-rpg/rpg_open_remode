@@ -2,6 +2,8 @@
 #define RMD_SEED_UPDATE_CU
 
 #include <rmd/device_data.cuh>
+#include <rmd/seed_matrix.cuh>
+#include <rmd/texture_memory.cuh>
 
 #include "triangulation.cu"
 

@@ -38,6 +38,11 @@ public:
 
   void outputDepthmap(cv::Mat &depth_32fc1);
 
+#ifdef RMD_DEBUG
+   void outputDisparity(cv::Mat &depth_32fc1_x, cv::Mat &depth_32fc1_y);
+   void outputConvergence(cv::Mat &conv_8uc1);
+#endif
+
 private:
   void inputImage(const cv::Mat &img_8uc1);
 
