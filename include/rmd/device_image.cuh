@@ -45,6 +45,44 @@ struct DeviceImage
     return data[y*stride+x];
   }
 
+  __device__
+  const ElementType & operator()(size_t x, size_t y) const
+  {
+    return data[y*stride+x];
+  }
+
+  /// Upload aligned_data_row_major to device memory
+  __host__
+  void setDevData(const ElementType * aligned_data_row_major)
+  {
+    const cudaError err = cudaMemcpy2D(
+          data,
+          pitch,
+          aligned_data_row_major,
+          width*sizeof(ElementType),
+          width*sizeof(ElementType),
+          height,
+          cudaMemcpyHostToDevice);
+    if(err != cudaSuccess)
+      throw CudaException("Image: unable to copy data from host to device.", err);
+  }
+
+  /// Download the data from the device memory to aligned_data_row_major, a preallocated array in host memory
+  __host__
+  void getDevData(ElementType* aligned_data_row_major) const
+  {
+    const cudaError err = cudaMemcpy2D(
+          aligned_data_row_major,      // destination memory address
+          width*sizeof(ElementType),   // pitch of destination memory
+          data,                        // source memory address
+          pitch,                       // pitch of source memory
+          width*sizeof(ElementType),   // width of matrix transfor (columns in bytes)
+          height,                      // height of matrix transfer
+          cudaMemcpyDeviceToHost);
+    if(err != cudaSuccess)
+      throw CudaException("Image: unable to copy data from device to host.", err);
+  }
+
   __host__
   ~DeviceImage()
   {

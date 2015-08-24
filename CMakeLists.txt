@@ -62,6 +62,10 @@ target_link_libraries(
 # GTest
 enable_testing()
 find_package(GTest REQUIRED)
+# Accepts the following variable as input:
+# GTEST_ROOT - (as a CMake or environment variable)
+#              The root directory of the gtest install prefix
+
 include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(all_tests
@@ -73,6 +77,7 @@ target_link_libraries(
   all_tests
   remodetest
   ${GTEST_BOTH_LIBRARIES}
+  ${OpenCV_LIBS}
   pthread)
 
 # The following is to run make test
