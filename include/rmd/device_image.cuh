@@ -15,7 +15,7 @@ struct DeviceImage
     : width(width),
       height(height)
   {
-    const cudaError err = cudaMallocPitch(
+    cudaError err = cudaMallocPitch(
           &data,
           &pitch,
           width*sizeof(ElementType),
@@ -23,6 +23,26 @@ struct DeviceImage
     if(err != cudaSuccess)
       throw CudaException("Image: unable to allocate pitched memory.", err);
     stride = pitch / sizeof(ElementType);
+
+    err = cudaMalloc(
+          &dev_ptr,
+          sizeof(*this));
+    if(err != cudaSuccess)
+      throw CudaException("DeviceData, cannot allocate device memory to store image parameters.", err);
+
+    err = cudaMemcpy(
+          dev_ptr,
+          this,
+          sizeof(*this),
+          cudaMemcpyHostToDevice);
+    if(err != cudaSuccess)
+      throw CudaException("DeviceData, cannot copy image parameters to device memory.", err);
+  }
+
+  __device__
+  ElementType & operator()(size_t x, size_t y)
+  {
+    return data[y*stride+x];
   }
 
   __host__

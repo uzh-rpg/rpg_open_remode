@@ -38,6 +38,11 @@ CUDA_ADD_LIBRARY(
     src/seed_matrix.cu
 )
 
+CUDA_ADD_LIBRARY(
+    remodetest
+    test/sobel.cu
+)
+
 ## Declare a cpp executable
 add_executable(
     dataset_main
@@ -66,7 +71,7 @@ add_executable(all_tests
 
 target_link_libraries(
   all_tests
-  remode
+  remodetest
   ${GTEST_BOTH_LIBRARIES}
   pthread)
 
