@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <opencv2/opencv.hpp>
 
+#include "copy.cuh"
 #include "sobel.cuh"
 
 TEST(RMDCuTests, deviceImageUploadDownloadFloat)
@@ -18,7 +19,7 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat)
   float * cu_img = new float[w*h];
   in_img.getDevData(cu_img);
 
-  for(size_t y=0; y< h; ++y)
+  for(size_t y=0; y<h; ++y)
   {
     for(size_t x=0; x<w; ++x)
     {
@@ -43,7 +44,7 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
   const size_t h = img_flt.rows;
 
   float2 * cu_grad = new float2[w*h];
-  for(size_t y=0; y< h; ++y)
+  for(size_t y=0; y<h; ++y)
   {
     for(size_t x=0; x<w; ++x)
     {
@@ -68,6 +69,35 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
     }
   }
   delete cu_grad;
+}
+
+TEST(RMDCuTests, deviceImageCopyFloat)
+{
+  cv::Mat img = cv::imread("/home/mpi/Desktop/pict/DSC_0182.JPG", CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat img_flt;
+  img.convertTo(img_flt, CV_32F, 1./255.);
+
+  const size_t w = img_flt.cols;
+  const size_t h = img_flt.rows;
+  // upload data to gpu memory
+  rmd::DeviceImage<float> in_img(w, h);
+  in_img.setDevData(reinterpret_cast<float*>(img_flt.data));
+
+  // create copy on device
+  rmd::DeviceImage<float> out_img(w, h);
+  rmd::copy(in_img, out_img);
+
+  float * cu_img = new float[w*h];
+  out_img.getDevData(cu_img);
+
+  for(size_t y=0; y<h; ++y)
+  {
+    for(size_t x=0; x<w; ++x)
+    {
+      ASSERT_FLOAT_EQ(img_flt.at<float>(y, x), cu_img[y*w+x]);
+    }
+  }
+  delete cu_img;
 }
 
 TEST(RMDCuTests, deviceImageSobelTest)

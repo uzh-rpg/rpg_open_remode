@@ -1,5 +1,5 @@
-#ifndef SOBEL_CUH
-#define SOBEL_CUH
+#ifndef RMD_TEST_SOBEL_CUH
+#define RMD_TEST_SOBEL_CUH
 
 #include <rmd/device_image.cuh>
 
@@ -12,4 +12,4 @@ void sobel(
 
 } // rmd namespace
 
-#endif // SOBEL_CUH
+#endif // RMD_TEST_SOBEL_CUH

@@ -22,6 +22,7 @@ struct DeviceImage
           height);
     if(err != cudaSuccess)
       throw CudaException("Image: unable to allocate pitched memory.", err);
+
     stride = pitch / sizeof(ElementType);
 
     err = cudaMalloc(
@@ -86,7 +87,10 @@ struct DeviceImage
   __host__
   ~DeviceImage()
   {
-    const cudaError err = cudaFree(data);
+    cudaError err = cudaFree(data);
+    if(err != cudaSuccess)
+      throw CudaException("Image: unable to free allocated memory.", err);
+    err = cudaFree(dev_ptr);
     if(err != cudaSuccess)
       throw CudaException("Image: unable to free allocated memory.", err);
   }
