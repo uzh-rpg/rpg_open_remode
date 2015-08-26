@@ -134,4 +134,12 @@ void rmd::SeedMatrix::downloadB(float *host_align_row_maj) const
 {
   b_.getDevData(host_align_row_maj);
 }
+void rmd::SeedMatrix::downloadSumTempl(float *host_align_row_maj) const
+{
+  sum_templ_.getDevData(host_align_row_maj);
+}
+void rmd::SeedMatrix::downloadConstTemplDenom(float *host_align_row_maj) const
+{
+  const_templ_denom_.getDevData(host_align_row_maj);
+}
 #endif

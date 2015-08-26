@@ -64,4 +64,45 @@ TEST(RMDCuTests, seedMatrixInit)
       ASSERT_FLOAT_EQ(10.0f, initial_b.at<float>(r, c));
     }
   }
+
+  // Test initialization of NCC template statistics
+
+  // CUDA computation
+  cv::Mat cu_sum_templ(ref_img.rows, ref_img.cols, CV_32FC1);
+  seeds.downloadSumTempl(reinterpret_cast<float*>(cu_sum_templ.data));
+  cv::Mat cu_const_templ_denom(ref_img.rows, ref_img.cols, CV_32FC1);
+  seeds.downloadConstTemplDenom(reinterpret_cast<float*>(cu_const_templ_denom.data));
+
+  // Host computation
+  cv::Mat ocv_sum_templ(ref_img.rows, ref_img.cols, CV_32FC1);
+  cv::Mat ocv_const_templ_denom(ref_img.rows, ref_img.cols, CV_32FC1);
+
+  int side = seeds.getPatchSide();
+  for(size_t y=side; y<ref_img.rows-side/2; ++y)
+  {
+    for(size_t x=side; x<ref_img.cols-side/2; ++x)
+    {
+      double sum_templ    = 0.0f;
+      double sum_templ_sq = 0.0f;
+      for(int patch_y=0; patch_y<side; ++patch_y)
+      {
+        for(int patch_x=0; patch_x<side; ++patch_x)
+        {
+          const double templ = (double) ref_img_flt.at<float>( y-side/2+patch_y, x-side/2+patch_x );
+          sum_templ += templ;
+          sum_templ_sq += templ*templ;
+        }
+      }
+      ocv_sum_templ.at<float>(y, x) = (float) sum_templ;
+      ocv_const_templ_denom.at<float>(y, x) = (float) ( ((double)(side*side))*sum_templ_sq - sum_templ*sum_templ );
+    }
+  }
+  for(size_t r=side; r<ref_img.rows-side/2; ++r)
+  {
+    for(size_t c=side; c<ref_img.cols-side/2; ++c)
+    {
+      ASSERT_NEAR(ocv_sum_templ.at<float>(r, c), cu_sum_templ.at<float>(r, c), 0.00001f);
+      ASSERT_NEAR(ocv_const_templ_denom.at<float>(r, c), cu_const_templ_denom.at<float>(r, c), 0.001f);
+    }
+  }
 }

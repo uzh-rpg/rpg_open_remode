@@ -148,8 +148,8 @@ TEST(RMDCuTests, deviceImageSobelTest)
   {
     for(size_t x=1; x<w-1; ++x)
     {
-      ASSERT_NEAR(ocv_grad_x.at<float>(y, x), cu_grad[y*w+x].x, 0.00001);
-      ASSERT_NEAR(ocv_grad_y.at<float>(y, x), cu_grad[y*w+x].y, 0.00001);
+      ASSERT_NEAR(ocv_grad_x.at<float>(y, x), cu_grad[y*w+x].x, 0.00001f);
+      ASSERT_NEAR(ocv_grad_y.at<float>(y, x), cu_grad[y*w+x].y, 0.00001f);
     }
   }
   delete cu_grad;
@@ -201,8 +201,8 @@ TEST(RMDCuTests, deviceImageSobelTexTest)
   {
     for(size_t x=1; x<w-1; ++x)
     {
-      ASSERT_NEAR(ocv_grad_x.at<float>(y, x), cu_grad[y*w+x].x, 0.00001);
-      ASSERT_NEAR(ocv_grad_y.at<float>(y, x), cu_grad[y*w+x].y, 0.00001);
+      ASSERT_NEAR(ocv_grad_x.at<float>(y, x), cu_grad[y*w+x].x, 0.00001f);
+      ASSERT_NEAR(ocv_grad_y.at<float>(y, x), cu_grad[y*w+x].y, 0.00001f);
     }
   }
   delete cu_grad;

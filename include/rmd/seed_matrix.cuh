@@ -45,6 +45,9 @@ public:
   void downloadSigmaSq(float *host_align_row_maj) const;
   void downloadA(float *host_align_row_maj) const;
   void downloadB(float *host_align_row_maj) const;
+  void downloadSumTempl(float *host_align_row_maj) const;
+  void downloadConstTemplDenom(float *host_align_row_maj) const;
+  int getPatchSide() const { return dev_data_.patch.side; }
 #endif
 
 private:
