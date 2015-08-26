@@ -86,18 +86,17 @@ void seedUpdateKernel(
     }
 
     const float mu_prime = c1 * m + c2 * mu;
-    dev_ptr->sigma.data[y*dev_ptr->sigma.stride+x] =
-        c1 *(s_sq + m*m) + c2 * (sigma_sq + mu*mu) - mu_prime*mu_prime;
-    dev_ptr->mu.data[y*dev_ptr->mu.stride+x] = mu_prime;
+    dev_ptr->sigma->at(x, y) = c1 *(s_sq + m*m) + c2 * (sigma_sq + mu*mu) - mu_prime*mu_prime;
+    dev_ptr->mu->at(x, y) = mu_prime;
     const float a_prime = ( e - f ) / ( f - e/f );
-    dev_ptr->a.data[y*dev_ptr->a.stride+x] = a_prime;
-    dev_ptr->b.data[y*dev_ptr->b.stride+x] = a_prime * ( 1.0f-f ) / f;
+    dev_ptr->a->at(x, y) = a_prime;
+    dev_ptr->b->at(x, y) = a_prime * ( 1.0f-f ) / f;
   }
 
   else if(ConvergenceStates::NO_MATCH == tex2D(convergence_tex, xx, yy))
   { // no match but projection inside the image: penalize the seed
     const float b = tex2D(b_tex, xx, yy) + 1.0f;
-    dev_ptr->b.data[y*dev_ptr->b.stride+x] = b;
+    dev_ptr->b->at(x, y) = b;
   }
   else if (ConvergenceStates::NOT_VISIBLE == tex2D(convergence_tex, xx, yy))
   { // no match, projection out of the image

@@ -2,7 +2,7 @@
 #define SEED_MATRIX_CUH
 
 #include <cuda_runtime.h>
-#include <rmd/image.cuh>
+#include <rmd/device_image.cuh>
 #include <rmd/pinhole_camera.cuh>
 #include <rmd/device_data.cuh>
 #include <rmd/se3.cuh>
@@ -39,27 +39,20 @@ public:
   bool update(
       float *host_curr_img_align_row_maj,
       const SE3<float> &T_curr_world);
-  void downloadDepthmap(float *host_depthmap_align_row_maj);
+  void downloadDepthmap(float *host_depthmap_align_row_maj) const;
 
-#ifdef RMD_DEBUG
-  void downloadDisparity(
-      float *host_disp_x_align_row_maj,
-      float *host_disp_y_align_row_maj);
-  void downloadConvergence(
-      unsigned char *host_conv_align_row_maj);
-#endif
 private:
   size_t width_;
   size_t height_;
-  Image<float> ref_img_, curr_img_;
+  DeviceImage<float> ref_img_, curr_img_;
   // Template statistics for NCC (pre)computation
-  Image<float> sum_templ_, const_templ_denom_;
+  DeviceImage<float> sum_templ_, const_templ_denom_;
   // Measurement parameters
-  Image<float> mu_, sigma_, a_, b_;
+  DeviceImage<float> mu_, sigma_, a_, b_;
   // Convergence state
-  Image<unsigned char> convergence_;
+  DeviceImage<unsigned char> convergence_;
   // Epipolar matches
-  Image<float2> epipolar_matches_;
+  DeviceImage<float2> epipolar_matches_;
   DeviceData dev_data_;
   SE3<float> T_world_ref_;
   // kernel config

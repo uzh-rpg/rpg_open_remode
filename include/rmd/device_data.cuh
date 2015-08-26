@@ -2,12 +2,12 @@
 #define RMD_DEVICE_DATA_CUH
 
 #include <rmd/pinhole_camera.cuh>
-#include <rmd/image.cuh>
+#include <rmd/device_image.cuh>
 
 namespace rmd
 {
 
-struct DeviceSceneData
+struct SceneData
 {
   float min_depth;
   float max_depth;
@@ -16,34 +16,6 @@ struct DeviceSceneData
   float sigma_sq_max;
 };
 
-template<typename ElementType>
-struct Device2DData
-{
-  __host__
-  void set(
-      ElementType *data,
-      const size_t &pitch,
-      const size_t &stride)
-  {
-    this->data   = data;
-    this->pitch  = pitch;
-    this->stride = stride;
-  }
-  __host__
-  void set(const Image<ElementType> &img)
-  {
-    set(
-          img.getDevDataPtr(),
-          img.getPitch(),
-          img.getStride()
-          );
-  }
-  ElementType *data;
-  size_t pitch;
-  size_t stride;
-};
-
-// Information on template patch
 struct TemplatePatch
 {
 #ifndef RMD_TEMPLATE_PATCH_SIDE
@@ -92,23 +64,24 @@ struct DeviceData
       throw CudaException("DeviceData, cannot copy image parameters to device memory.", err);
   }
 
-  Device2DData<float> ref_img;
-  Device2DData<float> curr_img;
-  Device2DData<float> sum_templ;
-  Device2DData<float> const_templ_denom;
-  Device2DData<float> mu;
-  Device2DData<float> sigma;
-  Device2DData<float> a;
-  Device2DData<float> b;
-  Device2DData<unsigned char> convergence;
-  Device2DData<float2> epipolar_matches;
+
+  DeviceImage<float> *ref_img;
+  DeviceImage<float> *curr_img;
+  DeviceImage<float> *sum_templ;
+  DeviceImage<float> *const_templ_denom;
+  DeviceImage<float> *mu;
+  DeviceImage<float> *sigma;
+  DeviceImage<float> *a;
+  DeviceImage<float> *b;
+  DeviceImage<unsigned char> *convergence;
+  DeviceImage<float2> *epipolar_matches;
 
   PinholeCamera cam;
   float one_pix_angle;
   size_t width;
   size_t height;
 
-  DeviceSceneData scene;
+  SceneData scene;
   TemplatePatch patch;
 
   // Algorithm parameters

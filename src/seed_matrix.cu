@@ -3,11 +3,9 @@
 #include <rmd/helper_vector_types.cuh>
 
 #include "seed_init.cu"
-#include "seed_update.cu"
 #include "seed_check.cu"
 #include "epipolar_match.cu"
-
-#include <stdio.h>
+#include "seed_update.cu"
 
 rmd::SeedMatrix::SeedMatrix(
     const size_t &width,
@@ -27,21 +25,23 @@ rmd::SeedMatrix::SeedMatrix(
   , epipolar_matches_(width, height)
 {
   // Save image details to be uploaded to device memory
-  dev_data_.ref_img.set(ref_img_);
-  dev_data_.curr_img.set(curr_img_);
-  dev_data_.sum_templ.set(sum_templ_);
-  dev_data_.const_templ_denom.set(const_templ_denom_);
-  dev_data_.mu.set(mu_);
-  dev_data_.sigma.set(sigma_);
-  dev_data_.a.set(a_);
-  dev_data_.b.set(b_);
-  dev_data_.convergence.set(convergence_);
-  dev_data_.epipolar_matches.set(epipolar_matches_);
+  dev_data_.ref_img = ref_img_.dev_ptr;
+  dev_data_.curr_img = curr_img_.dev_ptr;
+  dev_data_.sum_templ = sum_templ_.dev_ptr;
+  dev_data_.const_templ_denom = const_templ_denom_.dev_ptr;
+  dev_data_.mu = mu_.dev_ptr;
+  dev_data_.sigma = sigma_.dev_ptr;
+  dev_data_.a = a_.dev_ptr;
+  dev_data_.b = b_.dev_ptr;
+  dev_data_.convergence = convergence_.dev_ptr;
+  dev_data_.epipolar_matches = epipolar_matches_.dev_ptr;
+
   // Save camera parameters
-  dev_data_.cam    = cam;
+  dev_data_.cam = cam;
   dev_data_.one_pix_angle = cam.getOnePixAngle();
   dev_data_.width  = width;
   dev_data_.height = height;
+
   // Kernel configuration
   dim_block_.x = 16;
   dim_block_.y = 16;
@@ -96,62 +96,27 @@ bool rmd::SeedMatrix::update(
   rmd::bindTexture(a_tex, a_);
   rmd::bindTexture(b_tex, b_);
 
-  printf("zieta\n");
-
   // Assest current convergence status
   rmd::seedCheckKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
+  cudaDeviceSynchronize();
   rmd::bindTexture(convergence_tex, convergence_);
 
-  cudaDeviceSynchronize();
   // Establish epipolar correspondences
   // call epipolar matching kernel
   rmd::seedEpipolarMatch<<<dim_grid_, dim_block_>>>(
                                                     dev_data_.dev_ptr,
                                                     T_curr_ref);
+  cudaDeviceSynchronize();
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(
                                                    dev_data_.dev_ptr,
                                                    T_curr_ref.inv());
+  cudaDeviceSynchronize();
   return true;
 }
 
-void rmd::SeedMatrix::downloadDepthmap(float *host_depthmap_align_row_maj)
+void rmd::SeedMatrix::downloadDepthmap(float *host_depthmap_align_row_maj) const
 {
   mu_.getDevData(host_depthmap_align_row_maj);
 }
-
-#ifdef RMD_DEBUG
-void rmd::SeedMatrix::downloadDisparity(
-    float *host_disp_x_align_row_maj,
-    float *host_disp_y_align_row_maj)
-{
-  float2 disp[640*480];
-  epipolar_matches_.getDevData(disp);
-
-  for(size_t y = 0; y<480; ++y)
-  {
-    for(size_t x = 0; x<640; ++x)
-    {
-      const size_t i = y*640+x;
-      host_disp_x_align_row_maj[i] = disp[i].x;
-      host_disp_y_align_row_maj[i] = disp[i].y;
-    }
-  }
-}
-
-void rmd::SeedMatrix::downloadConvergence(
-    unsigned char *host_conv_align_row_maj)
-{
-  unsigned char conv[640*480];
-  convergence_.getDevData(conv);
-  for(size_t y = 0; y<480; ++y)
-  {
-    for(size_t x = 0; x<640; ++x)
-    {
-      const size_t i = y*640+x;
-      host_conv_align_row_maj[i] = conv[i];
-    }
-  }
-}
-#endif

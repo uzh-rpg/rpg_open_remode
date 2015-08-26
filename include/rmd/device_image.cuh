@@ -43,11 +43,23 @@ struct DeviceImage
   __device__
   ElementType & operator()(size_t x, size_t y)
   {
-    return data[y*stride+x];
+    return at(x, y);
   }
 
   __device__
   const ElementType & operator()(size_t x, size_t y) const
+  {
+    return at(x, y);
+  }
+
+  __device__
+  ElementType & at(size_t x, size_t y)
+  {
+    return data[y*stride+x];
+  }
+
+  __device__
+  const ElementType & at(size_t x, size_t y) const
   {
     return data[y*stride+x];
   }

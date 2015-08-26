@@ -2,7 +2,7 @@
 #define RMD_TEXTURE_MEMORY_CUH
 
 #include <cuda_runtime.h>
-#include <rmd/image.cuh>
+#include <rmd/device_image.cuh>
 
 namespace rmd
 {
@@ -21,7 +21,7 @@ texture<float2, cudaTextureType2D, cudaReadModeElementType> epipolar_matches_tex
 template<typename ElementType>
 inline void bindTexture(
     texture<ElementType, cudaTextureType2D> &tex,
-    Image<ElementType> &mem,
+    const DeviceImage<ElementType> &mem,
     cudaTextureFilterMode filter_mode=cudaFilterModeLinear)
 {
   tex.addressMode[0] = cudaAddressModeClamp; // Neumann Boundary Conditions
@@ -32,11 +32,11 @@ inline void bindTexture(
   const cudaError bindStatus = cudaBindTexture2D(
         0,
         tex,
-        mem.getDevDataPtr(),
-        mem.getChannelFormatDesc(),
-        mem.getWidth(),
-        mem.getHeight(),
-        mem.getPitch()
+        mem.data,
+        mem.getCudaChannelFormatDesc(),
+        mem.width,
+        mem.height,
+        mem.pitch
         );
   if(bindStatus != cudaSuccess)
     throw CudaException("Unable to bind texture: ", bindStatus);

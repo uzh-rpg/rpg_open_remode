@@ -77,20 +77,3 @@ void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1)
   depth_32fc1.create(height_, width_, CV_32FC1);
   seeds_.downloadDepthmap(reinterpret_cast<float*>(depth_32fc1.data));
 }
-
-#ifdef RMD_DEBUG
-void rmd::Depthmap::outputDisparity(cv::Mat &depth_32fc1_x, cv::Mat &depth_32fc1_y)
-{
-  depth_32fc1_x.create(height_, width_, CV_32FC1);
-  depth_32fc1_y.create(height_, width_, CV_32FC1);
-  seeds_.downloadDisparity(
-        reinterpret_cast<float*>(depth_32fc1_x.data),
-        reinterpret_cast<float*>(depth_32fc1_y.data));
-}
-
-void rmd::Depthmap::outputConvergence(cv::Mat &conv_8uc1)
-{
-  conv_8uc1.create(height_, width_, CV_8UC1);
-  seeds_.downloadConvergence(reinterpret_cast<unsigned char*>(conv_8uc1.data));
-}
-#endif
