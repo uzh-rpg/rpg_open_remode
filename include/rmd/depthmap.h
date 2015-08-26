@@ -46,15 +46,15 @@ public:
 private:
   void inputImage(const cv::Mat &img_8uc1);
 
-  SeedMatrix m_seeds;
+  SeedMatrix seeds_;
 
-  size_t m_width;
-  size_t m_height;
+  size_t width_;
+  size_t height_;
 
-  cv::Mat m_cv_K, m_cv_D;
-  cv::Mat m_undist_map1, m_undist_map2;
-  cv::Mat m_img_undistorted_32fc1;
-  bool m_is_distorted;
+  cv::Mat cv_K_, cv_D_;
+  cv::Mat undist_map1_, undist_map2_;
+  cv::Mat img_undistorted_32fc1_;
+  bool is_distorted_;
 };
 
 }
