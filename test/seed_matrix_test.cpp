@@ -23,20 +23,45 @@ TEST(RMDCuTests, seedMatrixInit)
         1.086410f,
         4.766730f,
         -1.449960f);
+
   const float min_scene_depth = 0.4f;
   const float max_scene_depth = 1.8f;
 
   rmd::SeedMatrix seeds(ref_img.cols, ref_img.rows, cam);
+
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
+
   seeds.setReferenceImage(reinterpret_cast<float*>(ref_img_flt.data), T_curr_world, min_scene_depth, max_scene_depth);
+
+  sdkStopTimer(&timer);
+  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("setReference image CUDA execution time: %f seconds.\n", t);
 
   cv::Mat initial_depthmap(ref_img.rows, ref_img.cols, CV_32FC1);
   seeds.downloadDepthmap(reinterpret_cast<float*>(initial_depthmap.data));
 
+  cv::Mat initial_sigma_sq(ref_img.rows, ref_img.cols, CV_32FC1);
+  seeds.downloadSigmaSq(reinterpret_cast<float*>(initial_sigma_sq.data));
+
+  cv::Mat initial_a(ref_img.rows, ref_img.cols, CV_32FC1);
+  seeds.downloadA(reinterpret_cast<float*>(initial_a.data));
+
+  cv::Mat initial_b(ref_img.rows, ref_img.cols, CV_32FC1);
+  seeds.downloadB(reinterpret_cast<float*>(initial_b.data));
+
+  const float avg_scene_depth = (min_scene_depth+max_scene_depth)/2.0f;
+  const float max_scene_sigma_sq = (max_scene_depth - min_scene_depth) * (max_scene_depth - min_scene_depth) / 36.0f;
   for(size_t r=0; r<ref_img.rows; ++r)
   {
     for(size_t c=0; c<ref_img.cols; ++c)
     {
-      ASSERT_FLOAT_EQ((min_scene_depth+max_scene_depth)/2.0f, initial_depthmap.at<float>(r, c));
+      ASSERT_FLOAT_EQ(avg_scene_depth, initial_depthmap.at<float>(r, c));
+      ASSERT_FLOAT_EQ(max_scene_sigma_sq, initial_sigma_sq.at<float>(r, c));
+      ASSERT_FLOAT_EQ(10.0f, initial_a.at<float>(r, c));
+      ASSERT_FLOAT_EQ(10.0f, initial_b.at<float>(r, c));
     }
   }
 }

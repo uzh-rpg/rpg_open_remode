@@ -120,3 +120,18 @@ void rmd::SeedMatrix::downloadDepthmap(float *host_depthmap_align_row_maj) const
 {
   mu_.getDevData(host_depthmap_align_row_maj);
 }
+
+#if RMD_DEBUG
+void rmd::SeedMatrix::downloadSigmaSq(float *host_align_row_maj) const
+{
+  sigma_.getDevData(host_align_row_maj);
+}
+void rmd::SeedMatrix::downloadA(float *host_align_row_maj) const
+{
+  a_.getDevData(host_align_row_maj);
+}
+void rmd::SeedMatrix::downloadB(float *host_align_row_maj) const
+{
+  b_.getDevData(host_align_row_maj);
+}
+#endif

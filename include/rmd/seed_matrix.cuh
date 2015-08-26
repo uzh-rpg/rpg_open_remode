@@ -41,6 +41,12 @@ public:
       const SE3<float> &T_curr_world);
   void downloadDepthmap(float *host_depthmap_align_row_maj) const;
 
+#if RMD_DEBUG
+  void downloadSigmaSq(float *host_align_row_maj) const;
+  void downloadA(float *host_align_row_maj) const;
+  void downloadB(float *host_align_row_maj) const;
+#endif
+
 private:
   size_t width_;
   size_t height_;
