@@ -7,7 +7,7 @@
 
 TEST(RMDCuTests, deviceImageUploadDownloadFloat)
 {
-  cv::Mat img = cv::imread("/home/mpi/Desktop/pict/DSC_0182.JPG", CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -32,7 +32,7 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat)
 
 TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
 {
-  cv::Mat img = cv::imread("/home/mpi/Desktop/pict/DSC_0182.JPG", CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -75,7 +75,7 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
 
 TEST(RMDCuTests, deviceImageCopyFloat)
 {
-  cv::Mat img = cv::imread("/home/mpi/Desktop/pict/DSC_0182.JPG", CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -105,7 +105,7 @@ TEST(RMDCuTests, deviceImageCopyFloat)
 
 TEST(RMDCuTests, deviceImageSobelTest)
 {
-  cv::Mat img = cv::imread("/home/mpi/Desktop/pict/DSC_0182.JPG", CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -158,7 +158,7 @@ TEST(RMDCuTests, deviceImageSobelTest)
 
 TEST(RMDCuTests, deviceImageSobelTexTest)
 {
-  cv::Mat img = cv::imread("/home/mpi/Desktop/pict/DSC_0182.JPG", CV_LOAD_IMAGE_GRAYSCALE);
+  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 

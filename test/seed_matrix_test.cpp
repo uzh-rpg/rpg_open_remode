@@ -10,8 +10,9 @@ TEST(RMDCuTests, seedMatrixInit)
 {
   rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
   cv::Mat ref_img = cv::imread(
-        "/media/mpi/Elements/thinkpad_backup/matia/workspace/rpg_reconstruction/benchmark/datasets/traj_over_table/scene_000.png",
+        "../test_data/images/scene_000.png",
         CV_LOAD_IMAGE_GRAYSCALE);
+
   cv::Mat ref_img_flt;
   ref_img.convertTo(ref_img_flt, CV_32F, 1.0f/255.0f);
 

@@ -84,7 +84,7 @@ target_link_libraries(
   pthread)
 
 # The following is to run make test
-# add_test(
-#  RMDCuTests
-#  all_tests
-#)
+add_test(
+  RMDCuTests
+  all_tests --gtest_repeat=2
+)
