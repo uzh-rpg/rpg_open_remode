@@ -95,6 +95,12 @@ struct DeviceImage
       throw CudaException("Image: unable to free allocated memory.", err);
   }
 
+  __host__
+  cudaChannelFormatDesc getCudaChannelFormatDesc() const
+  {
+    return cudaCreateChannelDesc<ElementType>();
+  }
+
   // fields
   size_t width;
   size_t height;
