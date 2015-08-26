@@ -71,12 +71,14 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 add_executable(all_tests
   test/device_image_test.cpp
+  test/seed_matrix_test.cpp
   test/main_test.cpp
 )
 
 target_link_libraries(
   all_tests
   remodetest
+  remode
   ${GTEST_BOTH_LIBRARIES}
   ${OpenCV_LIBS}
   pthread)

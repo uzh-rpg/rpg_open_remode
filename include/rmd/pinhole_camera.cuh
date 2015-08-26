@@ -1,12 +1,5 @@
-/*
- * pinhole_camera.cuh
- *
- *  Created on: Feb 11, 2014
- *      Author: matia
- */
-
-#ifndef REMODE_PINHOLE_CAMERA_CUH_
-#define REMODE_PINHOLE_CAMERA_CUH_
+#ifndef RMD_PINHOLE_CAMERA_CUH_
+#define RMD_PINHOLE_CAMERA_CUH_
 
 #include <vector_types.h>
 #include <cuda_toolkit/helper_math.h>
@@ -55,4 +48,4 @@ struct PinholeCamera
 } // namespace rmd
 
 
-#endif // REMODE_PINHOLE_CAMERA_CUH_
+#endif // RMD_PINHOLE_CAMERA_CUH_

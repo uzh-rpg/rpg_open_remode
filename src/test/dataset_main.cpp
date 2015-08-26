@@ -108,5 +108,13 @@ int main(int argc, char **argv)
 
   // denoise
 
+  // show depthmap
+  cv::Mat result;
+  depthmap.outputDepthmap(result);
+  cv::imshow("result", result);
+  cv::waitKey();
+
+  cv::imwrite("/home/mpi/Desktop/result.png", result);
+
   return EXIT_SUCCESS;
 }

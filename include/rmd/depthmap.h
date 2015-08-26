@@ -1,5 +1,5 @@
-#ifndef DEPTHMAP_H
-#define DEPTHMAP_H
+#ifndef RMD_DEPTHMAP_H
+#define RMD_DEPTHMAP_H
 
 #include <Eigen/Eigen>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -36,7 +36,7 @@ public:
   void update(const cv::Mat &img_curr,
               const SE3<float> &T_curr_world);
 
-  void outputDepthmap(cv::Mat &depth_32fc1);
+  void outputDepthmap(cv::Mat &depth_32fc1) const;
 
 private:
   void inputImage(const cv::Mat &img_8uc1);
@@ -54,4 +54,4 @@ private:
 
 }
 
-#endif // DEPTHMAP_H
+#endif // RMD_DEPTHMAP_H

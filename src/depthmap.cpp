@@ -72,7 +72,7 @@ void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
   img_undistorted_8uc1.convertTo(img_undistorted_32fc1_, CV_32F, 1.0f/255.0f);
 }
 
-void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1)
+void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1) const
 {
   depth_32fc1.create(height_, width_, CV_32FC1);
   seeds_.downloadDepthmap(reinterpret_cast<float*>(depth_32fc1.data));
