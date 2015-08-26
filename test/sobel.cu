@@ -40,7 +40,14 @@ void sobel(
     const DeviceImage<float> &in_img,
     DeviceImage<float2> &out_grad)
 {
-  sobelKernel<<<16, 16>>>(in_img.dev_ptr, out_grad.dev_ptr);
+  // CUDA fields
+  dim3 dim_block;
+  dim3 dim_grid;
+  dim_block.x = 16;
+  dim_block.y = 16;
+  dim_grid.x = (in_img.width  + dim_block.x - 1) / dim_block.x;
+  dim_grid.y = (in_img.height + dim_block.y - 1) / dim_block.y;
+  sobelKernel<<<dim_grid, dim_block>>>(in_img.dev_ptr, out_grad.dev_ptr);
 }
 
 } // rmd namespace

@@ -58,6 +58,7 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
   in_img.setDevData(cu_grad);
 
   // download data to host memory
+  memset(cu_grad, 0, sizeof(float2)*w*h);
   in_img.getDevData(cu_grad);
 
   for(size_t y=0; y<h; ++y)
@@ -79,6 +80,7 @@ TEST(RMDCuTests, deviceImageCopyFloat)
 
   const size_t w = img_flt.cols;
   const size_t h = img_flt.rows;
+
   // upload data to gpu memory
   rmd::DeviceImage<float> in_img(w, h);
   in_img.setDevData(reinterpret_cast<float*>(img_flt.data));
@@ -116,12 +118,15 @@ TEST(RMDCuTests, deviceImageSobelTest)
   // CUDA gradient computation
   const size_t w = img_flt.cols;
   const size_t h = img_flt.rows;
+
   // upload data to device memory
   rmd::DeviceImage<float> in_img(w, h);
   in_img.setDevData(reinterpret_cast<float*>(img_flt.data));
+
   // compute gradient on device
   rmd::DeviceImage<float2> out_grad(w, h);
   rmd::sobel(in_img, out_grad);
+
   // download result to host memory
   float2 * cu_grad = new float2[w*h];
   out_grad.getDevData(cu_grad);
@@ -130,15 +135,9 @@ TEST(RMDCuTests, deviceImageSobelTest)
   {
     for(size_t x=1; x<w-1; ++x)
     {
-      ASSERT_FLOAT_EQ(ocv_grad_x.at<float>(y, x), cu_grad[y*w+x].x);
-      ASSERT_FLOAT_EQ(ocv_grad_y.at<float>(y, x), cu_grad[y*w+x].y);
+      ASSERT_NEAR(ocv_grad_x.at<float>(y, x), cu_grad[y*w+x].x, 0.00001);
+      ASSERT_NEAR(ocv_grad_y.at<float>(y, x), cu_grad[y*w+x].y, 0.00001);
     }
   }
-/*
-  cv::imshow("input",  img);
-  cv::imshow("grad_x", ocv_grad_x);
-  cv::imshow("grad_y", ocv_grad_y);
-  cv::waitKey();
-*/
   delete cu_grad;
 }
