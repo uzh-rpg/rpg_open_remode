@@ -47,7 +47,7 @@ void seedEpipolarMatch(
       (px_mean_curr.x < 0)                ||
       (px_mean_curr.y < 0) )
   {
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::NOT_VISIBLE;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::NOT_VISIBLE;
     return;
   }
 
@@ -65,8 +65,8 @@ void seedEpipolarMatch(
   const int2 &offset = dev_ptr->patch.offset;
 
   // Retrieve template statistics for NCC matching
-  const float sum_templ = dev_ptr->sum_templ->at(x, y);
-  const float const_templ_denom = dev_ptr->const_templ_denom->at(x, y);
+  const float sum_templ = dev_ptr->sum_templ->atXY(x, y);
+  const float const_templ_denom = dev_ptr->const_templ_denom->atXY(x, y);
   // init best match score
   float best_ncc = -1.0f;
 
@@ -115,12 +115,12 @@ void seedEpipolarMatch(
   }
   if(best_ncc < 0.5f)
   {
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::NO_MATCH;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::NO_MATCH;
   }
   else
   {
-    dev_ptr->epipolar_matches->at(x, y) = best_px_curr;
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::UPDATE;
+    dev_ptr->epipolar_matches->atXY(x, y) = best_px_curr;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::UPDATE;
   }
 }
 

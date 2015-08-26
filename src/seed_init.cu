@@ -33,16 +33,16 @@ void seedInitKernel(DeviceData *dev_ptr)
       sum_templ_sq += templ*templ;
     }
   }
-  dev_ptr->sum_templ->at(x, y) = sum_templ;
+  dev_ptr->sum_templ->atXY(x, y) = sum_templ;
 
-  dev_ptr->const_templ_denom->at(x, y) =
+  dev_ptr->const_templ_denom->atXY(x, y) =
       (float) ( (double) side*side*sum_templ_sq - (double) sum_templ*sum_templ );
 
   // Init measurement parameters
-  dev_ptr->mu->at(x, y) = dev_ptr->scene.avg_depth;
-  dev_ptr->sigma->at(x, y) = dev_ptr->scene.sigma_sq_max;
-  dev_ptr->a->at(x, y) = 10.0f;
-  dev_ptr->b->at(x, y) = 10.0f;
+  dev_ptr->mu->atXY(x, y) = dev_ptr->scene.avg_depth;
+  dev_ptr->sigma->atXY(x, y) = dev_ptr->scene.sigma_sq_max;
+  dev_ptr->a->atXY(x, y) = 10.0f;
+  dev_ptr->b->atXY(x, y) = 10.0f;
 }
 
 } // rmd namespace

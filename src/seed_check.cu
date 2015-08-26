@@ -20,7 +20,7 @@ void seedCheckKernel(DeviceData *dev_ptr)
   if(x > dev_ptr->width-dev_ptr->patch.side-1 || y > dev_ptr->height-dev_ptr->patch.side-1 ||
      x < dev_ptr->patch.side || y < dev_ptr->patch.side)
   {
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::BORDER;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::BORDER;
     return;
   }
 
@@ -37,15 +37,15 @@ void seedCheckKernel(DeviceData *dev_ptr)
   if( ((a / (a + b)) > dev_ptr->eta_inlier)
       && (sigma_sq < dev_ptr->epsilon) )
   { // The seed converged
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::CONVERGED;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::CONVERGED;
   }
   else if((a-1) / (a + b - 2) < dev_ptr->eta_outlier)
   { // The seed failed to converge
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::DIVERGED;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::DIVERGED;
   }
   else
   {
-    dev_ptr->convergence->at(x, y) = ConvergenceStates::UPDATE;
+    dev_ptr->convergence->atXY(x, y) = ConvergenceStates::UPDATE;
   }
 }
 
