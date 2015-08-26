@@ -48,6 +48,7 @@ void sobel(
   dim_grid.x = (in_img.width  + dim_block.x - 1) / dim_block.x;
   dim_grid.y = (in_img.height + dim_block.y - 1) / dim_block.y;
   sobelKernel<<<dim_grid, dim_block>>>(in_img.dev_ptr, out_grad.dev_ptr);
+  cudaDeviceSynchronize();
 }
 
 } // rmd namespace

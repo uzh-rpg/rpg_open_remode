@@ -97,51 +97,12 @@ int main(int argc, char **argv)
       else
       {
         std::cerr << "ERROR: could not set reference image" << std::endl;
-        return -1;
+        return EXIT_FAILURE;
       }
     }
     else
     {
       depthmap.update(img, T_world_curr.inv());
-
-#ifdef RMD_DEBUG
-      double min_val, max_val;
-
-      // Download and show current disparity maps
-      cv::Mat disp_x, displayable_disp_x;
-      cv::Mat disp_y, displayable_disp_y;
-      depthmap.outputDisparity(disp_x, disp_y);
-      // show disparity along x
-      cv::minMaxLoc(disp_x, &min_val, &max_val);
-      std::cout << "DEBUG: min disp_x " << min_val << ", max disp_x " << max_val << std::endl;
-      disp_x = (disp_x - min_val) * 1 / (max_val - min_val);
-      disp_x.convertTo(displayable_disp_x, CV_8UC1, 255);
-      cv::imshow("disp_x", displayable_disp_x);
-      // show disparity along y
-      cv::minMaxLoc(disp_y, &min_val, &max_val);
-      std::cout << "DEBUG: min disp_y " << min_val << ", max disp_y " << max_val << std::endl;
-      disp_y = (disp_y - min_val) * 1 / (max_val - min_val);
-      disp_y.convertTo(displayable_disp_y, CV_8UC1, 255);
-      cv::imshow("disp_y", displayable_disp_y);
-
-      // Download and show current depth estimation
-      cv::Mat curr_depth_estimation, displayable;
-      depthmap.outputDepthmap(curr_depth_estimation);
-      cv::minMaxLoc(curr_depth_estimation, &min_val, &max_val);
-      std::cout << "DEBUG: min depth " << min_val << ", max depth " << max_val << std::endl;
-      curr_depth_estimation = (curr_depth_estimation - min_val) * 1 / (max_val - min_val);
-      curr_depth_estimation.convertTo(displayable, CV_8UC1, 255);
-      cv::imshow("depth", displayable);
-
-      // Download and show current convergence status
-      cv::Mat curr_conv;
-      depthmap.outputConvergence(curr_conv);
-      cv::minMaxLoc(curr_conv, &min_val, &max_val);
-      std::cout << "DEBUG: min conv " << min_val << ", max conv " << max_val << std::endl;
-      cv::imshow("conv", curr_conv);
-
-      cv::waitKey(10);
-#endif
     }
   }
 

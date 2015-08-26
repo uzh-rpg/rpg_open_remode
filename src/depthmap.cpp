@@ -93,5 +93,4 @@ void rmd::Depthmap::outputConvergence(cv::Mat &conv_8uc1)
   conv_8uc1.create(height_, width_, CV_8UC1);
   seeds_.downloadConvergence(reinterpret_cast<unsigned char*>(conv_8uc1.data));
 }
-
 #endif

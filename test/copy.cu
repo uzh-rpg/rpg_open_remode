@@ -31,6 +31,7 @@ void copy(
   dim_grid.x = (img.width  + dim_block.x - 1) / dim_block.x;
   dim_grid.y = (img.height + dim_block.y - 1) / dim_block.y;
   copyKernel<<<dim_grid, dim_block>>>(img.dev_ptr, copy.dev_ptr);
+  cudaDeviceSynchronize();
 }
 
 } // rmd namespace

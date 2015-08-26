@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cuda_toolkit/helper_timer.h>
 #include <opencv2/opencv.hpp>
 
 #include "copy.cuh"
@@ -109,15 +110,19 @@ TEST(RMDCuTests, deviceImageSobelTest)
   img.convertTo(img_flt, CV_32F, 1./255.);
 
   // Compare results of the Scharr operator to compute image gradient
-
-  // Opencv gradient computation
-  cv::Mat ocv_grad_x, ocv_grad_y;
-  cv::Sobel(img_flt, ocv_grad_x, CV_32F, 1, 0, CV_SCHARR);
-  cv::Sobel(img_flt, ocv_grad_y, CV_32F, 0, 1, CV_SCHARR);
-
-  // CUDA gradient computation
   const size_t w = img_flt.cols;
   const size_t h = img_flt.rows;
+
+  // Opencv gradient computation
+  cv::Mat ocv_grad_x(h, w, CV_32FC1);
+  cv::Mat ocv_grad_y(h, w, CV_32FC1);
+  double t = (double)cv::getTickCount();
+  cv::Sobel(img_flt, ocv_grad_x, CV_32F, 1, 0, CV_SCHARR);
+  cv::Sobel(img_flt, ocv_grad_y, CV_32F, 0, 1, CV_SCHARR);
+  t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
+  printf("Opencv execution time: %f seconds.\n", t);
+
+  // CUDA gradient computation
 
   // upload data to device memory
   rmd::DeviceImage<float> in_img(w, h);
@@ -125,7 +130,15 @@ TEST(RMDCuTests, deviceImageSobelTest)
 
   // compute gradient on device
   rmd::DeviceImage<float2> out_grad(w, h);
+
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
   rmd::sobel(in_img, out_grad);
+  sdkStopTimer(&timer);
+  t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("CUDA execution time: %f seconds.\n", t);
 
   // download result to host memory
   float2 * cu_grad = new float2[w*h];
