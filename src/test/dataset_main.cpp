@@ -50,8 +50,8 @@ bool readDataSequence(
 
 int main(int argc, char **argv)
 {
-  boost::filesystem::path dataset_path("/media/mpi/Elements/thinkpad_backup/matia/workspace/rpg_reconstruction/benchmark/datasets/traj_over_table");
-  boost::filesystem::path sequence_file_path("/media/mpi/Elements/thinkpad_backup/matia/workspace/rpg_reconstruction/benchmark/monocular_depth/experiments/first_200_frames_traj_over_table_our_input_sequence.txt");
+  boost::filesystem::path dataset_path("../test_data/images");
+  boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
 
   std::vector<DatasetEntry> dataset;
   if (!readDataSequence(sequence_file_path.string(), dataset))
