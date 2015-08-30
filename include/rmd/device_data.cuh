@@ -73,7 +73,7 @@ struct DeviceData
   DeviceImage<float> *sigma;
   DeviceImage<float> *a;
   DeviceImage<float> *b;
-  DeviceImage<unsigned char> *convergence;
+  DeviceImage<int8_t> *convergence;
   DeviceImage<float2> *epipolar_matches;
 
   PinholeCamera cam;

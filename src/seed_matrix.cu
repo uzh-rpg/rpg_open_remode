@@ -142,4 +142,8 @@ void rmd::SeedMatrix::downloadConstTemplDenom(float *host_align_row_maj) const
 {
   const_templ_denom_.getDevData(host_align_row_maj);
 }
+void rmd::SeedMatrix::downloadConvergence(int8_t *host_align_row_maj) const
+{
+  convergence_.getDevData(host_align_row_maj);
+}
 #endif

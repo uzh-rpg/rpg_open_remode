@@ -78,7 +78,7 @@ TEST(RMDCuTests, seedMatrixInit)
   cv::Mat ocv_sum_templ(ref_img.rows, ref_img.cols, CV_32FC1);
   cv::Mat ocv_const_templ_denom(ref_img.rows, ref_img.cols, CV_32FC1);
 
-  int side = seeds.getPatchSide();
+  const int side = seeds.getPatchSide();
   for(size_t y=side; y<ref_img.rows-side/2; ++y)
   {
     for(size_t x=side; x<ref_img.cols-side/2; ++x)
@@ -104,6 +104,66 @@ TEST(RMDCuTests, seedMatrixInit)
     {
       ASSERT_NEAR(ocv_sum_templ.at<float>(r, c), cu_sum_templ.at<float>(r, c), 0.00001f);
       ASSERT_NEAR(ocv_const_templ_denom.at<float>(r, c), cu_const_templ_denom.at<float>(r, c), 0.001f);
+    }
+  }
+}
+
+TEST(RMDCuTests, seedMatrixCheck)
+{
+  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
+  cv::Mat ref_img = cv::imread(
+        "../test_data/images/scene_000.png",
+        CV_LOAD_IMAGE_GRAYSCALE);
+
+  cv::Mat ref_img_flt;
+  ref_img.convertTo(ref_img_flt, CV_32F, 1.0f/255.0f);
+
+  rmd::SE3<float> T_curr_world(
+        0.611661f,
+        0.789455f,
+        0.051299f,
+        -0.000779f,
+        1.086410f,
+        4.766730f,
+        -1.449960f);
+
+  const float min_scene_depth = 0.4f;
+  const float max_scene_depth = 1.8f;
+
+  rmd::SeedMatrix seeds(ref_img.cols, ref_img.rows, cam);
+
+  seeds.setReferenceImage(reinterpret_cast<float*>(ref_img_flt.data), T_curr_world, min_scene_depth, max_scene_depth);
+
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
+
+  seeds.update(reinterpret_cast<float*>(ref_img_flt.data), T_curr_world);
+
+  sdkStopTimer(&timer);
+  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("update CUDA execution time: %f seconds.\n", t);
+
+  cv::Mat cu_convergence(ref_img.rows, ref_img.cols, CV_8SC1);
+  seeds.downloadConvergence(reinterpret_cast<int8_t*>(cu_convergence.data));
+
+  const int side = seeds.getPatchSide();
+  for(size_t r=0; r<ref_img.rows; ++r)
+  {
+    for(size_t c=0; c<ref_img.cols; ++c)
+    {
+      if(r>ref_img.rows-side-1
+         || r<side
+         || c>ref_img.cols-side-1
+         || c<side)
+      {
+        ASSERT_EQ(rmd::ConvergenceStates::BORDER, cu_convergence.at<int8_t>(r, c));
+      }
+      else
+      {
+        ASSERT_EQ(rmd::ConvergenceStates::UPDATE, cu_convergence.at<int8_t>(r, c));
+      }
     }
   }
 }
