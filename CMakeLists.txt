@@ -31,7 +31,7 @@ if(RMD_DEBUG)
 endif()
 
 # Maximum extent of epipolar line search in pixels
-ADD_DEFINITIONS(-DMAX_EXTENT_EPIPOLAR_SEARCH=100)
+ADD_DEFINITIONS(-DRMD_MAX_EXTENT_EPIPOLAR_SEARCH=100)
 
 CUDA_ADD_LIBRARY(
     remode

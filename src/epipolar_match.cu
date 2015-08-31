@@ -25,7 +25,7 @@ void seedEpipolarMatch(
   const float xx = x+0.5f;
   const float yy = y+0.5f;
 
-  const unsigned char seed_state = tex2D(convergence_tex, xx, yy);
+  const int8_t seed_state = tex2D(convergence_tex, xx, yy);
   if( (ConvergenceStates::BORDER    == seed_state) ||
       (ConvergenceStates::CONVERGED == seed_state) ||
       (ConvergenceStates::DIVERGED  == seed_state) )
@@ -58,7 +58,7 @@ void seedEpipolarMatch(
 
   const float2 epi_line = px_max_curr - px_min_curr;
   const float2 epi_dir  = normalize(epi_line);
-  const float  half_length = 0.5f * fminf(norm(epi_line), MAX_EXTENT_EPIPOLAR_SEARCH);
+  const float  half_length = 0.5f * fminf(norm(epi_line), RMD_MAX_EXTENT_EPIPOLAR_SEARCH);
   float2 px_curr, best_px_curr;
 
   const int  &side   = dev_ptr->patch.side;
@@ -113,7 +113,7 @@ void seedEpipolarMatch(
       best_ncc = ncc;
     }
   }
-  if(best_ncc < 0.5f)
+  if(best_ncc < 0.0f)
   {
     dev_ptr->convergence->atXY(x, y) = ConvergenceStates::NO_MATCH;
   }
