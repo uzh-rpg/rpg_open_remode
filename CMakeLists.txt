@@ -49,6 +49,7 @@ add_executable(
     dataset_main
     src/depthmap.cpp
     src/test/dataset_main.cpp
+    test/dataset.cpp
 )
 
 ## Specify libraries to link a library or executable target against
@@ -73,6 +74,7 @@ add_executable(all_tests
   test/device_image_test.cpp
   test/seed_matrix_test.cpp
   test/main_test.cpp
+  test/dataset.cpp
 )
 
 target_link_libraries(
@@ -81,7 +83,9 @@ target_link_libraries(
   remode
   ${GTEST_BOTH_LIBRARIES}
   ${OpenCV_LIBS}
-  pthread)
+  pthread
+  boost_system
+  boost_filesystem)
 
 # The following is to run make test
 add_test(
