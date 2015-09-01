@@ -35,3 +35,6 @@ build
 
 # QTCreator project
 CMakeLists.txt.user
+
+# Test dataset folder
+test_data
