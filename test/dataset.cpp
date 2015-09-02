@@ -1,13 +1,23 @@
 #include "dataset.h"
 
-const std::string & rmd::test::DatasetEntry::getFileName() const
+const std::string & rmd::test::DatasetEntry::getImageFileName() const
 {
-  return file_name_;
+  return image_file_name_;
 }
 
-std::string & rmd::test::DatasetEntry::getFileName()
+std::string & rmd::test::DatasetEntry::getImageFileName()
 {
-  return file_name_;
+  return image_file_name_;
+}
+
+const std::string & rmd::test::DatasetEntry::getDepthmapFileName() const
+{
+  return depthmap_file_name_;
+}
+
+std::string & rmd::test::DatasetEntry::getDepthmapFileName()
+{
+  return depthmap_file_name_;
 }
 
 const Eigen::Vector3f & rmd::test::DatasetEntry::getTranslation() const
@@ -46,7 +56,11 @@ bool rmd::test::Dataset::readDataSequence(){
     {
       std::stringstream line_str(line);
       DatasetEntry data;
-      line_str >> data.getFileName();
+      std::string imgFileName;
+      line_str >> imgFileName;
+      data.getImageFileName() = imgFileName;
+      const std::string depthmapFileName = imgFileName.substr(0, imgFileName.find('.')+1) + "depth";
+      data.getDepthmapFileName() = depthmapFileName;
       line_str >> data.getTranslation().x();
       line_str >> data.getTranslation().y();
       line_str >> data.getTranslation().z();
@@ -66,7 +80,7 @@ bool rmd::test::Dataset::readDataSequence(){
 bool rmd::test::Dataset::readImage(cv::Mat &img, const DatasetEntry &entry) const
 {
   const boost::filesystem::path dataset_path(dataset_path_);
-  const auto img_file_path = dataset_path / entry.getFileName();
+  const auto img_file_path = dataset_path / "images" / entry.getImageFileName();
   img = cv::imread(img_file_path.string(), CV_LOAD_IMAGE_GRAYSCALE);
   if(img.data == NULL)
     return false;
@@ -87,17 +101,22 @@ void rmd::test::Dataset::readCameraPose(rmd::SE3<float> &pose, const DatasetEntr
         );
 }
 
-bool rmd::test::Dataset::readDepthmap(cv::Mat &depthmap, const DatasetEntry &entry) const
+bool rmd::test::Dataset::readDepthmap(
+    cv::Mat &depthmap,
+    const DatasetEntry &entry,
+    const size_t &width,
+    const size_t &height) const
 {
-  const boost::filesystem::path depthmap_file_path("../test_data/depthmaps/scene_000.depth");
+  const boost::filesystem::path dataset_path(dataset_path_);
+  const auto depthmap_file_path = dataset_path / "depthmaps" / entry.getDepthmapFileName();
   std::ifstream depthmap_file_str(depthmap_file_path.string());
   if (depthmap_file_str.is_open())
   {
-    depthmap.create(480, 640, CV_32FC1);
+    depthmap.create(height, width, CV_32FC1);
     float f;
-    for(size_t r=0; r<480; ++r)
+    for(size_t r=0; r<height; ++r)
     {
-      for(size_t c=0; c<640; ++c)
+      for(size_t c=0; c<width; ++c)
       {
         depthmap_file_str >> f;
         depthmap.at<float>(r, c) = f;
