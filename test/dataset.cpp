@@ -87,6 +87,29 @@ void rmd::test::Dataset::readCameraPose(rmd::SE3<float> &pose, const DatasetEntr
         );
 }
 
+bool rmd::test::Dataset::readDepthmap(cv::Mat &depthmap, const DatasetEntry &entry) const
+{
+  const boost::filesystem::path depthmap_file_path("../test_data/depthmaps/scene_000.depth");
+  std::ifstream depthmap_file_str(depthmap_file_path.string());
+  if (depthmap_file_str.is_open())
+  {
+    depthmap.create(480, 640, CV_32FC1);
+    float f;
+    for(size_t r=0; r<480; ++r)
+    {
+      for(size_t c=0; c<640; ++c)
+      {
+        depthmap_file_str >> f;
+        depthmap.at<float>(r, c) = f;
+      }
+    }
+    depthmap_file_str.close();
+    return true;
+  }
+  else
+    return false;
+}
+
 std::vector<rmd::test::DatasetEntry>::const_iterator rmd::test::Dataset::begin() const
 { return dataset_.begin(); }
 

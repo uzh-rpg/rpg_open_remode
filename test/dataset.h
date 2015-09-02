@@ -35,6 +35,7 @@ public:
   bool readDataSequence();
   bool readImage(cv::Mat &img, const DatasetEntry &entry) const;
   void readCameraPose(rmd::SE3<float> &pose, const DatasetEntry &entry) const;
+  bool readDepthmap(cv::Mat &depthmap, const DatasetEntry &entry) const;
   std::vector<DatasetEntry>::const_iterator begin() const;
   std::vector<DatasetEntry>::const_iterator end() const;
 
