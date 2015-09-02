@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv)
 {
-  const boost::filesystem::path dataset_path("../test_data/images");
+  const boost::filesystem::path dataset_path("../test_data");
   const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
 
   rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string());
@@ -20,21 +20,24 @@ int main(int argc, char **argv)
     return -1;
   }
 
+  const size_t width  = 640;
+  const size_t height = 480;
+
   bool first_img = true;
-  rmd::Depthmap depthmap(640, 480, 481.2f, 319.5f, -480.0f, 239.5f);
+  rmd::Depthmap depthmap(width, height, 481.2f, 319.5f, -480.0f, 239.5f);
 
   for(const auto data : dataset)
   {
     cv::Mat img;
     if(!dataset.readImage(img, data))
     {
-      std::cerr << "ERROR: could not read image " << data.getFileName() << std::endl;
+      std::cerr << "ERROR: could not read image " << data.getImageFileName() << std::endl;
       continue;
     }
     rmd::SE3<float> T_world_curr;
     dataset.readCameraPose(T_world_curr, data);
 
-    std::cout << "RUN EXPERIMENT: inputting image " << data.getFileName() <<  std::endl;
+    std::cout << "RUN EXPERIMENT: inputting image " << data.getImageFileName() <<  std::endl;
     std::cout << "T_world_curr:" << std::endl;
     std::cout << T_world_curr << std::endl;
 
@@ -66,6 +69,8 @@ int main(int argc, char **argv)
   cv::waitKey();
 
   cv::imwrite("/home/mpi/Desktop/result.png", result);
+
+
 
   return EXIT_SUCCESS;
 }
