@@ -119,7 +119,7 @@ bool rmd::test::Dataset::readDepthmap(
       for(size_t c=0; c<width; ++c)
       {
         depthmap_file_str >> f;
-        depthmap.at<float>(r, c) = f;
+        depthmap.at<float>(r, c) = f/100.0f;
       }
     }
     depthmap_file_str.close();

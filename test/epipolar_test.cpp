@@ -47,8 +47,8 @@ TEST(RMDCuTests, epipolarTest)
 
   rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
 
-  const size_t ref_ind = 0;
-  const size_t curr_ind = 10;
+  const size_t ref_ind = 1;
+  const size_t curr_ind = 199;
 
   const auto ref_entry = dataset(ref_ind);
   cv::Mat ref_img;
