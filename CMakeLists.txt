@@ -75,6 +75,7 @@ add_executable(all_tests
   test/seed_matrix_test.cpp
   test/main_test.cpp
   test/dataset.cpp
+  test/epipolar_test.cpp
 )
 
 target_link_libraries(

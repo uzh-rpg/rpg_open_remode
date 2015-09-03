@@ -45,6 +45,9 @@ public:
       const size_t &height) const;
   std::vector<DatasetEntry>::const_iterator begin() const;
   std::vector<DatasetEntry>::const_iterator end() const;
+  const DatasetEntry & operator()(size_t index) const;
+
+  static cv::Mat scaleDepthmap(const cv::Mat &depthmap);
 
 private:
   std::string dataset_path_;

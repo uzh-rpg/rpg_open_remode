@@ -134,3 +134,21 @@ std::vector<rmd::test::DatasetEntry>::const_iterator rmd::test::Dataset::begin()
 
 std::vector<rmd::test::DatasetEntry>::const_iterator rmd::test::Dataset::end() const
 { return dataset_.end(); }
+
+const rmd::test::DatasetEntry & rmd::test::Dataset::operator()(size_t index) const
+{
+  return dataset_.at(index);
+}
+
+cv::Mat rmd::test::Dataset::scaleDepthmap(const cv::Mat &depthmap)
+{
+  cv::Mat scaled_depthmap = depthmap.clone();
+  double min_val, max_val;
+  cv::minMaxLoc(scaled_depthmap, &min_val, &max_val);
+  cv::Mat converted;
+  scaled_depthmap = (scaled_depthmap - min_val) * 1.0 / (max_val - min_val);
+  scaled_depthmap.convertTo(converted, CV_8UC1, 255);
+  cv::Mat colored(converted.rows, converted.cols, CV_8UC3);
+  cv::cvtColor(converted, colored, CV_GRAY2BGR);
+  return colored;
+}
