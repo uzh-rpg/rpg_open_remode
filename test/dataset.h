@@ -6,6 +6,7 @@
 #include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
 #include <rmd/se3.cuh>
+#include <rmd/pinhole_camera.cuh>
 
 namespace rmd
 {
@@ -34,7 +35,10 @@ private:
 class Dataset
 {
 public:
-  Dataset(const std::string &dataset_path, const std::string &sequence_file_path);
+  Dataset(
+      const std::string &dataset_path,
+      const std::string &sequence_file_path,
+      const rmd::PinholeCamera &cam);
   bool readDataSequence();
   bool readImage(cv::Mat &img, const DatasetEntry &entry) const;
   void readCameraPose(rmd::SE3<float> &pose, const DatasetEntry &entry) const;
@@ -53,6 +57,7 @@ private:
   std::string dataset_path_;
   std::string sequence_file_path_;
   std::vector<DatasetEntry> dataset_;
+  rmd::PinholeCamera cam_;
 };
 
 } // test namespace

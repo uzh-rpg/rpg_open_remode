@@ -13,7 +13,9 @@ int main(int argc, char **argv)
   const boost::filesystem::path dataset_path("../test_data");
   const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
 
-  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string());
+  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
+
+  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
   if (!dataset.readDataSequence())
   {
     std::cerr << "ERROR: could not read dataset" << std::endl;
@@ -24,7 +26,7 @@ int main(int argc, char **argv)
   const size_t height = 480;
 
   bool first_img = true;
-  rmd::Depthmap depthmap(width, height, 481.2f, 319.5f, -480.0f, 239.5f);
+  rmd::Depthmap depthmap(width, height, cam.fx, cam.cx, cam.fy, cam.cy);
 
   for(const auto data : dataset)
   {

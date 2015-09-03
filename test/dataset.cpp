@@ -40,9 +40,13 @@ Eigen::Quaternionf & rmd::test::DatasetEntry::getQuaternion()
   return quaternion_;
 }
 
-rmd::test::Dataset::Dataset(const std::string &dataset_path, const std::string &sequence_file_path)
+rmd::test::Dataset::Dataset(
+    const std::string &dataset_path,
+    const std::string &sequence_file_path,
+    const rmd::PinholeCamera &cam)
   : dataset_path_(dataset_path)
   , sequence_file_path_(sequence_file_path)
+  , cam_(cam)
 {
 }
 
@@ -113,13 +117,15 @@ bool rmd::test::Dataset::readDepthmap(
   if (depthmap_file_str.is_open())
   {
     depthmap.create(height, width, CV_32FC1);
-    float f;
+    float z;
     for(size_t r=0; r<height; ++r)
     {
       for(size_t c=0; c<width; ++c)
       {
-        depthmap_file_str >> f;
-        depthmap.at<float>(r, c) = f/100.0f;
+        depthmap_file_str >> z;
+        z /= 100.0f;
+        const float3 f = cam_.cam2world(make_float2(c, r));
+        depthmap.at<float>(r, c) = z/sqrtf(dot(f, f));
       }
     }
     depthmap_file_str.close();
