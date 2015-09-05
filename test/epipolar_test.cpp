@@ -25,8 +25,8 @@ void mouseCallback(int event, int x, int y, int flags, void *userdata)
   if(event == cv::EVENT_LBUTTONDOWN)
   {
     const float  depth   = cb_data.ref_depthmap->at<float>(y, x);
-    const float2 ref_px  = make_float2(x, y);
-    const float3 ref_f   = cb_data.cam->cam2world(ref_px);
+    const float2 ref_px  = make_float2((float)x, (float)y);
+    const float3 ref_f   = normalize(cb_data.cam->cam2world(ref_px));
     const float2 curr_px = cb_data.cam->world2cam( *cb_data.T_curr_ref * (ref_f * depth ) );
     printf("(%d, %d), d = %f -> (%f, %f)\n", x, y, depth, curr_px.x, curr_px.y);
     cv::circle(*cb_data.ref_img, cv::Point(x, y), 3, cv::Scalar(255));
@@ -154,10 +154,12 @@ TEST(RMDCuTests, epipolarMatchTest)
       matches_y.at<float>(r, c) = epipolar_matches[ref_img.cols*r+c].y;
     }
   }
+  /*
   cv::Mat colored_x = rmd::test::Dataset::scaleMat(matches_x);
-
   cv::imshow("matches_x", colored_x);
   cv::waitKey();
+  */
+
 
   delete epipolar_matches;
 }

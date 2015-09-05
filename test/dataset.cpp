@@ -123,9 +123,7 @@ bool rmd::test::Dataset::readDepthmap(
       for(size_t c=0; c<width; ++c)
       {
         depthmap_file_str >> z;
-        z /= 100.0f;
-        const float3 f = cam_.cam2world(make_float2(c, r));
-        depthmap.at<float>(r, c) = z/sqrtf(dot(f, f));
+        depthmap.at<float>(r, c) = z / 100.0f;
       }
     }
     depthmap_file_str.close();
