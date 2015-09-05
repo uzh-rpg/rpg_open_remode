@@ -5,25 +5,44 @@
 #include <rmd/se3.cuh>
 
 #include <opencv2/opencv.hpp>
+#include <boost/filesystem.hpp>
+
+#include "dataset.h"
 
 TEST(RMDCuTests, seedMatrixInit)
 {
-  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
-  cv::Mat ref_img = cv::imread(
-        "../test_data/images/scene_000.png",
-        CV_LOAD_IMAGE_GRAYSCALE);
+  const boost::filesystem::path dataset_path("../test_data");
+  const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
 
+  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
+
+  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
+  if (!dataset.readDataSequence())
+    FAIL() << "could not read dataset";
+
+  const size_t ref_ind = 1;
+  const size_t curr_ind = 20;
+
+  const auto ref_entry = dataset(ref_ind);
+  cv::Mat ref_img;
+  dataset.readImage(ref_img, ref_entry);
   cv::Mat ref_img_flt;
   ref_img.convertTo(ref_img_flt, CV_32F, 1.0f/255.0f);
 
-  rmd::SE3<float> T_curr_world(
-        0.611661f,
-        0.789455f,
-        0.051299f,
-        -0.000779f,
-        1.086410f,
-        4.766730f,
-        -1.449960f);
+  cv::Mat ref_depthmap;
+  dataset.readDepthmap(ref_depthmap, ref_entry, ref_img.cols, ref_img.rows);
+
+  rmd::SE3<float> T_world_ref;
+  dataset.readCameraPose(T_world_ref, ref_entry);
+
+  const auto curr_entry = dataset(curr_ind);
+  cv::Mat curr_img;
+  dataset.readImage(curr_img, curr_entry);
+  cv::Mat curr_img_flt;
+  curr_img.convertTo(curr_img_flt, CV_32F, 1.0f/255.0f);
+
+  rmd::SE3<float> T_world_curr;
+  dataset.readCameraPose(T_world_curr, curr_entry);
 
   const float min_scene_depth = 0.4f;
   const float max_scene_depth = 1.8f;
@@ -35,7 +54,11 @@ TEST(RMDCuTests, seedMatrixInit)
   sdkResetTimer(&timer);
   sdkStartTimer(&timer);
 
-  seeds.setReferenceImage(reinterpret_cast<float*>(ref_img_flt.data), T_curr_world, min_scene_depth, max_scene_depth);
+  seeds.setReferenceImage(
+        reinterpret_cast<float*>(ref_img_flt.data),
+        T_world_ref.inv(),
+        min_scene_depth,
+        max_scene_depth);
 
   sdkStopTimer(&timer);
   double t = sdkGetAverageTimerValue(&timer) / 1000.0;
@@ -110,36 +133,58 @@ TEST(RMDCuTests, seedMatrixInit)
 
 TEST(RMDCuTests, seedMatrixCheck)
 {
-  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
-  cv::Mat ref_img = cv::imread(
-        "../test_data/images/scene_000.png",
-        CV_LOAD_IMAGE_GRAYSCALE);
+  const boost::filesystem::path dataset_path("../test_data");
+  const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
 
+  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
+
+  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
+  if (!dataset.readDataSequence())
+    FAIL() << "could not read dataset";
+
+  const size_t ref_ind = 1;
+  const size_t curr_ind = 20;
+
+  const auto ref_entry = dataset(ref_ind);
+  cv::Mat ref_img;
+  dataset.readImage(ref_img, ref_entry);
   cv::Mat ref_img_flt;
   ref_img.convertTo(ref_img_flt, CV_32F, 1.0f/255.0f);
 
-  rmd::SE3<float> T_curr_world(
-        0.611661f,
-        0.789455f,
-        0.051299f,
-        -0.000779f,
-        1.086410f,
-        4.766730f,
-        -1.449960f);
+  cv::Mat ref_depthmap;
+  dataset.readDepthmap(ref_depthmap, ref_entry, ref_img.cols, ref_img.rows);
+
+  rmd::SE3<float> T_world_ref;
+  dataset.readCameraPose(T_world_ref, ref_entry);
+
+  const auto curr_entry = dataset(curr_ind);
+  cv::Mat curr_img;
+  dataset.readImage(curr_img, curr_entry);
+  cv::Mat curr_img_flt;
+  curr_img.convertTo(curr_img_flt, CV_32F, 1.0f/255.0f);
+
+  rmd::SE3<float> T_world_curr;
+  dataset.readCameraPose(T_world_curr, curr_entry);
 
   const float min_scene_depth = 0.4f;
   const float max_scene_depth = 1.8f;
 
   rmd::SeedMatrix seeds(ref_img.cols, ref_img.rows, cam);
 
-  seeds.setReferenceImage(reinterpret_cast<float*>(ref_img_flt.data), T_curr_world, min_scene_depth, max_scene_depth);
+  seeds.setReferenceImage(
+        reinterpret_cast<float*>(ref_img_flt.data),
+        T_world_ref.inv(),
+        min_scene_depth,
+        max_scene_depth);
 
   StopWatchInterface * timer = NULL;
   sdkCreateTimer(&timer);
   sdkResetTimer(&timer);
   sdkStartTimer(&timer);
 
-  seeds.update(reinterpret_cast<float*>(ref_img_flt.data), T_curr_world);
+  seeds.update(
+        reinterpret_cast<float*>(ref_img_flt.data),
+        T_world_curr.inv());
 
   sdkStopTimer(&timer);
   double t = sdkGetAverageTimerValue(&timer) / 1000.0;

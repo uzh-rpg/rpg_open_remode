@@ -146,4 +146,8 @@ void rmd::SeedMatrix::downloadConvergence(int8_t *host_align_row_maj) const
 {
   convergence_.getDevData(host_align_row_maj);
 }
+void rmd::SeedMatrix::downloadEpipolarMatches(float2 *host_align_row_maj) const
+{
+  epipolar_matches_.getDevData(host_align_row_maj);
+}
 #endif

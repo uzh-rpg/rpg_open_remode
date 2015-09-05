@@ -146,7 +146,7 @@ const rmd::test::DatasetEntry & rmd::test::Dataset::operator()(size_t index) con
   return dataset_.at(index);
 }
 
-cv::Mat rmd::test::Dataset::scaleDepthmap(const cv::Mat &depthmap)
+cv::Mat rmd::test::Dataset::scaleMat(const cv::Mat &depthmap)
 {
   cv::Mat scaled_depthmap = depthmap.clone();
   double min_val, max_val;

@@ -73,11 +73,91 @@ TEST(RMDCuTests, epipolarTest)
   cb_data.T_curr_ref = &T_curr_ref;
   cb_data.cam = &cam;
 
-  cv::Mat colored_ref_repthmap = rmd::test::Dataset::scaleDepthmap(ref_depthmap);
+  cv::Mat colored_ref_repthmap = rmd::test::Dataset::scaleMat(ref_depthmap);
 
   cv::imshow("ref",  ref_img);
   cv::imshow("curr", curr_img);
   cv::imshow("depthmap", colored_ref_repthmap);
   cv::setMouseCallback("ref", mouseCallback, &cb_data);
   cv::waitKey();
+}
+
+TEST(RMDCuTests, epipolarMatchTest)
+{
+  const boost::filesystem::path dataset_path("../test_data");
+  const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
+
+  rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
+
+  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
+  if (!dataset.readDataSequence())
+    FAIL() << "could not read dataset";
+
+  const size_t ref_ind = 1;
+  const size_t curr_ind = 20;
+
+  const auto ref_entry = dataset(ref_ind);
+  cv::Mat ref_img;
+  dataset.readImage(ref_img, ref_entry);
+  cv::Mat ref_img_flt;
+  ref_img.convertTo(ref_img_flt, CV_32F, 1.0f/255.0f);
+
+  cv::Mat ref_depthmap;
+  dataset.readDepthmap(ref_depthmap, ref_entry, ref_img.cols, ref_img.rows);
+
+  rmd::SE3<float> T_world_ref;
+  dataset.readCameraPose(T_world_ref, ref_entry);
+
+  const auto curr_entry = dataset(curr_ind);
+  cv::Mat curr_img;
+  dataset.readImage(curr_img, curr_entry);
+  cv::Mat curr_img_flt;
+  curr_img.convertTo(curr_img_flt, CV_32F, 1.0f/255.0f);
+
+  rmd::SE3<float> T_world_curr;
+  dataset.readCameraPose(T_world_curr, curr_entry);
+
+  const float min_scene_depth = 0.4f;
+  const float max_scene_depth = 1.8f;
+
+  rmd::SeedMatrix seeds(ref_img.cols, ref_img.rows, cam);
+
+  seeds.setReferenceImage(
+        reinterpret_cast<float*>(ref_img_flt.data),
+        T_world_ref.inv(),
+        min_scene_depth,
+        max_scene_depth);
+
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
+
+  seeds.update(
+        reinterpret_cast<float*>(curr_img_flt.data),
+        T_world_curr.inv());
+
+  sdkStopTimer(&timer);
+  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("update CUDA execution time: %f seconds.\n", t);
+
+  float2 * epipolar_matches = new float2[ref_img.cols * ref_img.rows];
+  seeds.downloadEpipolarMatches(epipolar_matches);
+
+  cv::Mat matches_x(ref_img.rows, ref_img.cols, CV_32FC1);
+  cv::Mat matches_y(ref_img.rows, ref_img.cols, CV_32FC1);
+  for(size_t r=0; r<ref_img.rows; ++r)
+  {
+    for(size_t c=0; c<ref_img.cols; ++c)
+    {
+      matches_x.at<float>(r, c) = epipolar_matches[ref_img.cols*r+c].x;
+      matches_y.at<float>(r, c) = epipolar_matches[ref_img.cols*r+c].y;
+    }
+  }
+  cv::Mat colored_x = rmd::test::Dataset::scaleMat(matches_x);
+
+  cv::imshow("matches_x", colored_x);
+  cv::waitKey();
+
+  delete epipolar_matches;
 }

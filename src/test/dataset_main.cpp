@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   // show depthmap
   cv::Mat result;
   depthmap.outputDepthmap(result);
-  cv::Mat colored = rmd::test::Dataset::scaleDepthmap(result);
+  cv::Mat colored = rmd::test::Dataset::scaleMat(result);
   cv::imshow("result", colored);
   cv::waitKey();
 
