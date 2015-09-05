@@ -91,12 +91,12 @@ void seedEpipolarMatch(
       {
         const float templ = tex2D(
               ref_img_tex,
-              (float)(px_ref.x+offset.x+patch_x)+0.5f,
-              (float)(px_ref.y+offset.y+patch_y)+0.5f);
+              px_ref.x+(float)(offset.x+patch_x)+0.5f,
+              px_ref.y+(float)(offset.y+patch_y)+0.5f);
         const float img = tex2D(
               curr_img_tex,
-              (float)(px_curr.x+offset.x+patch_x)+0.5f,
-              (float)(px_curr.y+offset.y+patch_y)+0.5f);
+              px_curr.x+(float)(offset.x+patch_x)+0.5f,
+              px_curr.y+(float)(offset.y+patch_y)+0.5f);
         sum_img    += img;
         sum_img_sq += img*img;
         sum_img_templ += img*templ;
