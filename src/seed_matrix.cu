@@ -98,21 +98,27 @@ bool rmd::SeedMatrix::update(
 
   // Assest current convergence status
   rmd::seedCheckKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
-  cudaDeviceSynchronize();
+  cudaError err = cudaDeviceSynchronize();
+  if(cudaSuccess != err)
+    throw CudaException("SeedMatrix: unable to synchronize device", err);
+
   rmd::bindTexture(convergence_tex, convergence_);
 
   // Establish epipolar correspondences
   // call epipolar matching kernel
-  rmd::seedEpipolarMatch<<<dim_grid_, dim_block_>>>(
-                                                    dev_data_.dev_ptr,
+  rmd::seedEpipolarMatchKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr,
                                                     T_curr_ref);
-  cudaDeviceSynchronize();
+  err = cudaDeviceSynchronize();
+  if(cudaSuccess != err)
+    throw CudaException("SeedMatrix: unable to synchronize device", err);
+
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(
                                                    dev_data_.dev_ptr,
                                                    T_curr_ref.inv());
   cudaDeviceSynchronize();
+
   return true;
 }
 
@@ -142,7 +148,7 @@ void rmd::SeedMatrix::downloadConstTemplDenom(float *host_align_row_maj) const
 {
   const_templ_denom_.getDevData(host_align_row_maj);
 }
-void rmd::SeedMatrix::downloadConvergence(int8_t *host_align_row_maj) const
+void rmd::SeedMatrix::downloadConvergence(int *host_align_row_maj) const
 {
   convergence_.getDevData(host_align_row_maj);
 }

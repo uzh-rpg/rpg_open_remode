@@ -94,7 +94,7 @@ TEST(RMDCuTests, epipolarMatchTest)
     FAIL() << "could not read dataset";
 
   const size_t ref_ind = 1;
-  const size_t curr_ind = 20;
+  const size_t curr_ind = 1;
 
   const auto ref_entry = dataset(ref_ind);
   cv::Mat ref_img;
@@ -150,8 +150,11 @@ TEST(RMDCuTests, epipolarMatchTest)
   {
     for(size_t c=0; c<ref_img.cols; ++c)
     {
-      matches_x.at<float>(r, c) = epipolar_matches[ref_img.cols*r+c].x;
-      matches_y.at<float>(r, c) = epipolar_matches[ref_img.cols*r+c].y;
+      const float match_x = epipolar_matches[ref_img.cols*r+c].x;
+      const float match_y = epipolar_matches[ref_img.cols*r+c].y;
+      matches_x.at<float>(r, c) = match_x;
+      matches_y.at<float>(r, c) = match_y;
+      printf("(%lu, %lu) -> (%f, %f)\n", c, r, match_x, match_y);
     }
   }
   /*

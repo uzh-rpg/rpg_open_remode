@@ -190,8 +190,8 @@ TEST(RMDCuTests, seedMatrixCheck)
   double t = sdkGetAverageTimerValue(&timer) / 1000.0;
   printf("update CUDA execution time: %f seconds.\n", t);
 
-  cv::Mat cu_convergence(ref_img.rows, ref_img.cols, CV_8SC1);
-  seeds.downloadConvergence(reinterpret_cast<int8_t*>(cu_convergence.data));
+  cv::Mat cu_convergence(ref_img.rows, ref_img.cols, CV_32SC1);
+  seeds.downloadConvergence(reinterpret_cast<int*>(cu_convergence.data));
 
   const int side = seeds.getPatchSide();
   for(size_t r=0; r<ref_img.rows; ++r)
@@ -203,11 +203,11 @@ TEST(RMDCuTests, seedMatrixCheck)
          || c>ref_img.cols-side-1
          || c<side)
       {
-        ASSERT_EQ(rmd::ConvergenceStates::BORDER, cu_convergence.at<int8_t>(r, c));
+        ASSERT_EQ(rmd::ConvergenceStates::BORDER, cu_convergence.at<int>(r, c));
       }
       else
       {
-        ASSERT_EQ(rmd::ConvergenceStates::UPDATE, cu_convergence.at<int8_t>(r, c));
+        ASSERT_EQ(rmd::ConvergenceStates::UPDATE, cu_convergence.at<int>(r, c));
       }
     }
   }
