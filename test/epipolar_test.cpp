@@ -144,25 +144,24 @@ TEST(RMDCuTests, epipolarMatchTest)
   float2 * epipolar_matches = new float2[ref_img.cols * ref_img.rows];
   seeds.downloadEpipolarMatches(epipolar_matches);
 
-  cv::Mat matches_x(ref_img.rows, ref_img.cols, CV_32FC1);
-  cv::Mat matches_y(ref_img.rows, ref_img.cols, CV_32FC1);
+  int * cu_convergence = new int[ref_img.cols * ref_img.rows];
+  seeds.downloadConvergence(cu_convergence);
+
   for(size_t r=0; r<ref_img.rows; ++r)
   {
     for(size_t c=0; c<ref_img.cols; ++c)
     {
       const float match_x = epipolar_matches[ref_img.cols*r+c].x;
       const float match_y = epipolar_matches[ref_img.cols*r+c].y;
-      matches_x.at<float>(r, c) = match_x;
-      matches_y.at<float>(r, c) = match_y;
-      printf("(%lu, %lu) -> (%f, %f)\n", c, r, match_x, match_y);
+      const int convergence = cu_convergence[ref_img.cols*r+c];
+      if(rmd::ConvergenceStates::UPDATE == convergence)
+      {
+        ASSERT_NEAR(static_cast<float>(c), match_x, 0.01);
+        ASSERT_NEAR(static_cast<float>(r), match_y, 0.01);
+      }
     }
   }
-  /*
-  cv::Mat colored_x = rmd::test::Dataset::scaleMat(matches_x);
-  cv::imshow("matches_x", colored_x);
-  cv::waitKey();
-  */
 
-
+  delete cu_convergence;
   delete epipolar_matches;
 }

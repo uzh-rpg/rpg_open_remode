@@ -106,17 +106,14 @@ bool rmd::SeedMatrix::update(
 
   // Establish epipolar correspondences
   // call epipolar matching kernel
-  rmd::seedEpipolarMatchKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr,
-                                                    T_curr_ref);
+  rmd::seedEpipolarMatchKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref);
   err = cudaDeviceSynchronize();
   if(cudaSuccess != err)
     throw CudaException("SeedMatrix: unable to synchronize device", err);
 
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
-  rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(
-                                                   dev_data_.dev_ptr,
-                                                   T_curr_ref.inv());
+  rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref.inv());
   cudaDeviceSynchronize();
 
   return true;

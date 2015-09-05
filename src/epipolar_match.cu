@@ -12,7 +12,7 @@ namespace rmd
 {
 
 __global__
-void seedEpipolarMatch(
+void seedEpipolarMatchKernel(
     DeviceData *dev_ptr,
     rmd::SE3<float> T_curr_ref)
 {
@@ -25,7 +25,7 @@ void seedEpipolarMatch(
   const float xx = x+0.5f;
   const float yy = y+0.5f;
 
-  const int8_t seed_state = tex2D(convergence_tex, xx, yy);
+  const int seed_state = tex2D(convergence_tex, xx, yy);
   if( (ConvergenceStates::BORDER    == seed_state) ||
       (ConvergenceStates::CONVERGED == seed_state) ||
       (ConvergenceStates::DIVERGED  == seed_state) )
