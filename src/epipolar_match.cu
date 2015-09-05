@@ -52,9 +52,9 @@ void seedEpipolarMatch(
   }
 
   const float2 px_min_curr =
-      dev_ptr->cam.world2cam( T_curr_ref * (f_ref * fmaxf( mu - 3.0f*sqrtf(sigma), 0.01f)) );
+      dev_ptr->cam.world2cam( T_curr_ref * (f_ref * fmaxf( mu - 3.0f*sigma, 0.01f)) );
   const float2 px_max_curr =
-      dev_ptr->cam.world2cam( T_curr_ref * (f_ref * ( mu + (3.0f*sqrtf(sigma)) ) ) );
+      dev_ptr->cam.world2cam( T_curr_ref * (f_ref * ( mu + (3.0f*sigma) ) ) );
 
   const float2 epi_line = px_max_curr - px_min_curr;
   const float2 epi_dir  = normalize(epi_line);
