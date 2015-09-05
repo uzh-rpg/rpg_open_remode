@@ -71,6 +71,9 @@ void seedEpipolarMatch(
   // init best match score
   float best_ncc = -1.0f;
 
+  float sum_img;
+  float sum_img_sq;
+  float sum_img_templ;
   for(float l = -half_length; l <= half_length; l += 0.7f)
   {
     px_curr = px_mean_curr + l*epi_dir;
@@ -82,9 +85,9 @@ void seedEpipolarMatch(
       continue;
     }
 
-    float sum_img       = 0.0f;
-    float sum_img_sq    = 0.0f;
-    float sum_img_templ = 0.0f;
+    sum_img       = 0.0f;
+    sum_img_sq    = 0.0f;
+    sum_img_templ = 0.0f;
 
     for(int patch_y=0; patch_y<side; ++patch_y)
     {
