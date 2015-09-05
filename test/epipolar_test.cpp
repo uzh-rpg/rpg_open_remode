@@ -159,6 +159,7 @@ TEST(RMDCuTests, epipolarMatchTest)
         ASSERT_NEAR(static_cast<float>(c), match_x, 0.01);
         ASSERT_NEAR(static_cast<float>(r), match_y, 0.01);
       }
+      //printf("Pixel coordinates: (reference image) (%lu, %lu) -> (%f, %f) (current image)\n", c, r, match_x, match_y);
     }
   }
 
