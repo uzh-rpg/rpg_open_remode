@@ -16,13 +16,13 @@ struct SceneData
   float sigma_sq_max;
 };
 
-struct TemplatePatch
+struct CorrPatch
 {
-#ifndef RMD_TEMPLATE_PATCH_SIDE
-#define RMD_TEMPLATE_PATCH_SIDE 5
+#ifndef RMD_CORR_PATCH_SIDE
+#define RMD_CORR_PATCH_SIDE 5
 #endif
-  TemplatePatch()
-    : side(RMD_TEMPLATE_PATCH_SIDE)
+  CorrPatch()
+    : side(RMD_CORR_PATCH_SIDE)
     , offset(make_int2(-side/2, -side/2))
   { }
   const int  side;
@@ -82,7 +82,7 @@ struct DeviceData
   size_t height;
 
   SceneData scene;
-  TemplatePatch patch;
+  CorrPatch patch;
 
   // Algorithm parameters
   float eta_inlier;
