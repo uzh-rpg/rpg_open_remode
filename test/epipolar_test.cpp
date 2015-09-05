@@ -156,10 +156,10 @@ TEST(RMDCuTests, epipolarMatchTest)
       const int convergence = cu_convergence[ref_img.cols*r+c];
       if(rmd::ConvergenceStates::UPDATE == convergence)
       {
-        ASSERT_NEAR(static_cast<float>(c), match_x, 0.01);
-        ASSERT_NEAR(static_cast<float>(r), match_y, 0.01);
+        EXPECT_NEAR(static_cast<float>(c), match_x, 0.01);
+        EXPECT_NEAR(static_cast<float>(r), match_y, 0.01);
       }
-      //printf("Pixel coordinates: (reference image) (%lu, %lu) -> (%f, %f) (current image)\n", c, r, match_x, match_y);
+      // printf("Pixel coordinates: (reference image) (%lu, %lu) -> (%f, %f) (current image)\n", c, r, match_x, match_y);
     }
   }
 

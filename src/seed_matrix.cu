@@ -101,8 +101,7 @@ bool rmd::SeedMatrix::update(
   cudaError err = cudaDeviceSynchronize();
   if(cudaSuccess != err)
     throw CudaException("SeedMatrix: unable to synchronize device", err);
-
-  rmd::bindTexture(convergence_tex, convergence_);
+  rmd::bindTexture(convergence_tex, convergence_, cudaFilterModePoint);
 
   // Establish epipolar correspondences
   // call epipolar matching kernel
@@ -110,7 +109,6 @@ bool rmd::SeedMatrix::update(
   err = cudaDeviceSynchronize();
   if(cudaSuccess != err)
     throw CudaException("SeedMatrix: unable to synchronize device", err);
-
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref.inv());
