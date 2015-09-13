@@ -203,11 +203,11 @@ TEST(RMDCuTests, seedMatrixCheck)
          || c>ref_img.cols-side-1
          || c<side)
       {
-        ASSERT_EQ(rmd::ConvergenceStates::BORDER, cu_convergence.at<int>(r, c));
+        ASSERT_EQ(rmd::ConvergenceStates::BORDER, cu_convergence.at<int>(r, c)) << "(r, c) = (" << r << ", " << c <<")";
       }
       else
       {
-        ASSERT_EQ(rmd::ConvergenceStates::UPDATE, cu_convergence.at<int>(r, c));
+        ASSERT_EQ(rmd::ConvergenceStates::UPDATE, cu_convergence.at<int>(r, c)) << "(r, c) = (" << r << ", " << c <<")";
       }
     }
   }
