@@ -1,12 +1,11 @@
 #include <rmd/depthmap_denoiser.cuh>
 #include <rmd/texture_memory.cuh>
 
-rmd::DepthmapDenoiser::DepthmapDenoiser(size_t width, size_t height, float depth_range)
+rmd::DepthmapDenoiser::DepthmapDenoiser(size_t width, size_t height)
   : u_(width, height)
   , u_head_(width, height)
   , p_(width, height)
   , g_(width, height)
-  , large_sigma_sq_(depth_range*depth_range/72.0f)
 {
   dim_block_.x = 16;
   dim_block_.y = 16;
@@ -39,4 +38,9 @@ void rmd::DepthmapDenoiser::denoise(
   {
 
   }
+}
+
+void rmd::DepthmapDenoiser::setLargeSigmaSq(float depth_range)
+{
+  large_sigma_sq_=  depth_range * depth_range / 72.0f;
 }

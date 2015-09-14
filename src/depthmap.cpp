@@ -13,6 +13,7 @@ rmd::Depthmap::Depthmap(
   , seeds_(width, height, rmd::PinholeCamera(fx, fy, cx, cy))
 {
   cv_K_ = (cv::Mat_<float>(3, 3) << fx, 0.0f, cx, 0.0f, fy, cy, 0.0f, 0.0f, 1.0f);
+  denoiser_.reset(new rmd::DepthmapDenoiser(width_, height_));
 }
 
 void rmd::Depthmap::initUndistortionMap(
@@ -40,7 +41,7 @@ bool rmd::Depthmap::setReferenceImage(
     const float &min_depth,
     const float &max_depth)
 {
-  denoiser_.reset(new rmd::DepthmapDenoiser(width_, height_, max_depth-min_depth));
+  denoiser_->setLargeSigmaSq(max_depth-min_depth);
   inputImage(img_curr);
   return seeds_.setReferenceImage(
         reinterpret_cast<float*>(img_undistorted_32fc1_.data),

@@ -10,13 +10,14 @@ class DepthmapDenoiser
 {
 
 public:
-  DepthmapDenoiser(size_t width, size_t height, float depth_range);
+  DepthmapDenoiser(size_t width, size_t height);
   void denoise(
       const rmd::DeviceImage<float> &mu,
       const rmd::DeviceImage<float> &sigma_sq,
       const rmd::DeviceImage<float> &a,
       const rmd::DeviceImage<float> &b,
       float *host_denoised);
+  void setLargeSigmaSq(float depth_range);
 private:
   DeviceImage<float> u_;
   DeviceImage<float> u_head_;
@@ -26,7 +27,7 @@ private:
   dim3 dim_block_;
   dim3 dim_grid_;
 
-  const float large_sigma_sq_;
+  float large_sigma_sq_;
 };
 
 }
