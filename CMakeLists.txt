@@ -36,6 +36,7 @@ ADD_DEFINITIONS(-DRMD_MAX_EXTENT_EPIPOLAR_SEARCH=100)
 CUDA_ADD_LIBRARY(
     remode
     src/seed_matrix.cu
+    src/depthmap_denoiser.cu
 )
 
 CUDA_ADD_LIBRARY(

@@ -62,8 +62,6 @@ int main(int argc, char **argv)
     }
   }
 
-  // denoise
-
   // show depthmap
   cv::Mat result;
   depthmap.outputDepthmap(result);
@@ -73,7 +71,11 @@ int main(int argc, char **argv)
 
   cv::imwrite("/home/mpi/Desktop/result.png", result);
 
+  // denoise
+  cv::Mat denoised_result;
+  depthmap.outputDenoisedDepthmap(denoised_result);
 
+  std::cout << "fino a qui tutto bene" << std::endl;
 
   return EXIT_SUCCESS;
 }

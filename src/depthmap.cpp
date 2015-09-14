@@ -40,6 +40,7 @@ bool rmd::Depthmap::setReferenceImage(
     const float &min_depth,
     const float &max_depth)
 {
+  denoiser_.reset(new rmd::DepthmapDenoiser(width_, height_, max_depth-min_depth));
   inputImage(img_curr);
   return seeds_.setReferenceImage(
         reinterpret_cast<float*>(img_undistorted_32fc1_.data),
@@ -76,4 +77,15 @@ void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1) const
 {
   depth_32fc1.create(height_, width_, CV_32FC1);
   seeds_.downloadDepthmap(reinterpret_cast<float*>(depth_32fc1.data));
+}
+
+void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1)
+{
+  depth_32fc1.create(height_, width_, CV_32FC1);
+  denoiser_->denoise(
+        seeds_.getMu(),
+        seeds_.getSigmaSq(),
+        seeds_.getA(),
+        seeds_.getB(),
+        reinterpret_cast<float*>(depth_32fc1.data));
 }

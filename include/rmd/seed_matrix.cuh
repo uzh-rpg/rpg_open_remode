@@ -41,6 +41,11 @@ public:
       const SE3<float> &T_curr_world);
   void downloadDepthmap(float *host_depthmap_align_row_maj) const;
 
+  const DeviceImage<float> & getMu() const;
+  const DeviceImage<float> & getSigmaSq() const;
+  const DeviceImage<float> & getA() const;
+  const DeviceImage<float> & getB() const;
+
 #if RMD_DEBUG
   void downloadSigmaSq(float *host_align_row_maj) const;
   void downloadA(float *host_align_row_maj) const;

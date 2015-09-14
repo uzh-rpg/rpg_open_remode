@@ -122,6 +122,26 @@ void rmd::SeedMatrix::downloadDepthmap(float *host_depthmap_align_row_maj) const
   mu_.getDevData(host_depthmap_align_row_maj);
 }
 
+const rmd::DeviceImage<float> & rmd::SeedMatrix::getMu() const
+{
+  return mu_;
+}
+
+const rmd::DeviceImage<float> & rmd::SeedMatrix::getSigmaSq() const
+{
+  return sigma_;
+}
+
+const rmd::DeviceImage<float> & rmd::SeedMatrix::getA() const
+{
+  return a_;
+}
+
+const rmd::DeviceImage<float> & rmd::SeedMatrix::getB() const
+{
+  return b_;
+}
+
 #if RMD_DEBUG
 void rmd::SeedMatrix::downloadSigmaSq(float *host_align_row_maj) const
 {

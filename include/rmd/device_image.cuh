@@ -1,6 +1,7 @@
 #ifndef DEVICE_IMAGE_CUH
 #define DEVICE_IMAGE_CUH
 
+#include <assert.h>
 #include <cuda_runtime.h>
 #include <rmd/cuda_exception.cuh>
 
@@ -111,6 +112,39 @@ struct DeviceImage
   cudaChannelFormatDesc getCudaChannelFormatDesc() const
   {
     return cudaCreateChannelDesc<ElementType>();
+  }
+
+  __host__
+  void zero()
+  {
+    const cudaError err = cudaMemset2D(
+          data,
+          pitch,
+          0,
+          width*sizeof(ElementType),
+          height);
+    if(err != cudaSuccess)
+      throw CudaException("Image: unable to zero.", err);
+  }
+
+  __host__
+  DeviceImage<ElementType> & operator=(const DeviceImage<ElementType> &other_image)
+  {
+    if(this != &other_image)
+    {
+      assert(width  == other_image.width &&
+             height == other_image.height);
+      const cudaError err = cudaMemcpy2D(data,
+                                         pitch,
+                                         other_image.data,
+                                         other_image.pitch,
+                                         width*sizeof(ElementType),
+                                         height,
+                                         cudaMemcpyDeviceToDevice);
+      if(err != cudaSuccess)
+        throw CudaException("Image, operator '=': unable to copy data from another image.", err);
+    }
+    return *this;
   }
 
   // fields

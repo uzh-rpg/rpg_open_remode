@@ -1,10 +1,12 @@
 #ifndef RMD_DEPTHMAP_H
 #define RMD_DEPTHMAP_H
 
+#include <memory>
 #include <Eigen/Eigen>
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include <rmd/seed_matrix.cuh>
+#include <rmd/depthmap_denoiser.cuh>
 
 namespace rmd
 {
@@ -37,6 +39,7 @@ public:
               const SE3<float> &T_curr_world);
 
   void outputDepthmap(cv::Mat &depth_32fc1) const;
+  void outputDenoisedDepthmap(cv::Mat &depth_32fc1);
 
 private:
   void inputImage(const cv::Mat &img_8uc1);
@@ -50,6 +53,8 @@ private:
   cv::Mat undist_map1_, undist_map2_;
   cv::Mat img_undistorted_32fc1_;
   bool is_distorted_;
+
+  std::unique_ptr<DepthmapDenoiser> denoiser_;
 };
 
 }
