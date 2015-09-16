@@ -67,15 +67,16 @@ int main(int argc, char **argv)
   depthmap.outputDepthmap(result);
   cv::Mat colored = rmd::test::Dataset::scaleMat(result);
   cv::imshow("result", colored);
-  cv::waitKey();
 
-  cv::imwrite("/home/mpi/Desktop/result.png", result);
+  //cv::imwrite("/home/mpi/Desktop/result.png", result);
 
   // denoise
   cv::Mat denoised_result;
   depthmap.outputDenoisedDepthmap(denoised_result);
+  cv::Mat colored_denoised = rmd::test::Dataset::scaleMat(denoised_result);
+  cv::imshow("denoised_result", colored_denoised);
 
-  std::cout << "fino a qui tutto bene" << std::endl;
+  cv::waitKey();
 
   return EXIT_SUCCESS;
 }
