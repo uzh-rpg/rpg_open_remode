@@ -2,11 +2,47 @@
 #include <rmd/depthmap_denoiser.cuh>
 #include <rmd/texture_memory.cuh>
 
-rmd::DepthmapDenoiser::DeviceData::DeviceData(
-    DeviceImage<float> * const u_dev_ptr,
-    DeviceImage<float> * const u_head_dev_ptr,
-    DeviceImage<float> * const p_dev_ptr,
-    DeviceImage<float> * const g_dev_ptr)
+namespace rmd
+{
+
+template<typename T>
+inline __device__
+T max(T a, T b)
+{
+  return a > b ? a : b;
+}
+
+template<typename T>
+inline __device__
+T min(T a, T b)
+{
+  return a < b ? a : b;
+}
+
+__global__
+void computeWeightsKernel(denoise::DeviceData *dev_ptr)
+{
+  int x = blockIdx.x * blockDim.x + threadIdx.x;
+  int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+  float xx = x+0.5f;
+  float yy = y+0.5f;
+
+  if (x < dev_ptr->width && y < dev_ptr->height)
+  {
+    const float E_pi = tex2D(a_tex, xx, yy) / (tex2D(a_tex, xx, yy) + tex2D(b_tex, xx, yy));
+    dev_ptr->g->atXY(x, y) = rmd::max<float>((E_pi*tex2D(sigma_tex, xx, yy)+(1.0f-E_pi)*dev_ptr->large_sigma_sq)/dev_ptr->large_sigma_sq, 1.0f);
+  }
+}
+
+} // rmd namespace
+
+rmd::denoise::DeviceData::DeviceData(DeviceImage<float> * const u_dev_ptr,
+                                     DeviceImage<float> * const u_head_dev_ptr,
+                                     DeviceImage<float> * const p_dev_ptr,
+                                     DeviceImage<float> * const g_dev_ptr,
+                                     const size_t &w,
+                                     const size_t &h)
   : L(sqrt(8.0f))
   , tau(0.02f)
   , sigma((1 / (L*L)) / tau)
@@ -15,6 +51,8 @@ rmd::DepthmapDenoiser::DeviceData::DeviceData(
   , u_head(u_head_dev_ptr)
   , p(p_dev_ptr)
   , g(g_dev_ptr)
+  , width(w)
+  , height(h)
 { }
 
 rmd::DepthmapDenoiser::DepthmapDenoiser(size_t width, size_t height)
@@ -23,11 +61,13 @@ rmd::DepthmapDenoiser::DepthmapDenoiser(size_t width, size_t height)
   , p_(width, height)
   , g_(width, height)
 {
-  host_ptr = new rmd::DepthmapDenoiser::DeviceData(
+  host_ptr = new rmd::denoise::DeviceData(
         u_.dev_ptr,
         u_head_.dev_ptr,
         p_.dev_ptr,
-        g_.dev_ptr);
+        g_.dev_ptr,
+        width,
+        height);
   const cudaError err = cudaMalloc(
         &dev_ptr,
         sizeof(*host_ptr));
@@ -73,6 +113,9 @@ void rmd::DepthmapDenoiser::denoise(
   rmd::bindTexture(sigma_tex, sigma_sq);
   rmd::bindTexture(a_tex, a);
   rmd::bindTexture(b_tex, b);
+
+  rmd::computeWeightsKernel<<<dim_grid_, dim_block_>>>(dev_ptr);
+  rmd::bindTexture(g_tex, g_);
 
   u_ = mu;
   u_head_ = u_;
