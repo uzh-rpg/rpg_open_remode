@@ -1,6 +1,7 @@
 #include <iostream>
 #include <rmd/depthmap_denoiser.cuh>
 #include <rmd/texture_memory.cuh>
+#include <cuda_toolkit/helper_math.h>
 
 namespace rmd
 {
@@ -31,16 +32,78 @@ void computeWeightsKernel(denoise::DeviceData *dev_ptr)
   if (x < dev_ptr->width && y < dev_ptr->height)
   {
     const float E_pi = tex2D(a_tex, xx, yy) / (tex2D(a_tex, xx, yy) + tex2D(b_tex, xx, yy));
-    dev_ptr->g->atXY(x, y) = rmd::max<float>((E_pi*tex2D(sigma_tex, xx, yy)+(1.0f-E_pi)*dev_ptr->large_sigma_sq)/dev_ptr->large_sigma_sq, 1.0f);
+    dev_ptr->g->atXY(x, y) = max<float>((E_pi*tex2D(sigma_tex, xx, yy)+(1.0f-E_pi)*dev_ptr->large_sigma_sq)/dev_ptr->large_sigma_sq, 1.0f);
   }
+}
+
+__global__
+void updateTVL1PrimalDualKernel(denoise::DeviceData *dev_ptr)
+{
+  const int x = blockIdx.x * blockDim.x + threadIdx.x;
+  const int y = blockIdx.y * blockDim.y + threadIdx.y;
+
+  const float xx = x+0.5f;
+  const float yy = y+0.5f;
+
+  const int width = dev_ptr->width;
+  const int height = dev_ptr->height;
+
+  if (x < width && y < height)
+  {
+    const float noisy_depth = tex2D(mu_tex, xx, yy );
+    const float old_u = dev_ptr->u->atXY(x, y);
+    const float g = tex2D(g_tex, xx, yy);
+    // update dual
+    const float2 p = dev_ptr->p->atXY(x, y);
+    float2 grad_uhead = make_float2(0.0f, 0.0f);
+    const float current_u = dev_ptr->u->atXY(x, y);
+    grad_uhead.x = dev_ptr->u_head->atXY(min<int>(width-1, x+1), y)  - current_u;
+    grad_uhead.y = dev_ptr->u_head->atXY(x, min<int>(height-1, y+1)) - current_u;
+    const float2 temp_p = g* grad_uhead * dev_ptr->sigma + p;
+    const float sqrt_p = sqrt(temp_p.x * temp_p.x + temp_p.y * temp_p.y);
+    dev_ptr->p->atXY(x, y) = temp_p / max<float>(1.0f, sqrt_p);
+
+    __syncthreads();
+
+    // update primal
+    float2 current_p = dev_ptr->p->atXY(x, y);
+    float2 w_p = dev_ptr->p->atXY(max<int>(0, x-1), y);
+    float2 n_p = dev_ptr->p->atXY(x, max<int>(0, y-1));
+    if (x == 0)
+      w_p.x = 0.0f;
+    else if (x >= width - 1)
+      current_p.x = 0.0f;
+    if (y == 0)
+      n_p.y = 0.0f;
+    else if (y >= height - 1)
+      current_p.y = 0.0f;
+    const float divergence = current_p.x - w_p.x + current_p.y - n_p.y;
+
+    float temp_u = old_u + dev_ptr->tau * g * divergence;
+    if ((temp_u - noisy_depth) > (dev_ptr->tau * dev_ptr->lambda))
+    {
+      dev_ptr->u->atXY(x, y) = temp_u - dev_ptr->tau * dev_ptr->lambda;
+    }
+    else if ((temp_u - noisy_depth) < (-dev_ptr->tau * dev_ptr->lambda))
+    {
+      dev_ptr->u->atXY(x, y) = temp_u + dev_ptr->tau * dev_ptr->lambda;
+    }
+    else
+    {
+      dev_ptr->u->atXY(x, y) = noisy_depth;
+    }
+    dev_ptr->u_head->atXY(x, y) = dev_ptr->u->atXY(x, y)
+        + dev_ptr->theta * (dev_ptr->u->atXY(x, y) - old_u);
+  }
+  __syncthreads();
 }
 
 } // rmd namespace
 
-rmd::denoise::DeviceData::DeviceData(DeviceImage<float> * const u_dev_ptr,
-                                     DeviceImage<float> * const u_head_dev_ptr,
-                                     DeviceImage<float> * const p_dev_ptr,
-                                     DeviceImage<float> * const g_dev_ptr,
+rmd::denoise::DeviceData::DeviceData(DeviceImage<float>  * const u_dev_ptr,
+                                     DeviceImage<float>  * const u_head_dev_ptr,
+                                     DeviceImage<float2> * const p_dev_ptr,
+                                     DeviceImage<float>  * const g_dev_ptr,
                                      const size_t &w,
                                      const size_t &h)
   : L(sqrt(8.0f))
@@ -53,6 +116,7 @@ rmd::denoise::DeviceData::DeviceData(DeviceImage<float> * const u_dev_ptr,
   , g(g_dev_ptr)
   , width(w)
   , height(h)
+  , lambda(0.2f)
 { }
 
 rmd::DepthmapDenoiser::DepthmapDenoiser(size_t width, size_t height)
@@ -93,7 +157,9 @@ void rmd::DepthmapDenoiser::denoise(
     const rmd::DeviceImage<float> &sigma_sq,
     const rmd::DeviceImage<float> &a,
     const rmd::DeviceImage<float> &b,
-    float *host_denoised)
+    float *host_denoised,
+    float lambda,
+    int iterations)
 {
   // large_sigma_sq must be set before calling this method
   if(host_ptr->large_sigma_sq < 0.0f)
@@ -101,6 +167,7 @@ void rmd::DepthmapDenoiser::denoise(
     std::cerr << "ERROR: setLargeSigmaSq must be called before this method" << std::endl;
     return;
   }
+  host_ptr->lambda = lambda;
   const cudaError err = cudaMemcpy(
         dev_ptr,
         host_ptr,
@@ -121,9 +188,9 @@ void rmd::DepthmapDenoiser::denoise(
   u_head_ = u_;
   p_.zero();
 
-  for (int i = 0; i < 200; ++i)
+  for(int i = 0; i < iterations; ++i)
   {
-
+    rmd::updateTVL1PrimalDualKernel<<<dim_grid_, dim_block_>>>(dev_ptr);
   }
   u_.getDevData(host_denoised);
 }

@@ -80,7 +80,7 @@ void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1) const
   seeds_.downloadDepthmap(reinterpret_cast<float*>(depth_32fc1.data));
 }
 
-void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1)
+void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, int iterations)
 {
   depth_32fc1.create(height_, width_, CV_32FC1);
   denoiser_->denoise(
@@ -88,5 +88,7 @@ void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1)
         seeds_.getSigmaSq(),
         seeds_.getA(),
         seeds_.getB(),
-        reinterpret_cast<float*>(depth_32fc1.data));
+        reinterpret_cast<float*>(depth_32fc1.data),
+        lambda,
+        iterations);
 }

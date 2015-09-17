@@ -39,7 +39,7 @@ public:
               const SE3<float> &T_curr_world);
 
   void outputDepthmap(cv::Mat &depth_32fc1) const;
-  void outputDenoisedDepthmap(cv::Mat &depth_32fc1);
+  void outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, int iterations);
 
 private:
   void inputImage(const cv::Mat &img_8uc1);

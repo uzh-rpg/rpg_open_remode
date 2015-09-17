@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
   // denoise
   cv::Mat denoised_result;
-  depthmap.outputDenoisedDepthmap(denoised_result);
+  depthmap.outputDenoisedDepthmap(denoised_result, 0.2f, 200);
   cv::Mat colored_denoised = rmd::test::Dataset::scaleMat(denoised_result);
   cv::imshow("denoised_result", colored_denoised);
 

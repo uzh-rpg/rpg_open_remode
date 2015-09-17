@@ -12,10 +12,10 @@ namespace denoise
 struct DeviceData
 {
   DeviceData(
-      DeviceImage<float> * const u_dev_ptr,
-      DeviceImage<float> * const u_head_dev_ptr,
-      DeviceImage<float> * const p_dev_ptr,
-      DeviceImage<float> * const g_dev_ptr,
+      DeviceImage<float>  * const u_dev_ptr,
+      DeviceImage<float>  * const u_head_dev_ptr,
+      DeviceImage<float2> * const p_dev_ptr,
+      DeviceImage<float>  * const g_dev_ptr,
       const size_t &w,
       const size_t &h);
   const float L;
@@ -23,15 +23,16 @@ struct DeviceData
   const float sigma;
   const float theta;
 
-  DeviceImage<float> * const u;
-  DeviceImage<float> * const u_head;
-  DeviceImage<float> * const p;
-  DeviceImage<float> * const g;
+  DeviceImage<float>  * const u;
+  DeviceImage<float>  * const u_head;
+  DeviceImage<float2> * const p;
+  DeviceImage<float>  * const g;
 
   const size_t width;
   const size_t height;
 
   float large_sigma_sq;
+  float lambda;
 };
 
 } // denoise namespace
@@ -42,17 +43,18 @@ class DepthmapDenoiser
 public:
   DepthmapDenoiser(size_t width, size_t height);
   ~DepthmapDenoiser();
-  void denoise(
-      const rmd::DeviceImage<float> &mu,
-      const rmd::DeviceImage<float> &sigma_sq,
-      const rmd::DeviceImage<float> &a,
-      const rmd::DeviceImage<float> &b,
-      float *host_denoised);
+  void denoise(const rmd::DeviceImage<float> &mu,
+               const rmd::DeviceImage<float> &sigma_sq,
+               const rmd::DeviceImage<float> &a,
+               const rmd::DeviceImage<float> &b,
+               float *host_denoised,
+               float lambda,
+               int iterations);
   void setLargeSigmaSq(float depth_range);
 private:
   DeviceImage<float> u_;
   DeviceImage<float> u_head_;
-  DeviceImage<float> p_;
+  DeviceImage<float2> p_;
   DeviceImage<float> g_;
 
   denoise::DeviceData * host_ptr;
