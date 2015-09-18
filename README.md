@@ -69,8 +69,8 @@ Download the test dataset
 
 Run REMODE on the test data
 
-   cd rpg_remode_legacy/build
-   ./dataset_main
+    cd rpg_remode_legacy/build
+    ./dataset_main
    
 #### Contributing
 
