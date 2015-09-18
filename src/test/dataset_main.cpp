@@ -16,7 +16,7 @@ int main(int argc, char **argv)
   rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
 
   rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
-  if (!dataset.readDataSequence())
+  if (!dataset.readDataSequence(20, 100))
   {
     std::cerr << "ERROR: could not read dataset" << std::endl;
     return -1;
@@ -68,11 +68,9 @@ int main(int argc, char **argv)
   cv::Mat colored = rmd::test::Dataset::scaleMat(result);
   cv::imshow("result", colored);
 
-  //cv::imwrite("/home/mpi/Desktop/result.png", result);
-
   // denoise
   cv::Mat denoised_result;
-  depthmap.outputDenoisedDepthmap(denoised_result, 0.2f, 200);
+  depthmap.outputDenoisedDepthmap(denoised_result, 0.4f, 200);
   cv::Mat colored_denoised = rmd::test::Dataset::scaleMat(denoised_result);
   cv::imshow("denoised_result", colored_denoised);
 

@@ -39,6 +39,7 @@ public:
       const std::string &dataset_path,
       const std::string &sequence_file_path,
       const rmd::PinholeCamera &cam);
+  bool readDataSequence(size_t start, size_t end=0);
   bool readDataSequence();
   bool readImage(cv::Mat &img, const DatasetEntry &entry) const;
   void readCameraPose(rmd::SE3<float> &pose, const DatasetEntry &entry) const;

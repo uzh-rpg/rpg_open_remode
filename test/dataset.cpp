@@ -50,35 +50,49 @@ rmd::test::Dataset::Dataset(
 {
 }
 
-bool rmd::test::Dataset::readDataSequence(){
+bool rmd::test::Dataset::readDataSequence(size_t start, size_t end)
+{
   dataset_.clear();
   std::string line;
   std::ifstream sequence_file_str(sequence_file_path_);
   if (sequence_file_str.is_open())
   {
+    size_t line_cnt = 0;
     while (getline(sequence_file_str, line))
     {
-      std::stringstream line_str(line);
-      DatasetEntry data;
-      std::string imgFileName;
-      line_str >> imgFileName;
-      data.getImageFileName() = imgFileName;
-      const std::string depthmapFileName = imgFileName.substr(0, imgFileName.find('.')+1) + "depth";
-      data.getDepthmapFileName() = depthmapFileName;
-      line_str >> data.getTranslation().x();
-      line_str >> data.getTranslation().y();
-      line_str >> data.getTranslation().z();
-      line_str >> data.getQuaternion().x();
-      line_str >> data.getQuaternion().y();
-      line_str >> data.getQuaternion().z();
-      line_str >> data.getQuaternion().w();
-      dataset_.push_back(data);
+      if(line_cnt >= start)
+      {
+        if(line_cnt < end || 0 == end)
+        {
+          std::stringstream line_str(line);
+          DatasetEntry data;
+          std::string imgFileName;
+          line_str >> imgFileName;
+          data.getImageFileName() = imgFileName;
+          const std::string depthmapFileName = imgFileName.substr(0, imgFileName.find('.')+1) + "depth";
+          data.getDepthmapFileName() = depthmapFileName;
+          line_str >> data.getTranslation().x();
+          line_str >> data.getTranslation().y();
+          line_str >> data.getTranslation().z();
+          line_str >> data.getQuaternion().x();
+          line_str >> data.getQuaternion().y();
+          line_str >> data.getQuaternion().z();
+          line_str >> data.getQuaternion().w();
+          dataset_.push_back(data);
+        }
+      }
+      line_cnt += 1;
     }
     sequence_file_str.close();
     return true;
   }
   else
     return false;
+}
+
+bool rmd::test::Dataset::readDataSequence()
+{
+  return readDataSequence(0, 0);
 }
 
 bool rmd::test::Dataset::readImage(cv::Mat &img, const DatasetEntry &entry) const
