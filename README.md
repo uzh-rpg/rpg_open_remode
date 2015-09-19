@@ -86,6 +86,10 @@ Run REMODE on the test data
 
     cd $MY_WORKSPACE/rpg_open_remode/build
     ./dataset_main
+  
+#### Acknowledgments
+
+The author acknowledges the key contributions by Christian Forster and Manuel Werlberger. 
    
 #### Contributing
 
