@@ -36,7 +36,7 @@ This implementation requires a CUDA capable GPU and the NVIDIA CUDA Toolkit
 
 https://developer.nvidia.com/cuda-zone
 
-The following libraries are also required: `OpenCV`, `Eigen`, `Boost` and `gtest`
+The following libraries are also required: `OpenCV`, `Eigen`, `Boost` and `googletest`
 
 #### Instructions
 
@@ -46,7 +46,8 @@ Ubuntu:
     
     sudo apt-get install libopencv-dev libeigen3-dev libboost-filesystem-dev
     
-Install gtest
+Install googletest 1.7
+Several Ubuntu packages install googletest as a dependency. In order to avoid conflicts with different libray versions, build googletest in $MY_WORKSPACE:
     
     cd $MY_WORKSPACE
     git clone https://github.com/google/googletest.git
