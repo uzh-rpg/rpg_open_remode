@@ -40,44 +40,51 @@ The following libraries are also required: `OpenCV`, `Eigen`, `Boost` and `gtest
 
 #### Instructions
 
-Install dependencies.
+Install dependencies. The following assumes you have an environment variable `MY_WORKSPACE` pointing to your workspace.
 
 Ubuntu:
     
     sudo apt-get install libopencv-dev libeigen3-dev libboost-filesystem-dev
     
 Install gtest
-
+    
+    cd $MY_WORKSPACE
     git clone https://github.com/google/googletest.git
-    cd googletest/googletest
+    cd googletest
+    git checkout release-1.7.0
     mkdir build && cd build
     cmake ..
     make
+    cd ..
+    mkdir install
+    cp -r include install
+    cp build/*.a install
 
 Clone the REMODE repository:
 
-    git clone https://github.com/uzh-rpg/rpg_remode_legacy.git
+    cd $MY_WORKSPACE
+    git clone https://github.com/uzh-rpg/rpg_open_remode.git
 
 Build the library and the tests:
 
-    cd rpg_remode_legacy
+    cd $MY_WORKSPACE/rpg_open_remode
     mkdir build && cd build
-    cmake ..
+    cmake -DGTEST_ROOT=$MY_WORKSPACE/googletest/install -DRMD_DEBUG=1 ..
     make
+    
+Download the test dataset
+
+    cd $MY_WORKSPACE/rpg_open_remode
+    wget http://rpg.ifi.uzh.ch/datasets/traj_over_table_test_data.zip | unzip -xz
 
 Run the tests
 
-    cd rpg_remode_legacy/build
+    cd $MY_WORKSPACE/rpg_open_remode/build
     ./all_tests
-
-Download the test dataset
-
-    cd rpg_remode_legacy
-    wget http://rpg.ifi.uzh.ch/datasets/traj_over_table_test_data.zip | unzip -xz
 
 Run REMODE on the test data
 
-    cd rpg_remode_legacy/build
+    cd $MY_WORKSPACE/rpg_open_remode/build
     ./dataset_main
    
 #### Contributing
