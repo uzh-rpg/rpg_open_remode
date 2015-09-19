@@ -36,7 +36,7 @@ This implementation requires a CUDA capable GPU and the NVIDIA CUDA Toolkit
 
 https://developer.nvidia.com/cuda-zone
 
-The following libraries are also required: `OpenCV`, `Eigen` and `Boost`.
+The following libraries are also required: `OpenCV`, `Eigen`, `Boost` and `gtest`
 
 #### Instructions
 
@@ -45,6 +45,14 @@ Install dependencies.
 Ubuntu:
     
     sudo apt-get install libopencv-dev libeigen3-dev libboost-filesystem-dev
+    
+Install gtest
+
+    git clone https://github.com/google/googletest.git
+    cd googletest/googletest
+    mkdir build && cd build
+    cmake ..
+    make
 
 Clone the REMODE repository:
 
@@ -55,7 +63,7 @@ Build the library and the tests:
     cd rpg_remode_legacy
     mkdir build && cd build
     cmake ..
-    make -j7
+    make
 
 Run the tests
 
