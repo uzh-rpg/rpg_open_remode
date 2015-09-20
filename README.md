@@ -76,7 +76,7 @@ Download the test dataset
 
     cd $MY_WORKSPACE/rpg_open_remode
     wget http://rpg.ifi.uzh.ch/datasets/remode_test_data.zip
-    unzip unzip remode_test_data.zip
+    unzip remode_test_data.zip
 
 Run the tests
 
