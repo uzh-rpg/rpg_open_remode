@@ -31,12 +31,10 @@ SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -gencode arch=compute_30,code=sm_30; 
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 find_package(CUDA REQUIRED)
 
-## System dependencies are found with CMake's conventions
 find_package(OpenCV REQUIRED)
 find_package(Eigen REQUIRED)
 find_package(Boost REQUIRED)
 
-## Specify additional locations of header files
 include_directories(
   include
   ${OpenCV_INCLUDE_DIRS}
@@ -62,7 +60,7 @@ CUDA_ADD_LIBRARY(
     test/sobel.cu
 )
 
-## Declare a cpp executable
+## Test on dataset
 add_executable(
     dataset_main
     src/depthmap.cpp
@@ -70,7 +68,6 @@ add_executable(
     test/dataset.cpp
 )
 
-## Specify libraries to link a library or executable target against
 target_link_libraries(
     dataset_main
     remode
