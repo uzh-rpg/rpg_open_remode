@@ -75,7 +75,8 @@ Build the library and the tests:
 Download the test dataset
 
     cd $MY_WORKSPACE/rpg_open_remode
-    wget http://rpg.ifi.uzh.ch/datasets/traj_over_table_test_data.zip | unzip -xz
+    wget http://rpg.ifi.uzh.ch/datasets/remode_test_data.zip
+    unzip unzip remode_test_data.zip
 
 Run the tests
 
