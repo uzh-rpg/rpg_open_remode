@@ -158,6 +158,7 @@ TEST(RMDCuTests, epipolarMatchTest)
   double t = sdkGetAverageTimerValue(&timer) / 1000.0;
   printf("update CUDA execution time: %f seconds.\n", t);
 
+#if RMD_DEBUG
   float2 * epipolar_matches = new float2[ref_img.cols * ref_img.rows];
   seeds.downloadEpipolarMatches(epipolar_matches);
 
@@ -182,4 +183,5 @@ TEST(RMDCuTests, epipolarMatchTest)
 
   delete cu_convergence;
   delete epipolar_matches;
+#endif
 }
