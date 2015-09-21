@@ -69,7 +69,7 @@ Build the library and the tests:
 
     cd $MY_WORKSPACE/rpg_open_remode
     mkdir build && cd build
-    cmake -DGTEST_ROOT=$MY_WORKSPACE/googletest/install -DRMD_DEBUG=1 ..
+    cmake -DGTEST_ROOT=$MY_WORKSPACE/googletest/install ..
     make
     
 Download the test dataset
