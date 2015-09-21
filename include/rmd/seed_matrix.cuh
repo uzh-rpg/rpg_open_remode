@@ -63,7 +63,7 @@ public:
   const DeviceImage<float> & getA() const;
   const DeviceImage<float> & getB() const;
 
-#if RMD_DEBUG
+#if RMD_BUILD_TESTS
   void downloadSigmaSq(float *host_align_row_maj) const;
   void downloadA(float *host_align_row_maj) const;
   void downloadB(float *host_align_row_maj) const;

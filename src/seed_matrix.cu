@@ -159,7 +159,7 @@ const rmd::DeviceImage<float> & rmd::SeedMatrix::getB() const
   return b_;
 }
 
-#if RMD_DEBUG
+#if RMD_BUILD_TESTS
 void rmd::SeedMatrix::downloadSigmaSq(float *host_align_row_maj) const
 {
   sigma_.getDevData(host_align_row_maj);

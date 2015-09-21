@@ -29,8 +29,13 @@ ENDIF()
 
 SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -gencode arch=compute_30,code=sm_30; --ptxas-options=-v)
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
-find_package(CUDA REQUIRED)
 
+option(BUILD_TESTS "Build test programs" ON)
+if(BUILD_TESTS)
+  ADD_DEFINITIONS(-DRMD_BUILD_TESTS)
+endif(BUILD_TESTS)
+
+find_package(CUDA REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Eigen REQUIRED)
 find_package(Boost REQUIRED)
@@ -41,10 +46,6 @@ include_directories(
   ${Eigen_INCLUDE_DIRS}
 )
 
-if(RMD_DEBUG)
-  ADD_DEFINITIONS(-DRMD_DEBUG)
-endif()
-
 # Maximum extent of epipolar line search in pixels
 ADD_DEFINITIONS(-DRMD_MAX_EXTENT_EPIPOLAR_SEARCH=100)
 
@@ -52,12 +53,6 @@ CUDA_ADD_LIBRARY(
     remode
     src/seed_matrix.cu
     src/depthmap_denoiser.cu
-)
-
-CUDA_ADD_LIBRARY(
-    remodetest
-    test/copy.cu
-    test/sobel.cu
 )
 
 ## Test on dataset
@@ -77,6 +72,7 @@ target_link_libraries(
 )
 
 # GTest
+if(BUILD_TESTS)
 enable_testing()
 find_package(GTest REQUIRED)
 # Accepts the following variable as input:
@@ -84,6 +80,12 @@ find_package(GTest REQUIRED)
 #              The root directory of the gtest install prefix
 
 include_directories(${GTEST_INCLUDE_DIRS})
+
+CUDA_ADD_LIBRARY(
+    remodetest
+    test/copy.cu
+    test/sobel.cu
+)
 
 add_executable(all_tests
   test/device_image_test.cpp
@@ -108,3 +110,4 @@ add_test(
   RMDCuTests
   all_tests --gtest_repeat=2
 )
+endif(BUILD_TESTS)
