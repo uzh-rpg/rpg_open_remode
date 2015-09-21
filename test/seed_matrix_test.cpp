@@ -84,6 +84,7 @@ TEST(RMDCuTests, seedMatrixInit)
   cv::Mat initial_depthmap(ref_img.rows, ref_img.cols, CV_32FC1);
   seeds.downloadDepthmap(reinterpret_cast<float*>(initial_depthmap.data));
 
+#if RMD_DEBUG
   cv::Mat initial_sigma_sq(ref_img.rows, ref_img.cols, CV_32FC1);
   seeds.downloadSigmaSq(reinterpret_cast<float*>(initial_sigma_sq.data));
 
@@ -146,6 +147,7 @@ TEST(RMDCuTests, seedMatrixInit)
       ASSERT_NEAR(ocv_const_templ_denom.at<float>(r, c), cu_const_templ_denom.at<float>(r, c), 0.001f);
     }
   }
+#endif
 }
 
 TEST(RMDCuTests, seedMatrixCheck)
@@ -207,6 +209,7 @@ TEST(RMDCuTests, seedMatrixCheck)
   double t = sdkGetAverageTimerValue(&timer) / 1000.0;
   printf("update CUDA execution time: %f seconds.\n", t);
 
+#if RMD_DEBUG
   cv::Mat cu_convergence(ref_img.rows, ref_img.cols, CV_32SC1);
   seeds.downloadConvergence(reinterpret_cast<int*>(cu_convergence.data));
 
@@ -228,4 +231,6 @@ TEST(RMDCuTests, seedMatrixCheck)
       }
     }
   }
+#endif
+
 }
