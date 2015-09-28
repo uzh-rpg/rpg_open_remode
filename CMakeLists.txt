@@ -27,7 +27,7 @@ ELSE()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ENDIF()
 
-SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -gencode arch=compute_30,code=sm_30; --ptxas-options=-v)
+SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3)
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 
 option(BUILD_TESTS "Build test programs" ON)
