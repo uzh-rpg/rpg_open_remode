@@ -225,7 +225,13 @@ TEST(RMDCuTests, seedMatrixCheck)
       }
       else
       {
-        ASSERT_EQ(rmd::ConvergenceStates::UPDATE, cu_convergence.at<int>(r, c)) << "(r, c) = (" << r << ", " << c <<")";
+        const int result = cu_convergence.at<int>(r, c);
+        const bool success = (result == rmd::ConvergenceStates::UPDATE      ||
+                              result == rmd::ConvergenceStates::DIVERGED    ||
+                              result == rmd::ConvergenceStates::CONVERGED   ||
+                              result == rmd::ConvergenceStates::NOT_VISIBLE ||
+                              result == rmd::ConvergenceStates::NO_MATCH    );
+        ASSERT_EQ(true, success) << "(r, c) = (" << r << ", " << c <<")";
       }
     }
   }
