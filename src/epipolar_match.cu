@@ -21,7 +21,7 @@
 #include <float.h>
 #include <rmd/se3.cuh>
 #include <rmd/seed_matrix.cuh>
-#include <rmd/device_data.cuh>
+#include <rmd/mvs_device_data.cuh>
 #include <rmd/texture_memory.cuh>
 #include <rmd/helper_vector_types.cuh>
 
@@ -30,8 +30,8 @@ namespace rmd
 
 __global__
 void seedEpipolarMatchKernel(
-    DeviceData *dev_ptr,
-    rmd::SE3<float> T_curr_ref)
+    mvs::DeviceData *dev_ptr,
+    SE3<float> T_curr_ref)
 {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;

@@ -21,7 +21,7 @@
 #include <cuda_runtime.h>
 #include <rmd/device_image.cuh>
 #include <rmd/pinhole_camera.cuh>
-#include <rmd/device_data.cuh>
+#include <rmd/mvs_device_data.cuh>
 #include <rmd/se3.cuh>
 
 namespace rmd
@@ -86,7 +86,7 @@ private:
   DeviceImage<int> convergence_;
   // Epipolar matches
   DeviceImage<float2> epipolar_matches_;
-  DeviceData dev_data_;
+  mvs::DeviceData dev_data_;
   SE3<float> T_world_ref_;
   // kernel config
   dim3 dim_block_;

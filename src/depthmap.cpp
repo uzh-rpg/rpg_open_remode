@@ -54,7 +54,7 @@ void rmd::Depthmap::initUndistortionMap(
 
 bool rmd::Depthmap::setReferenceImage(
     const cv::Mat &img_curr,
-    const SE3<float> &T_curr_world,
+    const rmd::SE3<float> &T_curr_world,
     const float &min_depth,
     const float &max_depth)
 {
@@ -69,7 +69,7 @@ bool rmd::Depthmap::setReferenceImage(
 
 void rmd::Depthmap::update(
     const cv::Mat &img_curr,
-    const SE3<float> &T_curr_world)
+    const rmd::SE3<float> &T_curr_world)
 {
   inputImage(img_curr);
   seeds_.update(

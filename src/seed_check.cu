@@ -18,7 +18,7 @@
 #ifndef RMD_SEED_CHECK_CU
 #define RMD_SEED_CHECK_CU
 
-#include <rmd/device_data.cuh>
+#include <rmd/mvs_device_data.cuh>
 #include <rmd/texture_memory.cuh>
 #include <rmd/seed_matrix.cuh>
 
@@ -26,7 +26,7 @@ namespace rmd
 {
 
 __global__
-void seedCheckKernel(DeviceData *dev_ptr)
+void seedCheckKernel(mvs::DeviceData *dev_ptr)
 {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;

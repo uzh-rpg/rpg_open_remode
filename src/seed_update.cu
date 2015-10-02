@@ -18,7 +18,7 @@
 #ifndef RMD_SEED_UPDATE_CU
 #define RMD_SEED_UPDATE_CU
 
-#include <rmd/device_data.cuh>
+#include <rmd/mvs_device_data.cuh>
 #include <rmd/seed_matrix.cuh>
 #include <rmd/texture_memory.cuh>
 
@@ -38,8 +38,8 @@ float normpdf(
 
 __global__
 void seedUpdateKernel(
-    DeviceData *dev_ptr,
-    rmd::SE3<float> T_ref_curr)
+    mvs::DeviceData *dev_ptr,
+    SE3<float> T_ref_curr)
 {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;

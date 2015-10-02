@@ -15,13 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef RMD_DEVICE_DATA_CUH
-#define RMD_DEVICE_DATA_CUH
+#ifndef RMD_MVS_DEVICE_DATA_CUH
+#define RMD_MVS_DEVICE_DATA_CUH
 
 #include <rmd/pinhole_camera.cuh>
 #include <rmd/device_image.cuh>
 
 namespace rmd
+{
+
+namespace mvs
 {
 
 struct SceneData
@@ -110,6 +113,8 @@ struct DeviceData
   bool is_dev_allocated;
 };
 
+} // mvs namespace
+
 } // rmd namespace
 
-#endif // RMD_DEVICE_DATA_CUH
+#endif // RMD_MVS_DEVICE_DATA_CUH

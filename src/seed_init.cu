@@ -18,14 +18,14 @@
 #ifndef RMD_SEED_INIT_CU
 #define RMD_SEED_INIT_CU
 
-#include <rmd/device_data.cuh>
+#include <rmd/mvs_device_data.cuh>
 #include <rmd/texture_memory.cuh>
 
 namespace rmd
 {
 
 __global__
-void seedInitKernel(DeviceData *dev_ptr)
+void seedInitKernel(mvs::DeviceData *dev_ptr)
 {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
