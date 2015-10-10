@@ -15,21 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <gtest/gtest.h>
-#include <cuda_runtime_api.h>
-#include <rmd/check_cuda_device.cuh>
+#ifndef RMD_CHECK_CUDA_DEVICE_CUH_
+#define RMD_CHECK_CUDA_DEVICE_CUH_
 
-/// Run all the tests that were declared with TEST()
-int main(int argc, char **argv)
+namespace rmd
 {
-  if(rmd::checkCudaDevice(argc, argv))
-  {
-    testing::InitGoogleTest(&argc, argv);
-    int ret = RUN_ALL_TESTS();
 
-    cudaDeviceReset();
+bool checkCudaDevice(int argc, char **argv);
 
-    return ret;
-  }
-  else return EXIT_FAILURE;
-}
+} // namespace rmd
+
+#endif /* RMD_CHECK_CUDA_DEVICE_CUH_ */

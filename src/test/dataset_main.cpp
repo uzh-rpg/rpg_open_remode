@@ -23,10 +23,15 @@
 #include <opencv2/opencv.hpp>
 
 #include <rmd/depthmap.h>
+#include <rmd/check_cuda_device.cuh>
+
 #include "../test/dataset.h"
 
 int main(int argc, char **argv)
 {
+  if(!rmd::checkCudaDevice(argc, argv))
+    return EXIT_FAILURE;
+
   const boost::filesystem::path dataset_path("../test_data");
   const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
 
