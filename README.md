@@ -87,6 +87,13 @@ Run REMODE on the test data
 
     cd $MY_WORKSPACE/rpg_open_remode/build
     ./dataset_main
+    
+If you have more than one CUDA-capable GPUs in your system, you can specify which one to use by passing the `--device=` command-line argument. For instance, to run the example using the GPU identified with ID 1, execute the following:
+
+    cd $MY_WORKSPACE/rpg_open_remode/build
+    ./dataset_main --device=1
+
+By default, the GPU identified by ID 0 is used.
   
 #### Acknowledgments
 
