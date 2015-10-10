@@ -22,44 +22,94 @@
 
 bool rmd::checkCudaDevice(int argc, char **argv)
 {
-  cudaDeviceProp deviceProp;
-  deviceProp.major = 0;
-  deviceProp.minor = 0;
+  printf("Running executable: %s\nChecking available CUDA-capable devices...\n", argv[0]);
 
-  int devID = 0;
+  int dev_cnt;
+  cudaError err = cudaGetDeviceCount(&dev_cnt);
+  if(cudaSuccess != err)
+  {
+    printf("ERROR: cudaGetDeviceCount %s\n", cudaGetErrorString(err));
+    return false;
+  }
+
+  if(0 == dev_cnt)
+  {
+    printf("ERROR: no CUDA-capable device found.\n");
+    return false;
+  }
+
+  cudaDeviceProp device_prop;
+  device_prop.major = 0;
+  device_prop.minor = 0;
+
+  printf("%d CUDA-capable GPU detected:\n", dev_cnt);
+  int dev_id;
+  for(dev_id=0; dev_id<dev_cnt; ++dev_id)
+  {
+    err = cudaGetDeviceProperties(&device_prop, dev_id);
+    if(cudaSuccess != err)
+    {
+      printf("ERROR: cudaGetDeviceProperties could not get properties for device %d. %s\n", dev_id, cudaGetErrorString(err));
+    }
+    else
+    {
+      printf("Device %d - %s\n", dev_id, device_prop.name);
+    }
+  }
+
+  dev_id = 0;
   const std::string device_arg("--device=");
   for(int i=1; i<argc; ++i)
   {
     const std::string arg(argv[i]);
     if(device_arg == arg.substr(0, device_arg.size()))
     {
-      devID = atoi(arg.substr(device_arg.size(), arg.size()).c_str());
-      printf("User-specified device: %d\n", devID);
+      dev_id = atoi(arg.substr(device_arg.size(), arg.size()).c_str());
+      printf("User-specified device: %d\n", dev_id);
       break;
     }
   }
 
-  cudaError err = cudaSetDevice(devID);
-  if(cudaSuccess != err)
+  if( (dev_id<0) || (dev_id>dev_cnt-1) )
   {
-    printf("ERROR: cudaSetDevice %s\n", cudaGetErrorString(err));
+    printf("ERROR: invalid device ID specified. Please specify a value in [0, %d].\n", dev_cnt-1);
     return false;
   }
-  err = cudaGetDeviceProperties(&deviceProp, devID);
+
+  err = cudaGetDeviceProperties(&device_prop, dev_id);
   if(cudaSuccess != err)
   {
     printf("ERROR: cudaGetDeviceProperties %s\n", cudaGetErrorString(err));
     return false;
   }
-  printf("Using GPU device %d: \"%s\" with compute capability %d.%d\n", devID, deviceProp.name, deviceProp.major, deviceProp.minor);
+  printf("Using GPU device %d: \"%s\" with compute capability %d.%d\n", dev_id, device_prop.name, device_prop.major, device_prop.minor);
   printf("GPU device %d has %d Multi-Processors, SM %d.%d compute capabilities\n\n",
-         devID, deviceProp.multiProcessorCount, deviceProp.major, deviceProp.minor);
+         dev_id, device_prop.multiProcessorCount, device_prop.major, device_prop.minor);
 
-  const int version = (deviceProp.major * 0x10 + deviceProp.minor);
+  const int version = (device_prop.major * 0x10 + device_prop.minor);
 
   if (version < 0x20)
   {
     printf("ERROR: a minimum CUDA compute 2.0 capability is required.\n");
+    return false;
+  }
+
+  if (cudaComputeModeProhibited == device_prop.computeMode)
+  {
+    printf("ERROR: device is running in 'Compute Mode Prohibited'\n");
+    return false;
+  }
+
+  if (device_prop.major < 1)
+  {
+    printf("ERROR: device %d is not a CUDA-capable GPU.\n", dev_id);
+    return false;
+  }
+
+  err = cudaSetDevice(dev_id);
+  if(cudaSuccess != err)
+  {
+    printf("ERROR: cudaSetDevice %s\n", cudaGetErrorString(err));
     return false;
   }
 
