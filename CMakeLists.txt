@@ -63,7 +63,7 @@ CUDA_ADD_LIBRARY(
 add_executable(
     dataset_main
     src/depthmap.cpp
-    src/test/dataset_main.cpp
+    test/dataset_main.cpp
     test/dataset.cpp
 )
 
