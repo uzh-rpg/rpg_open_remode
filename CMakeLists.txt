@@ -32,6 +32,11 @@ ELSE()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 ENDIF()
 
+option(BUILD_ROS_NODE "Build ROS node" ON)
+if(BUILD_ROS_NODE)
+  ADD_DEFINITIONS(-DBUILD_ROS_NODE)
+endif(BUILD_ROS_NODE)
+
 option(BUILD_TESTS "Build test programs" ON)
 if(BUILD_TESTS)
   ADD_DEFINITIONS(-DRMD_BUILD_TESTS)
@@ -39,7 +44,21 @@ endif(BUILD_TESTS)
 
 find_package(OpenCV REQUIRED)
 find_package(Eigen REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system filesystem)
+
+if(BUILD_ROS_NODE)
+  find_package(catkin REQUIRED COMPONENTS roscpp roslib cmake_modules)
+  catkin_package(
+      DEPENDS OpenCV Eigen Boost
+      CATKIN_DEPENDS roscpp roslib vikit_common vikit_ros
+      INCLUDE_DIRS include
+      LIBRARIES remode
+  )
+else()
+  #find_package(vikit_common REQUIRED)
+  set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+  set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+endif()
 
 include_directories(
   include
@@ -109,7 +128,7 @@ target_link_libraries(
   boost_system
   boost_filesystem)
 
-# The following is to run make test
+# Allow run of 'make test'
 add_test(
   RMDCuTests
   all_tests --gtest_repeat=2
