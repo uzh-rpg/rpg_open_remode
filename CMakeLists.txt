@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SET(PROJECT_NAME OpenREMODE)
+SET(PROJECT_NAME open_remode)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(${PROJECT_NAME})
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/")
@@ -55,9 +55,9 @@ if(BUILD_ROS_NODE)
   find_package(catkin REQUIRED COMPONENTS roscpp roslib cmake_modules)
   catkin_package(
       DEPENDS OpenCV Eigen Boost
-      CATKIN_DEPENDS roscpp roslib vikit_common vikit_ros
+      CATKIN_DEPENDS roscpp roslib
       INCLUDE_DIRS include
-      LIBRARIES open_remode
+      LIBRARIES open_remode open_remode_cuda
   )
 else()
   #find_package(vikit_common REQUIRED)
