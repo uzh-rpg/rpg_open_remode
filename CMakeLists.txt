@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SET(PROJECT_NAME remode)
+SET(PROJECT_NAME OpenREMODE)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(${PROJECT_NAME})
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/")
@@ -72,7 +72,7 @@ ADD_DEFINITIONS(-DRMD_CORR_PATCH_SIDE=5)
 ADD_DEFINITIONS(-DRMD_MAX_EXTENT_EPIPOLAR_SEARCH=100)
 
 CUDA_ADD_LIBRARY(
-    remode
+    open_remode
     src/check_cuda_device.cu
     src/seed_matrix.cu
     src/depthmap_denoiser.cu
@@ -88,7 +88,7 @@ add_executable(
 
 target_link_libraries(
     dataset_main
-    remode
+    open_remode
     boost_system
     boost_filesystem
     ${OpenCV_LIBS}
@@ -105,7 +105,7 @@ find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 CUDA_ADD_LIBRARY(
-    remodetest
+    open_remode_test
     test/copy.cu
     test/sobel.cu
 )
@@ -120,8 +120,8 @@ add_executable(all_tests
 
 target_link_libraries(
   all_tests
-  remodetest
-  remode
+  open_remode_test
+  open_remode
   ${GTEST_BOTH_LIBRARIES}
   ${OpenCV_LIBS}
   pthread
