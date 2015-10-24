@@ -46,7 +46,7 @@ Ubuntu:
     
     sudo apt-get install libopencv-dev libeigen3-dev libboost-filesystem-dev
     
-Install googletest 1.7. Several Ubuntu packages install googletest as a dependency. In order to avoid conflicts with different libray versions, build googletest in $MY_WORKSPACE:
+Install googletest 1.7. Several Ubuntu packages install googletest as a dependency. In order to avoid conflicts with different libray versions, build googletest in `$MY_WORKSPACE`:
     
     cd $MY_WORKSPACE
     git clone https://github.com/google/googletest.git
@@ -65,12 +65,21 @@ Clone the REMODE repository:
     cd $MY_WORKSPACE
     git clone https://github.com/uzh-rpg/rpg_open_remode.git
 
-Build the library and the tests:
+Build the library and the tests (no ROS):
 
     cd $MY_WORKSPACE/rpg_open_remode
     mkdir build && cd build
     cmake -DGTEST_ROOT=$MY_WORKSPACE/googletest/install -DBUILD_ROS_NODE=OFF ..
     make
+    
+To build the ROS package (assuming that the environment variable `MY_CATKIN_WORKSPACE` points to your Catkin workspace):
+
+    cd $MY_CATKIN_WORKSPACE/src
+    git clone https://github.com/uzh-rpg/rpg_open_remode.git
+    cd ..
+    source devel/setup.sh
+    catkin_make
+    catkin_make -DGTEST_ROOT=$MY_WORKSPACE/googletest/install tests
     
 Download the test dataset
 
