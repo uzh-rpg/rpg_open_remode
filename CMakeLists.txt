@@ -60,10 +60,9 @@ if(BUILD_ROS_NODE)
       LIBRARIES open_remode open_remode_cuda
   )
 else()
-  #find_package(vikit_common REQUIRED)
   set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
   set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-endif()
+endif(BUILD_ROS_NODE)
 
 include_directories(
   include
@@ -81,7 +80,7 @@ list(APPEND LINK_LIBS
 if(BUILD_ROS_NODE)
   include_directories(${catkin_INCLUDE_DIRS})
   list(APPEND LINK_LIBS ${catkin_LIBRARIES})
-endif()
+endif(BUILD_ROS_NODE)
 
 # Set CUDA sourcefiles
 list(APPEND CU_SOURCE_FILES
@@ -131,8 +130,8 @@ find_package(GTest REQUIRED)
 # GTEST_ROOT - (as a CMake or environment variable)
 #              The root directory of the gtest install prefix
 
-include_directories(${GTEST_INCLUDE_DIRS})
-list(APPEND LINK_LIBS
+include_directories(${GTEST_ROOT}/include)
+list(APPEND GTEST_LINK_LIBS
   ${GTEST_BOTH_LIBRARIES}
   pthread
 )
@@ -143,8 +142,8 @@ CUDA_ADD_LIBRARY(
     test/sobel.cu
 )
 
-add_executable(
-  all_tests
+# Set sourcefiles for the tests
+list(APPEND TEST_SOURCE_FILES
   test/device_image_test.cpp
   test/seed_matrix_test.cpp
   test/main_test.cpp
@@ -152,12 +151,24 @@ add_executable(
   test/epipolar_test.cpp
 )
 
+if(BUILD_ROS_NODE)
+catkin_add_gtest(
+  all_tests
+  ${TEST_SOURCE_FILES}
+)
+else()
+add_executable(
+  all_tests
+  ${TEST_SOURCE_FILES}
+)
+endif()
+
 target_link_libraries(
   all_tests
   open_remode
   open_remode_cuda
   open_remode_test
-  ${LINK_LIBS}
+  ${GTEST_LINK_LIBS}
 )
 
 # Allow run of 'make test'
