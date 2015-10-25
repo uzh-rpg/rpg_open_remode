@@ -52,10 +52,11 @@ find_package(Eigen REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 if(BUILD_ROS_NODE)
-  find_package(catkin REQUIRED COMPONENTS roscpp roslib cmake_modules)
+  find_package(catkin REQUIRED COMPONENTS
+    roscpp roslib cmake_modules svo_msgs)
   catkin_package(
       DEPENDS OpenCV Eigen Boost
-      CATKIN_DEPENDS roscpp roslib
+      CATKIN_DEPENDS roscpp roslib svo_msgs
       INCLUDE_DIRS include
       LIBRARIES open_remode open_remode_cuda
   )
@@ -108,6 +109,20 @@ target_link_libraries(
     open_remode
     ${LINK_LIBS}
 )
+
+if(BUILD_ROS_NODE)
+# Build the ROS node
+add_executable(
+  depthmap_node
+  src/depthmap_node.cpp
+  src/main_ros.cpp
+)
+target_link_libraries(
+  depthmap_node
+  open_remode
+  open_remode_cuda
+)
+endif(BUILD_ROS_NODE)
 
 ## Test on dataset
 add_executable(

@@ -16,9 +16,11 @@
   <build_depend>cmake_modules</build_depend> <!-- for FindEigen.cmake -->
   <build_depend>roscpp</build_depend>
   <build_depend>roslib</build_depend>
+  <build_depend>svo_msgs</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
   <run_depend>roslib</run_depend>
+  <run_depend>svo_msgs</run_depend>
 
 </package>
