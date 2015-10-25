@@ -26,11 +26,25 @@
 namespace rmd
 {
 
+namespace ProcessingStates
+{
+enum State
+{
+  UPDATE,
+  TAKE_REFERENCE_FRAME,
+};
+}
+typedef ProcessingStates::State State;
+
 class DepthmapNode
 {
 public:
+  DepthmapNode();
   void denseInputCallback(
       const svo_msgs::DenseInputConstPtr &dense_input);
+private:
+  rmd::Depthmap depthmap_;
+  State state_;
 };
 
 } // rmd namespace

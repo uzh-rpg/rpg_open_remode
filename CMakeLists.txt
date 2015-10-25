@@ -53,7 +53,7 @@ find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 if(BUILD_ROS_NODE)
   find_package(catkin REQUIRED COMPONENTS
-    roscpp roslib cmake_modules svo_msgs)
+    roscpp roslib cmake_modules svo_msgs cv_bridge)
   catkin_package(
       DEPENDS OpenCV Eigen Boost
       CATKIN_DEPENDS roscpp roslib svo_msgs
