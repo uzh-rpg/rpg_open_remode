@@ -122,6 +122,16 @@ target_link_libraries(
   open_remode
   open_remode_cuda
 )
+# Build a node to publish the dataset
+add_executable(
+  dataset_publisher
+  test/dataset.cpp
+  test/publish_dataset.cpp
+)
+target_link_libraries(
+  dataset_publisher
+  ${LINK_LIBS}
+)
 endif(BUILD_ROS_NODE)
 
 ## Test on dataset

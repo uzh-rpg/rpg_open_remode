@@ -18,7 +18,6 @@
 #ifndef RMD_DEPTHMAP_NODE_H
 #define RMD_DEPTHMAP_NODE_H
 
-#include <ros/ros.h>
 #include <svo_msgs/DenseInput.h>
 
 #include <rmd/depthmap.h>
