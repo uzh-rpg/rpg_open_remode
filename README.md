@@ -80,11 +80,13 @@ Download the test dataset
 
 Run the tests
 
+    export RMD_TEST_DATA_PATH=$MY_WORKSPACE/rpg_open_remode/test_data
     cd $MY_WORKSPACE/rpg_open_remode/build
     ./all_tests
 
 Run REMODE on the test data
 
+    export RMD_TEST_DATA_PATH=$MY_WORKSPACE/rpg_open_remode/test_data
     cd $MY_WORKSPACE/rpg_open_remode/build
     ./dataset_main
     
