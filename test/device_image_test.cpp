@@ -19,12 +19,25 @@
 #include <cuda_toolkit/helper_timer.h>
 #include <opencv2/opencv.hpp>
 
+#include "../test/dataset.h"
+
 #include "copy.cuh"
 #include "sobel.cuh"
 
 TEST(RMDCuTests, deviceImageUploadDownloadFloat)
 {
-  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
+  rmd::test::Dataset dataset;
+  if(!dataset.loadPathFromEnv())
+  {
+    FAIL() << "could not retrieve dataset path from the environment variable '"
+           << rmd::test::Dataset::getDataPathEnvVar();
+  }
+  cv::Mat img;
+  if(!dataset.readImage(img, "scene_000.png"))
+  {
+    FAIL() << "could not could not load test image from dataset";
+  }
+
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -49,7 +62,18 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat)
 
 TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
 {
-  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
+  rmd::test::Dataset dataset;
+  if(!dataset.loadPathFromEnv())
+  {
+    FAIL() << "could not retrieve dataset path from the environment variable '"
+           << rmd::test::Dataset::getDataPathEnvVar();
+  }
+  cv::Mat img;
+  if(!dataset.readImage(img, "scene_000.png"))
+  {
+    FAIL() << "could not could not load test image from dataset";
+  }
+
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -92,7 +116,18 @@ TEST(RMDCuTests, deviceImageUploadDownloadFloat2)
 
 TEST(RMDCuTests, deviceImageCopyFloat)
 {
-  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
+  rmd::test::Dataset dataset;
+  if(!dataset.loadPathFromEnv())
+  {
+    FAIL() << "could not retrieve dataset path from the environment variable '"
+           << rmd::test::Dataset::getDataPathEnvVar();
+  }
+  cv::Mat img;
+  if(!dataset.readImage(img, "scene_000.png"))
+  {
+    FAIL() << "could not could not load test image from dataset";
+  }
+
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -122,7 +157,18 @@ TEST(RMDCuTests, deviceImageCopyFloat)
 
 TEST(RMDCuTests, deviceImageSobelTest)
 {
-  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
+  rmd::test::Dataset dataset;
+  if(!dataset.loadPathFromEnv())
+  {
+    FAIL() << "could not retrieve dataset path from the environment variable '"
+           << rmd::test::Dataset::getDataPathEnvVar();
+  }
+  cv::Mat img;
+  if(!dataset.readImage(img, "scene_000.png"))
+  {
+    FAIL() << "could not could not load test image from dataset";
+  }
+
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
@@ -175,7 +221,18 @@ TEST(RMDCuTests, deviceImageSobelTest)
 
 TEST(RMDCuTests, deviceImageSobelTexTest)
 {
-  cv::Mat img = cv::imread("../test_data/images/scene_000.png", CV_LOAD_IMAGE_GRAYSCALE);
+  rmd::test::Dataset dataset;
+  if(!dataset.loadPathFromEnv())
+  {
+    FAIL() << "could not retrieve dataset path from the environment variable '"
+           << rmd::test::Dataset::getDataPathEnvVar();
+  }
+  cv::Mat img;
+  if(!dataset.readImage(img, "scene_000.png"))
+  {
+    FAIL() << "could not could not load test image from dataset";
+  }
+
   cv::Mat img_flt;
   img.convertTo(img_flt, CV_32F, 1./255.);
 
