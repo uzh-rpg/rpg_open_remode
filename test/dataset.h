@@ -72,7 +72,6 @@ public:
   std::vector<DatasetEntry>::const_iterator end() const;
   const DatasetEntry & operator()(size_t index) const;
 
-  static cv::Mat scaleMat(const cv::Mat &depthmap);
   bool loadPathFromEnv();
   static const char * getDataPathEnvVar();
 

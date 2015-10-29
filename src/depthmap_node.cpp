@@ -60,6 +60,7 @@ void rmd::DepthmapNode::denseInputCallback(
 
   switch (state_) {
   case rmd::State::TAKE_REFERENCE_FRAME:
+  {
     if(depthmap_.setReferenceImage(
          img_8uC1,
          T_world_curr.inv(),
@@ -73,9 +74,18 @@ void rmd::DepthmapNode::denseInputCallback(
       std::cerr << "ERROR: could not set reference image" << std::endl;
     }
     break;
+  }
   case rmd::State::UPDATE:
-      depthmap_.update(img_8uC1, T_world_curr.inv());
+  {
+    depthmap_.update(img_8uC1, T_world_curr.inv());
+#if 1
+    cv::Mat curr_depth;
+    depthmap_.outputDepthmap(curr_depth);
+    cv::imshow("curr_depth", rmd::Depthmap::scaleMat(curr_depth));
+    cv::waitKey(2);
+#endif
     break;
+  }
   default:
     break;
   }

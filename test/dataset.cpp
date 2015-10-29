@@ -196,19 +196,6 @@ const rmd::test::DatasetEntry & rmd::test::Dataset::operator()(size_t index) con
   return dataset_.at(index);
 }
 
-cv::Mat rmd::test::Dataset::scaleMat(const cv::Mat &depthmap)
-{
-  cv::Mat scaled_depthmap = depthmap.clone();
-  double min_val, max_val;
-  cv::minMaxLoc(scaled_depthmap, &min_val, &max_val);
-  cv::Mat converted;
-  scaled_depthmap = (scaled_depthmap - min_val) * 1.0 / (max_val - min_val);
-  scaled_depthmap.convertTo(converted, CV_8UC1, 255);
-  cv::Mat colored(converted.rows, converted.cols, CV_8UC3);
-  cv::cvtColor(converted, colored, CV_GRAY2BGR);
-  return colored;
-}
-
 bool rmd::test::Dataset::loadPathFromEnv()
 {
   const char *env_path = std::getenv(data_path_env_var);

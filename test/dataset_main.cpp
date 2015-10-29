@@ -89,13 +89,13 @@ int main(int argc, char **argv)
   // show depthmap
   cv::Mat result;
   depthmap.outputDepthmap(result);
-  cv::Mat colored = rmd::test::Dataset::scaleMat(result);
+  cv::Mat colored = rmd::Depthmap::scaleMat(result);
   cv::imshow("result", colored);
 
   // denoise
   cv::Mat denoised_result;
   depthmap.outputDenoisedDepthmap(denoised_result, 0.4f, 200);
-  cv::Mat colored_denoised = rmd::test::Dataset::scaleMat(denoised_result);
+  cv::Mat colored_denoised = rmd::Depthmap::scaleMat(denoised_result);
   cv::imshow("denoised_result", colored_denoised);
 
   cv::waitKey();
