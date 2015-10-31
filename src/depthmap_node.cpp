@@ -31,17 +31,17 @@ rmd::DepthmapNode::DepthmapNode()
 
 bool rmd::DepthmapNode::init()
 {
-  if(!vk::hasParam<int>("remode/cam_width"))
+  if(!vk::hasParam("remode/cam_width"))
     return false;
-  if(!vk::hasParam<int>("remode/cam_height"))
+  if(!vk::hasParam("remode/cam_height"))
     return false;
-  if(!vk::hasParam<float>("remode/cam_fx"))
+  if(!vk::hasParam("remode/cam_fx"))
     return false;
-  if(!vk::hasParam<float>("remode/cam_fy"))
+  if(!vk::hasParam("remode/cam_fy"))
     return false;
-  if(!vk::hasParam<float>("remode/cam_cx"))
+  if(!vk::hasParam("remode/cam_cx"))
     return false;
-  if(!vk::hasParam<float>("remode/cam_cy"))
+  if(!vk::hasParam("remode/cam_cy"))
     return false;
 
   const size_t cam_width  = vk::getParam<int>("remode/cam_width");
