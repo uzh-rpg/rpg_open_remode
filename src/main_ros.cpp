@@ -27,6 +27,11 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "open_remode");
   ros::NodeHandle nh;
   rmd::DepthmapNode dm_node;
+  if(!dm_node.init())
+  {
+    ROS_ERROR("could not initialize DepthmapNode. Shutting down node...");
+    return EXIT_FAILURE;
+  }
 
   std::string dense_input_topic("/svo/dense_input");
   ros::Subscriber dense_input_sub = nh.subscribe(

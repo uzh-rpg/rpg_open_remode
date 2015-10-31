@@ -39,10 +39,11 @@ class DepthmapNode
 {
 public:
   DepthmapNode();
+  bool init();
   void denseInputCallback(
       const svo_msgs::DenseInputConstPtr &dense_input);
 private:
-  rmd::Depthmap depthmap_;
+  std::unique_ptr<rmd::Depthmap> depthmap_;
   State state_;
 };
 

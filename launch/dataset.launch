@@ -1,0 +1,10 @@
+<launch>
+  <node pkg="open_remode" type="depthmap_node" name="remode" clear_params="true" output="screen">
+    <param name="cam_width" value="640" />
+    <param name="cam_height" value="480" />
+    <param name="cam_fx" value="481.2" />
+    <param name="cam_cx" value="319.5" />
+    <param name="cam_fy" value="-480.0" />
+    <param name="cam_cy" value="239.5" />
+  </node>   
+</launch>
