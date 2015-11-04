@@ -78,8 +78,7 @@ To build the ROS package (assuming that the environment variable `MY_CATKIN_WORK
     git clone https://github.com/uzh-rpg/rpg_open_remode.git
     cd ..
     source devel/setup.sh
-    catkin_make
-    catkin_make -DGTEST_ROOT=$MY_WORKSPACE/googletest/install tests
+    catkin_make -DGTEST_ROOT=$MY_WORKSPACE/googletest/install
     
 Download the test dataset
 
