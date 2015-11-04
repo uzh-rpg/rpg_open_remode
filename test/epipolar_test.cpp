@@ -20,6 +20,7 @@
 #include <rmd/helper_vector_types.cuh>
 
 #include <rmd/seed_matrix.cuh>
+#include <rmd/depthmap.h>
 #include <rmd/se3.cuh>
 
 #include <opencv2/opencv.hpp>
@@ -92,7 +93,7 @@ TEST(RMDCuTests, epipolarTest)
   cb_data.T_curr_ref = &T_curr_ref;
   cb_data.cam = &cam;
 
-  cv::Mat colored_ref_repthmap = rmd::test::Dataset::scaleMat(ref_depthmap);
+  cv::Mat colored_ref_repthmap = rmd::Depthmap::scaleMat(ref_depthmap);
 
   cv::imshow("ref",  ref_img);
   cv::imshow("curr", curr_img);
