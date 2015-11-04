@@ -176,17 +176,10 @@ list(APPEND TEST_SOURCE_FILES
   test/epipolar_test.cpp
 )
 
-if(BUILD_ROS_NODE)
-catkin_add_gtest(
-  all_tests
-  ${TEST_SOURCE_FILES}
-)
-else()
 add_executable(
   all_tests
   ${TEST_SOURCE_FILES}
 )
-endif()
 
 target_link_libraries(
   all_tests
