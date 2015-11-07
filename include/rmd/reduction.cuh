@@ -23,9 +23,15 @@
 namespace rmd
 {
 
-size_t countEqual(
-    const DeviceImage<int> &in_img,
-    int value);
+int sum(const int *in_img_data,
+        size_t in_img_stride,
+        size_t in_img_width,
+        size_t in_img_height);
+
+int sum(const DeviceImage<int> &in_img);
+
+size_t countEqual(const DeviceImage<int> &in_img,
+                  int value);
 
 } // rmd namespace
 

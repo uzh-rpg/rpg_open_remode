@@ -107,7 +107,7 @@ struct DeviceImage
           width*sizeof(ElementType),   // pitch of destination memory
           data,                        // source memory address
           pitch,                       // pitch of source memory
-          width*sizeof(ElementType),   // width of matrix transfor (columns in bytes)
+          width*sizeof(ElementType),   // width of matrix transfer (columns in bytes)
           height,                      // height of matrix transfer
           cudaMemcpyDeviceToHost);
     if(err != cudaSuccess)
