@@ -23,17 +23,57 @@ namespace rmd
 __global__
 void countEqualKernel(
     int *out_dev_ptr,
-    const int *in_dev_ptr,
+    size_t out_stride,
+    int *in_dev_ptr,
+    size_t in_stride,
+    size_t n,
+    size_t m,
     int value)
 {
-  int x = blockIdx.x * blockDim.x + threadIdx.x;
-  int y = blockIdx.y * blockDim.y + threadIdx.y;
-
   extern __shared__ int s_partial[];
   int count = 0;
 
+  // Sum over the thread grid
+  for(int x = blockIdx.x * blockDim.x + threadIdx.x;
+      x < n;
+      x += blockDim.x*gridDim.x)
+  {
+    for(int y = blockIdx.y * blockDim.y + threadIdx.y;
+        y < m;
+        y += blockDim.y*gridDim.y)
+    {
+      count += in_dev_ptr[y*in_stride+x];
+      // if(value == in_dev_ptr[y*in_stride+x])
+      //      {
+      //       count += 1;
+      //    }
+      //in_dev_ptr[y*in_stride+x] += 128;
+    }
+  }
+  s_partial[threadIdx.y*blockDim.x+threadIdx.x] = count;
+  __syncthreads();
 
-  //in_dev_ptr->atXY(x, y)
+  // Sum over the intermediate result in shared memory
+  for(int threads_x = blockDim.x >> 1;
+      threads_x;
+      threads_x >>= 1)
+  {
+    for(int threads_y = blockDim.y >> 1;
+        threads_y;
+        threads_y >>= 1)
+    {
+      if(threadIdx.x < threads_x && threadIdx.y < threads_y)
+      {
+        s_partial[threadIdx.y*blockDim.x+threadIdx.x] +=
+            s_partial[(threadIdx.y+threads_y)*blockDim.x + threadIdx.x + threads_x];
+      }
+      __syncthreads();
+    }
+  }
+  if((0 == threadIdx.x) && (0 == threadIdx.y))
+  {
+    out_dev_ptr[blockIdx.y*out_stride+blockIdx.x] = s_partial[0];
+  }
 }
 
 } // rmd namespace
@@ -68,7 +108,20 @@ size_t rmd::countEqual(
   if(cudaSuccess != err)
     throw CudaException("countEqual: unable to allocate device memory", err);
 
-  // countEqualKernel<<<dim_grid, dim_block, sh_mem_size>>>(d_partial, in_img.dev_ptr, value);
+  countEqualKernel<<<dim_grid, dim_block, sh_mem_size>>>(d_partial,
+                                                         d_partial_stride,
+                                                         in_img.data,
+                                                         in_img.stride,
+                                                         in_img.width,
+                                                         in_img.height,
+                                                         value);
+  countEqualKernel<<<1, dim_block, sh_mem_size>>>(d_count,
+                                                  0,
+                                                  d_partial,
+                                                  d_partial_stride,
+                                                  dim_grid.x,
+                                                  dim_grid.y,
+                                                  value);
 
   int h_count;
   err = cudaMemcpy(&h_count, d_count, sizeof(int), cudaMemcpyDeviceToHost);

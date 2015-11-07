@@ -27,14 +27,20 @@ TEST(RMDCuTests, deviceImageReduction)
   const size_t h = 480;
 
   cv::Mat_<int> h_in_img(h, w, 0);
-  // h_in_img.at<int>(100, 100) = 255;
+  h_in_img.at<int>(100, 100) = 1;
+//  h_in_img.at<int>(200, 1) = 2;
+//  h_in_img.at<int>(1, 1) = 4;
+  h_in_img.at<int>(h-2, 1) = 255;
+//  h_in_img.at<int>(1, w-2) = 2;
+//  h_in_img.at<int>(h-2, w-2) = 4;
 
   // upload data to gpu memory
   rmd::DeviceImage<int> d_img(w, h);
   d_img.setDevData(reinterpret_cast<int*>(h_in_img.data));
 
-  rmd::countEqual(d_img, 255);
-
+  size_t count = rmd::countEqual(d_img, 255);
+  std::cout << "COUNT = " << count << std::endl;
+/*
   cv::Mat_<int> h_out_img(h, w);
   d_img.getDevData(reinterpret_cast<int*>(h_out_img.data));
 
@@ -43,4 +49,5 @@ TEST(RMDCuTests, deviceImageReduction)
 
   cv::imshow("host_out_img", img_8uc1);
   cv::waitKey();
+  */
 }
