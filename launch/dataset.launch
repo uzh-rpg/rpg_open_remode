@@ -6,6 +6,6 @@
     <param name="cam_cx" value="319.5" />
     <param name="cam_fy" value="-480.0" />
     <param name="cam_cy" value="239.5" />
-    <param name="ref_compl_perc" value="5.0" />
+    <param name="ref_compl_perc" value="30.0" />
   </node>   
 </launch>

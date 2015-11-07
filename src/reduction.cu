@@ -18,28 +18,21 @@
 #include <rmd/reduction.cuh>
 #include <cuda_toolkit/helper_timer.h>
 
-// #define RMD_REDUCTION_DBG
-
-#ifdef RMD_REDUCTION_DBG
-#include <stdio.h>
-#endif
-
 namespace rmd
 {
 
 __global__
-void reductionSumKernel(
-    int *out_dev_ptr,
-    size_t out_stride,
-    const int *in_dev_ptr,
-    size_t in_stride,
-    size_t n,
-    size_t m)
+void reductionSumKernel(int *out_dev_ptr,
+                        size_t out_stride,
+                        const int *in_dev_ptr,
+                        size_t in_stride,
+                        size_t n,
+                        size_t m)
 {
   extern __shared__ int s_partial[];
   int count = 0;
 
-  // Sum over the thread grid
+  // Sum over 2D thread grid, use (x,y) indices
   for(int x = blockIdx.x * blockDim.x + threadIdx.x;
       x < n;
       x += blockDim.x*gridDim.x)
@@ -51,41 +44,38 @@ void reductionSumKernel(
       count += in_dev_ptr[y*in_stride+x];
     }
   }
+  // Sums are written to shared memory, single index
   s_partial[threadIdx.y*blockDim.x+threadIdx.x] = count;
   __syncthreads();
 
-  // Sum over the intermediate result in shared memory
-  for(int threads_x = blockDim.x >> 1;
-      threads_x;
-      threads_x >>= 1)
-  {
-    for(int threads_y = blockDim.y >> 1;
-        threads_y;
-        threads_y >>= 1)
+  // Reduce over block sums stored in shared memory
+  // Start using half the block threads,
+  // halve the active threads at each iteration
+  const int tid = threadIdx.y*blockDim.x+threadIdx.x;
+  for (int num_active_threads = (blockDim.x*blockDim.y)>>1;
+       num_active_threads;
+       num_active_threads >>= 1 ) {
+    if ( tid < num_active_threads)
     {
-      if(threadIdx.x < threads_x && threadIdx.y < threads_y)
-      {
-        s_partial[threadIdx.y*blockDim.x+threadIdx.x] +=
-            s_partial[(threadIdx.y+threads_y)*blockDim.x + threadIdx.x + threads_x];
-      }
-      __syncthreads();
+      s_partial[tid] += s_partial[tid+num_active_threads];
     }
+    __syncthreads();
   }
-  if((0 == threadIdx.x) && (0 == threadIdx.y))
+  // Thread 0 writes the result for the block
+  if(0 == tid)
   {
     out_dev_ptr[blockIdx.y*out_stride+blockIdx.x] = s_partial[0];
   }
 }
 
 __global__
-void maskKernel(
-    int *out_dev_ptr,
-    size_t out_stride,
-    int *in_dev_ptr,
-    size_t in_stride,
-    size_t n,
-    size_t m,
-    int value)
+void maskKernel(int *out_dev_ptr,
+                size_t out_stride,
+                const int *in_dev_ptr,
+                size_t in_stride,
+                size_t n,
+                size_t m,
+                int value)
 {
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
@@ -98,6 +88,8 @@ void maskKernel(
 
 } // rmd namespace
 
+// Sum image by reduction
+// Cfr. listing 12.1 by N. Wilt, "The CUDA Handbook"
 int rmd::sum(const int *in_img_data,
              size_t in_img_stride,
              size_t in_img_width,
@@ -132,13 +124,6 @@ int rmd::sum(const int *in_img_data,
   if(cudaSuccess != err)
     throw CudaException("countEqual: unable to allocate device memory", err);
 
-#ifdef RMD_REDUCTION_DBG
-  StopWatchInterface * timer = NULL;
-  sdkCreateTimer(&timer);
-  sdkResetTimer(&timer);
-  sdkStartTimer(&timer);
-#endif
-
   reductionSumKernel<<<dim_grid, dim_block, sh_mem_size>>>(d_partial,
                                                            d_partial_stride,
                                                            in_img_data,
@@ -152,12 +137,6 @@ int rmd::sum(const int *in_img_data,
                                                     d_partial_stride,
                                                     dim_grid.x,
                                                     dim_grid.y);
-
-#ifdef RMD_REDUCTION_DBG
-  sdkStopTimer(&timer);
-  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
-  printf("CUDA reductionSumKernel (2 passes) execution time: %f seconds.\n\n", t);
-#endif
 
   // download sum
   int h_count;
@@ -205,12 +184,6 @@ size_t rmd::countEqual(const DeviceImage<int> &in_img,
   dim_grid.x = (in_img.width  + dim_block.x - 1) / dim_block.x;
   dim_grid.y = (in_img.height + dim_block.y - 1) / dim_block.y;
 
-#ifdef RMD_REDUCTION_DBG
-  StopWatchInterface * timer = NULL;
-  sdkCreateTimer(&timer);
-  sdkResetTimer(&timer);
-  sdkStartTimer(&timer);
-#endif
   maskKernel<<<dim_grid, dim_block>>>(d_mask,
                                       d_mask_stride,
                                       in_img.data,
@@ -218,11 +191,6 @@ size_t rmd::countEqual(const DeviceImage<int> &in_img,
                                       in_img.width,
                                       in_img.height,
                                       value);
-#ifdef RMD_REDUCTION_DBG
-  sdkStopTimer(&timer);
-  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
-  printf("CUDA maskKernel execution time: %f seconds.\n\n", t);
-#endif
 
   // Sum over mask
   int mask_sum = rmd::sum(d_mask,

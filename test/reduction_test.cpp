@@ -26,17 +26,21 @@ TEST(RMDCuTests, deviceImageReduction)
   const size_t w = 752;
   const size_t h = 480;
 
-  static const int TO_FIND = 2;
-
+  cv::RNG rng;
   cv::Mat_<int> h_in_img(h, w, 0);
-  h_in_img.at<int>(1, w-2) = 2;
-  h_in_img.at<int>(h-2, w-2) = 4;
-  h_in_img.at<int>(100, 100) = 1;
-  h_in_img.at<int>(200, 200) = 2;
-  h_in_img.at<int>(300, 300) = 3;
-  h_in_img.at<int>(400, 400) = 4;
-  h_in_img.at<int>(150, 100)  = 4;
-  h_in_img.at<int>(275, 430) = 4;
+  for(size_t r=0; r<h; ++r)
+  {
+    for(size_t c=0; c<w; ++c)
+    {
+      h_in_img.at<int>(r, c) = rng.uniform(0, 256);
+    }
+  }
+
+  // Upload data to gpu memory
+  rmd::DeviceImage<int> d_img(w, h);
+  d_img.setDevData(reinterpret_cast<int*>(h_in_img.data));
+
+  static const int TO_FIND = 2;
 
   // OpenCV execution
   double t = (double)cv::getTickCount();
@@ -45,27 +49,9 @@ TEST(RMDCuTests, deviceImageReduction)
   t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
   printf("Opencv execution time: %f seconds.\n", t);
 
-  std::cout << "CV COUNT: " << cv_count << std::endl;
-
-  // upload data to gpu memory
-  rmd::DeviceImage<int> d_img(w, h);
-  d_img.setDevData(reinterpret_cast<int*>(h_in_img.data));
-
   // CUDA execution
-  int cu_sum = rmd::sum(d_img);
-  std::cout << "CUDA SUM: " << cu_sum << std::endl;
-
   size_t cu_count = rmd::countEqual(d_img, TO_FIND);
-  std::cout << "CUDA COUNT: " << cu_count << std::endl;
 
-/*
-  cv::Mat_<int> h_out_img(h, w);
-  d_img.getDevData(reinterpret_cast<int*>(h_out_img.data));
-
-  cv::Mat img_8uc1;
-  h_out_img.convertTo(img_8uc1, CV_8UC1);
-
-  cv::imshow("host_out_img", img_8uc1);
-  cv::waitKey();
-  */
+  std::cout << "DEBUG: OpenCV count=" << cv_count << ", CUDA count=" << cu_count << std::endl;
+  ASSERT_EQ(cv_count, cu_count);
 }
