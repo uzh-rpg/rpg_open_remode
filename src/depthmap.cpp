@@ -110,6 +110,10 @@ void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, i
         iterations);
 }
 
+size_t rmd::Depthmap::getConvergedCount() const
+{
+}
+
 cv::Mat rmd::Depthmap::scaleMat(const cv::Mat &depthmap)
 {
   cv::Mat scaled_depthmap = depthmap.clone();

@@ -88,6 +88,7 @@ list(APPEND CU_SOURCE_FILES
     src/check_cuda_device.cu
     src/seed_matrix.cu
     src/depthmap_denoiser.cu
+    src/reduction.cu
 )
 
 # Set sourcefiles
@@ -174,6 +175,7 @@ list(APPEND TEST_SOURCE_FILES
   test/main_test.cpp
   test/dataset.cpp
   test/epipolar_test.cpp
+  test/reduction_test.cpp
 )
 
 add_executable(
