@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     std::cerr << "ERROR: could not retrieve dataset path from the environment variable '"
               << rmd::test::Dataset::getDataPathEnvVar() <<"'" << std::endl;
   }
-  if (!dataset.readDataSequence(20, 100))
+  if (!dataset.readDataSequence(0, 200))
   {
     std::cerr << "ERROR: could not read dataset" << std::endl;
     return EXIT_FAILURE;

@@ -55,14 +55,7 @@ TEST(RMDCuTests, deviceImageReduction)
   int cu_sum = rmd::sum(d_img);
   std::cout << "CUDA SUM: " << cu_sum << std::endl;
 
-  StopWatchInterface * timer = NULL;
-  sdkCreateTimer(&timer);
-  sdkResetTimer(&timer);
-  sdkStartTimer(&timer);
   size_t cu_count = rmd::countEqual(d_img, TO_FIND);
-  sdkStopTimer(&timer);
-  t = sdkGetAverageTimerValue(&timer) / 1000.0;
-  printf("CUDA execution time: %f seconds.\n", t);
   std::cout << "CUDA COUNT: " << cu_count << std::endl;
 
 /*

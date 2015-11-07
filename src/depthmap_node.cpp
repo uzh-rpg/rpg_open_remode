@@ -70,6 +70,9 @@ bool rmd::DepthmapNode::init()
           vk::getParam<float>("remode/cam_d3"),
           vk::getParam<float>("remode/cam_d4", 0.0f));
   }
+
+  ref_compl_perc_ = vk::getParam<float>("remode/ref_compl_perc", 10.0f);
+
   return true;
 }
 
@@ -128,12 +131,18 @@ void rmd::DepthmapNode::denseInputCallback(
   case rmd::State::UPDATE:
   {
     depthmap_->update(img_8uC1, T_world_curr.inv());
+    float perc_conv = depthmap_->getConvergedPercentage();
+    std::cout << "INFO: percentage of converged measurements: " << perc_conv << "%" << std::endl;
+    if(perc_conv > ref_compl_perc_)
+    {
+      state_ = rmd::State::TAKE_REFERENCE_FRAME;
 #if 1
-    cv::Mat curr_depth;
-    depthmap_->outputDepthmap(curr_depth);
-    cv::imshow("curr_depth", rmd::Depthmap::scaleMat(curr_depth));
-    cv::waitKey(2);
+      cv::Mat curr_depth;
+      depthmap_->outputDenoisedDepthmap(curr_depth, 0.4f, 200);
+      cv::imshow("curr_depth", rmd::Depthmap::scaleMat(curr_depth));
+      cv::waitKey(2);
 #endif
+    }
     break;
   }
   default:

@@ -45,6 +45,7 @@ public:
 private:
   std::unique_ptr<rmd::Depthmap> depthmap_;
   State state_;
+  float ref_compl_perc_;
 };
 
 } // rmd namespace

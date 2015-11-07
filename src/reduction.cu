@@ -16,6 +16,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <rmd/reduction.cuh>
+#include <cuda_toolkit/helper_timer.h>
+
+// #define RMD_REDUCTION_DBG
+
+#ifdef RMD_REDUCTION_DBG
+#include <stdio.h>
+#endif
 
 namespace rmd
 {
@@ -125,6 +132,13 @@ int rmd::sum(const int *in_img_data,
   if(cudaSuccess != err)
     throw CudaException("countEqual: unable to allocate device memory", err);
 
+#ifdef RMD_REDUCTION_DBG
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
+#endif
+
   reductionSumKernel<<<dim_grid, dim_block, sh_mem_size>>>(d_partial,
                                                            d_partial_stride,
                                                            in_img_data,
@@ -138,6 +152,12 @@ int rmd::sum(const int *in_img_data,
                                                     d_partial_stride,
                                                     dim_grid.x,
                                                     dim_grid.y);
+
+#ifdef RMD_REDUCTION_DBG
+  sdkStopTimer(&timer);
+  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("CUDA reductionSumKernel (2 passes) execution time: %f seconds.\n\n", t);
+#endif
 
   // download sum
   int h_count;
@@ -185,6 +205,12 @@ size_t rmd::countEqual(const DeviceImage<int> &in_img,
   dim_grid.x = (in_img.width  + dim_block.x - 1) / dim_block.x;
   dim_grid.y = (in_img.height + dim_block.y - 1) / dim_block.y;
 
+#ifdef RMD_REDUCTION_DBG
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
+#endif
   maskKernel<<<dim_grid, dim_block>>>(d_mask,
                                       d_mask_stride,
                                       in_img.data,
@@ -192,6 +218,11 @@ size_t rmd::countEqual(const DeviceImage<int> &in_img,
                                       in_img.width,
                                       in_img.height,
                                       value);
+#ifdef RMD_REDUCTION_DBG
+  sdkStopTimer(&timer);
+  double t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("CUDA maskKernel execution time: %f seconds.\n\n", t);
+#endif
 
   // Sum over mask
   int mask_sum = rmd::sum(d_mask,

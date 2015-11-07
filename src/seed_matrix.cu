@@ -159,6 +159,11 @@ const rmd::DeviceImage<float> & rmd::SeedMatrix::getB() const
   return b_;
 }
 
+const rmd::DeviceImage<int> & rmd::SeedMatrix::getConvergence() const
+{
+  return convergence_;
+}
+
 #if RMD_BUILD_TESTS
 void rmd::SeedMatrix::downloadSigmaSq(float *host_align_row_maj) const
 {

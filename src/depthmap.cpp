@@ -16,6 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <rmd/depthmap.h>
+#include <rmd/reduction.cuh>
 
 rmd::Depthmap::Depthmap(
     size_t width,
@@ -112,6 +113,14 @@ void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, i
 
 size_t rmd::Depthmap::getConvergedCount() const
 {
+  const DeviceImage<int> & convergence_status = seeds_.getConvergence();
+  return rmd::countEqual(convergence_status, rmd::ConvergenceState::CONVERGED);
+}
+
+float rmd::Depthmap::getConvergedPercentage() const
+{
+  const size_t count = rmd::Depthmap::getConvergedCount();
+  return static_cast<float>(count) / static_cast<float>(width_*height_) * 100.0f;
 }
 
 cv::Mat rmd::Depthmap::scaleMat(const cv::Mat &depthmap)
