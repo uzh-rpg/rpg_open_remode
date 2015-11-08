@@ -97,7 +97,7 @@ private:
   // kernel config
   dim3 dim_block_;
   dim3 dim_grid_;
-
+  // Image reduction to compute seed statistics
   ImageReducer<int> *img_reducer_;
 };
 
