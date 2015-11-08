@@ -18,164 +18,170 @@
 #include <rmd/reduction.cuh>
 #include "reduction_kernels.cu"
 
-// Sum image by reduction
-// Cfr. listing 12.1 by N. Wilt, "The CUDA Handbook"
-int rmd::sum(const int *in_img_data,
-             size_t in_img_stride,
-             size_t in_img_width,
-             size_t in_img_height)
+template<typename T>
+rmd::ImageReducer<T>::ImageReducer(dim3 num_threads_per_block,
+                                   dim3 num_blocks_per_grid)
+  : block_dim_(num_threads_per_block)
+  , grid_dim_(num_blocks_per_grid)
+  , is_dev_part_alloc_(false)
+  , is_dev_fin_alloc_(false)
 {
-  // Kernel configuration
-  dim3 dim_block;
-  dim3 dim_grid;
-  dim_block.x = 16; // Num threads
-  dim_block.y = 16;
-  dim_grid.x = 4;   // Num blocks
-  dim_grid.y = 4;
-
   // Compute required amount of shared memory
-  unsigned int sh_mem_size = dim_block.x * dim_block.y * sizeof(int);
+  sh_mem_size_ = block_dim_.x * block_dim_.y * sizeof(T);
 
-  // Allocate intermediate result (TODO: this should be pre-allocated)
-  int *d_partial;
-  size_t d_partial_pitch;
-  cudaError err = cudaMallocPitch(
-        &d_partial,
-        &d_partial_pitch,
-        dim_grid.x*sizeof(int),
-        dim_grid.y);
-  if(cudaSuccess != err)
-    throw CudaException("countEqual: unable to allocate device memory", err);
-  const size_t d_partial_stride = d_partial_pitch / sizeof(int);
+  // Allocate intermediate result
+  const cudaError part_alloc_err = cudaMallocPitch(
+        &dev_partial_,
+        &dev_partial_pitch_,
+        grid_dim_.x*sizeof(T),
+        grid_dim_.y);
+  if(cudaSuccess != part_alloc_err)
+  {
+    throw CudaException("ImageReducer: unable to allocate pitched device memory for partial results", part_alloc_err);
+  }
+  else
+  {
+    dev_partial_stride_ = dev_partial_pitch_ / sizeof(T);
+    is_dev_part_alloc_ = true;
+  }
 
   // Allocate final result
-  int *d_count;
-  err = cudaMalloc(&d_count, sizeof(int));
-  if(cudaSuccess != err)
-    throw CudaException("countEqual: unable to allocate device memory", err);
-
-  reductionSumKernel
-      <<<dim_grid, dim_block, sh_mem_size>>>
-                                           (d_partial,
-                                            d_partial_stride,
-                                            in_img_data,
-                                            in_img_stride,
-                                            in_img_width,
-                                            in_img_height);
-
-  reductionSumKernel
-      <<<1, dim_block, sh_mem_size>>>
-                                    (d_count,
-                                     0,
-                                     d_partial,
-                                     d_partial_stride,
-                                     dim_grid.x,
-                                     dim_grid.y);
-
-  // download sum
-  int h_count;
-  err = cudaMemcpy(&h_count, d_count, sizeof(int), cudaMemcpyDeviceToHost);
-  if(cudaSuccess != err)
-    throw CudaException("sum: unable to copy result from device to host", err);
-
-  // Free device memory
-  err = cudaFree(d_count);
-  if(cudaSuccess != err)
-    throw CudaException("sum: unable to free device memory", err);
-  err = cudaFree(d_partial);
-  if(cudaSuccess != err)
-    throw CudaException("sum: unable to free device memory", err);
-
-  return h_count;
+  const cudaError fin_alloc_err = cudaMalloc(&dev_final_, sizeof(T));
+  if(cudaSuccess != fin_alloc_err)
+  {
+    throw CudaException("ImageReducer: unable to allocate device memory for final result", fin_alloc_err);
+  }
+  else
+  {
+    is_dev_fin_alloc_ = true;
+  }
 }
 
-int rmd::sum(const rmd::DeviceImage<int> &in_img)
+template<typename T>
+rmd::ImageReducer<T>::~ImageReducer()
 {
-  return rmd::sum(in_img.data,
-                  in_img.stride,
-                  in_img.width,
-                  in_img.height);
+  // Free device memory
+  if(is_dev_fin_alloc_)
+  {
+    const cudaError err = cudaFree(dev_final_);
+    if(cudaSuccess != err)
+      throw CudaException("ImageReducer: unable to free device memory", err);
+  }
+  if(is_dev_part_alloc_)
+  {
+    const cudaError err = cudaFree(dev_partial_);
+    if(cudaSuccess != err)
+      throw CudaException("ImageReducer: unable to free device memory", err);
+  }
 }
+
+// Sum image by reduction
+// Cfr. listing 12.1 by N. Wilt, "The CUDA Handbook"
+template<typename T>
+T rmd::ImageReducer<T>::sum(const T *in_img_data,
+                            size_t in_img_stride,
+                            size_t in_img_width,
+                            size_t in_img_height)
+{
+  if(is_dev_fin_alloc_ && is_dev_part_alloc_)
+  {
+    reductionSumKernel<T>
+        <<<grid_dim_, block_dim_, sh_mem_size_>>>
+                                                (dev_partial_,
+                                                 dev_partial_stride_,
+                                                 in_img_data,
+                                                 in_img_stride,
+                                                 in_img_width,
+                                                 in_img_height);
+
+    reductionSumKernel<T>
+        <<<1, block_dim_, sh_mem_size_>>>
+                                        (dev_final_,
+                                         0,
+                                         dev_partial_,
+                                         dev_partial_stride_,
+                                         grid_dim_.x,
+                                         grid_dim_.y);
+
+    // download sum
+    T h_count;
+    const cudaError err = cudaMemcpy(&h_count, dev_final_, sizeof(T), cudaMemcpyDeviceToHost);
+    if(cudaSuccess != err)
+      throw CudaException("sum: unable to copy result from device to host", err);
+
+    return h_count;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+template<typename T>
+T rmd::ImageReducer<T>::sum(const DeviceImage<T> &in_img)
+{
+  return rmd::ImageReducer<T>::sum(in_img.data,
+                                   in_img.stride,
+                                   in_img.width,
+                                   in_img.height);
+}
+
 
 // Count elements equal to 'value'
 // First count over the thread grid,
 // then perform a reduction sum on a single thread block
-size_t rmd::countEqual(const int *in_img_data,
-                       size_t in_img_stride,
-                       size_t in_img_width,
-                       size_t in_img_height,
-                       int value)
+template<>
+size_t rmd::ImageReducer<int>::countEqual(const int *in_img_data,
+                                          size_t in_img_stride,
+                                          size_t in_img_width,
+                                          size_t in_img_height,
+                                          int value)
 {
-  // Kernel configuration
-  dim3 dim_block;
-  dim3 dim_grid;
-  dim_block.x = 16; // Num threads
-  dim_block.y = 16;
-  dim_grid.x = 4;   // Num blocks
-  dim_grid.y = 4;
+  if(is_dev_fin_alloc_ && is_dev_part_alloc_)
+  {
+    reductionCountEqKernel<int>
+        <<<grid_dim_, block_dim_, sh_mem_size_>>>
+                                                (dev_partial_,
+                                                 dev_partial_stride_,
+                                                 in_img_data,
+                                                 in_img_stride,
+                                                 in_img_width,
+                                                 in_img_height,
+                                                 value);
 
-  // Compute required amount of shared memory
-  unsigned int sh_mem_size = dim_block.x * dim_block.y * sizeof(int);
+    reductionSumKernel<int>
+        <<<1, block_dim_, sh_mem_size_>>>
+                                        (dev_final_,
+                                         0,
+                                         dev_partial_,
+                                         dev_partial_stride_,
+                                         grid_dim_.x,
+                                         grid_dim_.y);
 
-  // Allocate intermediate result (TODO: this should be pre-allocated)
-  int *d_partial;
-  size_t d_partial_pitch;
-  cudaError err = cudaMallocPitch(
-        &d_partial,
-        &d_partial_pitch,
-        dim_grid.x*sizeof(int),
-        dim_grid.y);
-  if(cudaSuccess != err)
-    throw CudaException("countEqual: unable to allocate device memory", err);
-  const size_t d_partial_stride = d_partial_pitch / sizeof(int);
+    // download sum
+    int h_count;
+    const cudaError err = cudaMemcpy(&h_count, dev_final_, sizeof(int), cudaMemcpyDeviceToHost);
+    if(cudaSuccess != err)
+      throw CudaException("countEqual: unable to copy result from device to host", err);
 
-  // Allocate final result
-  int *d_count;
-  err = cudaMalloc(&d_count, sizeof(int));
-  if(cudaSuccess != err)
-    throw CudaException("countEqual: unable to allocate device memory", err);
+    return static_cast<size_t>(h_count);
+  }
+  else
+  {
+    return 0;
+  }
+}
 
-  reductionFindEqKernel
-      <<<dim_grid, dim_block, sh_mem_size>>>
-                                           (d_partial,
-                                            d_partial_stride,
-                                            in_img_data,
-                                            in_img_stride,
-                                            in_img_width,
-                                            in_img_height,
+template<>
+size_t rmd::ImageReducer<int>::countEqual(const DeviceImage<int> &in_img,
+                                          int value)
+{
+  return rmd::ImageReducer<int>::countEqual(in_img.data,
+                                            in_img.stride,
+                                            in_img.width,
+                                            in_img.height,
                                             value);
-
-  reductionSumKernel
-      <<<1, dim_block, sh_mem_size>>>
-                                    (d_count,
-                                     0,
-                                     d_partial,
-                                     d_partial_stride,
-                                     dim_grid.x,
-                                     dim_grid.y);
-
-  // download sum
-  int h_count;
-  err = cudaMemcpy(&h_count, d_count, sizeof(int), cudaMemcpyDeviceToHost);
-  if(cudaSuccess != err)
-    throw CudaException("sum: unable to copy result from device to host", err);
-
-  // Free device memory
-  err = cudaFree(d_count);
-  if(cudaSuccess != err)
-    throw CudaException("sum: unable to free device memory", err);
-  err = cudaFree(d_partial);
-  if(cudaSuccess != err)
-    throw CudaException("sum: unable to free device memory", err);
-
-  return h_count;
 }
 
-size_t rmd::countEqual(const rmd::DeviceImage<int> &in_img, int value)
-{
-  return rmd::countEqual(in_img.data,
-                         in_img.stride,
-                         in_img.width,
-                         in_img.height,
-                         value);
-}
+template class rmd::ImageReducer<int>;
+template class rmd::ImageReducer<float>;

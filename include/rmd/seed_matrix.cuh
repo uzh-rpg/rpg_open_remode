@@ -23,6 +23,7 @@
 #include <rmd/pinhole_camera.cuh>
 #include <rmd/mvs_device_data.cuh>
 #include <rmd/se3.cuh>
+#include <rmd/reduction.cuh>
 
 namespace rmd
 {
@@ -48,6 +49,7 @@ public:
       const size_t &width,
       const size_t &height,
       const PinholeCamera &cam);
+  ~SeedMatrix();
   bool setReferenceImage(
       float *host_ref_img_align_row_maj,
       const SE3<float> &T_curr_world,
@@ -64,6 +66,8 @@ public:
   const DeviceImage<float> & getB() const;
 
   const DeviceImage<int> & getConvergence() const;
+
+  size_t getConvergedCount() const;
 
 #if RMD_BUILD_TESTS
   void downloadSigmaSq(float *host_align_row_maj) const;
@@ -93,6 +97,8 @@ private:
   // kernel config
   dim3 dim_block_;
   dim3 dim_grid_;
+
+  ImageReducer<int> *img_reducer_;
 };
 
 } // rmd namespace

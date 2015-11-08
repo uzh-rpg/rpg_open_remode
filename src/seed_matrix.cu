@@ -59,11 +59,25 @@ rmd::SeedMatrix::SeedMatrix(
   dev_data_.width  = width;
   dev_data_.height = height;
 
-  // Kernel configuration
+  // Kernel configuration for depth estimation
   dim_block_.x = 16;
   dim_block_.y = 16;
   dim_grid_.x = (width  + dim_block_.x - 1) / dim_block_.x;
   dim_grid_.y = (height + dim_block_.y - 1) / dim_block_.y;
+
+  // Image reducer to compute statistics on seeds
+  dim3 num_threads_per_block;
+  dim3 num_blocks_per_grid;
+  num_threads_per_block.x = 16;
+  num_threads_per_block.y = 16;
+  num_blocks_per_grid.x = 4;
+  num_blocks_per_grid.y = 4;
+  img_reducer_ = new ImageReducer<int>(num_threads_per_block, num_blocks_per_grid);
+}
+
+rmd::SeedMatrix::~SeedMatrix()
+{
+  delete img_reducer_;
 }
 
 bool rmd::SeedMatrix::setReferenceImage(
@@ -162,6 +176,11 @@ const rmd::DeviceImage<float> & rmd::SeedMatrix::getB() const
 const rmd::DeviceImage<int> & rmd::SeedMatrix::getConvergence() const
 {
   return convergence_;
+}
+
+size_t rmd::SeedMatrix::getConvergedCount() const
+{
+  return img_reducer_->countEqual(convergence_, ConvergenceStates::CONVERGED);
 }
 
 #if RMD_BUILD_TESTS
