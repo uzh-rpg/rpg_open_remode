@@ -30,6 +30,12 @@ int sum(const int *in_img_data,
 
 int sum(const DeviceImage<int> &in_img);
 
+size_t countEqual(const int *in_img_data,
+                  size_t in_img_stride,
+                  size_t in_img_width,
+                  size_t in_img_height,
+                  int value);
+
 size_t countEqual(const DeviceImage<int> &in_img,
                   int value);
 
