@@ -59,19 +59,35 @@ Eigen::Quaternionf & rmd::test::DatasetEntry::getQuaternion()
 
 rmd::test::Dataset::Dataset(
     const std::string &dataset_path,
-    const std::string &sequence_file_path,
-    const rmd::PinholeCamera &cam)
+    const std::string &sequence_file)
   : dataset_path_(dataset_path)
-  , sequence_file_path_(sequence_file_path)
-  , cam_(cam)
+  , sequence_file_(sequence_file)
+{
+}
+
+rmd::test::Dataset::Dataset(
+    const std::string &sequence_file)
+  : dataset_path_(std::string())
+  , sequence_file_(sequence_file)
+{
+}
+
+rmd::test::Dataset::Dataset()
+  : dataset_path_(std::string())
+  , sequence_file_(std::string())
 {
 }
 
 bool rmd::test::Dataset::readDataSequence(size_t start, size_t end)
 {
+  if(dataset_path_.empty() || sequence_file_.empty())
+  {
+    return false;
+  }
   dataset_.clear();
   std::string line;
-  std::ifstream sequence_file_str(sequence_file_path_);
+  const auto sequence_file_path = boost::filesystem::path(dataset_path_) / sequence_file_;
+  std::ifstream sequence_file_str(sequence_file_path.string());
   if (sequence_file_str.is_open())
   {
     size_t line_cnt = 0;
@@ -112,15 +128,20 @@ bool rmd::test::Dataset::readDataSequence()
   return readDataSequence(0, 0);
 }
 
-bool rmd::test::Dataset::readImage(cv::Mat &img, const DatasetEntry &entry) const
+bool rmd::test::Dataset::readImage(cv::Mat &img, const char *file_name) const
 {
   const boost::filesystem::path dataset_path(dataset_path_);
-  const auto img_file_path = dataset_path / "images" / entry.getImageFileName();
+  const auto img_file_path = dataset_path / "images" / file_name;
   img = cv::imread(img_file_path.string(), CV_LOAD_IMAGE_GRAYSCALE);
   if(img.data == NULL)
     return false;
   else
     return true;
+}
+
+bool rmd::test::Dataset::readImage(cv::Mat &img, const DatasetEntry &entry) const
+{
+  return readImage(img, entry.getImageFileName().c_str());
 }
 
 void rmd::test::Dataset::readCameraPose(rmd::SE3<float> &pose, const DatasetEntry &entry) const
@@ -175,15 +196,18 @@ const rmd::test::DatasetEntry & rmd::test::Dataset::operator()(size_t index) con
   return dataset_.at(index);
 }
 
-cv::Mat rmd::test::Dataset::scaleMat(const cv::Mat &depthmap)
+bool rmd::test::Dataset::loadPathFromEnv()
 {
-  cv::Mat scaled_depthmap = depthmap.clone();
-  double min_val, max_val;
-  cv::minMaxLoc(scaled_depthmap, &min_val, &max_val);
-  cv::Mat converted;
-  scaled_depthmap = (scaled_depthmap - min_val) * 1.0 / (max_val - min_val);
-  scaled_depthmap.convertTo(converted, CV_8UC1, 255);
-  cv::Mat colored(converted.rows, converted.cols, CV_8UC3);
-  cv::cvtColor(converted, colored, CV_GRAY2BGR);
-  return colored;
+  const char *env_path = std::getenv(data_path_env_var);
+  if(nullptr != env_path)
+  {
+    dataset_path_ = std::string(env_path);
+    return true;
+  }
+  return false;
+}
+
+const char * rmd::test::Dataset::getDataPathEnvVar()
+{
+  return data_path_env_var;
 }

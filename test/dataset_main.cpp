@@ -32,16 +32,18 @@ int main(int argc, char **argv)
   if(!rmd::checkCudaDevice(argc, argv))
     return EXIT_FAILURE;
 
-  const boost::filesystem::path dataset_path("../test_data");
-  const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
-
   rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
 
-  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
+  rmd::test::Dataset dataset("first_200_frames_traj_over_table_input_sequence.txt");
+  if(!dataset.loadPathFromEnv())
+  {
+    std::cerr << "ERROR: could not retrieve dataset path from the environment variable '"
+              << rmd::test::Dataset::getDataPathEnvVar() <<"'" << std::endl;
+  }
   if (!dataset.readDataSequence(20, 100))
   {
     std::cerr << "ERROR: could not read dataset" << std::endl;
-    return -1;
+    return EXIT_FAILURE;
   }
 
   const size_t width  = 640;
@@ -87,13 +89,13 @@ int main(int argc, char **argv)
   // show depthmap
   cv::Mat result;
   depthmap.outputDepthmap(result);
-  cv::Mat colored = rmd::test::Dataset::scaleMat(result);
+  cv::Mat colored = rmd::Depthmap::scaleMat(result);
   cv::imshow("result", colored);
 
   // denoise
   cv::Mat denoised_result;
   depthmap.outputDenoisedDepthmap(denoised_result, 0.4f, 200);
-  cv::Mat colored_denoised = rmd::test::Dataset::scaleMat(denoised_result);
+  cv::Mat colored_denoised = rmd::Depthmap::scaleMat(denoised_result);
   cv::imshow("denoised_result", colored_denoised);
 
   cv::waitKey();

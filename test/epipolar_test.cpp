@@ -20,6 +20,7 @@
 #include <rmd/helper_vector_types.cuh>
 
 #include <rmd/seed_matrix.cuh>
+#include <rmd/depthmap.h>
 #include <rmd/se3.cuh>
 
 #include <opencv2/opencv.hpp>
@@ -55,12 +56,14 @@ void mouseCallback(int event, int x, int y, int flags, void *userdata)
 
 TEST(RMDCuTests, epipolarTest)
 {
-  const boost::filesystem::path dataset_path("../test_data");
-  const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
-
   rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
 
-  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
+  rmd::test::Dataset dataset("first_200_frames_traj_over_table_input_sequence.txt");
+  if(!dataset.loadPathFromEnv())
+  {
+    FAIL() << "could not retrieve dataset path from the environment variable '"
+           << rmd::test::Dataset::getDataPathEnvVar() <<"'" << std::endl;
+  }
   if (!dataset.readDataSequence())
     FAIL() << "could not read dataset";
 
@@ -90,7 +93,7 @@ TEST(RMDCuTests, epipolarTest)
   cb_data.T_curr_ref = &T_curr_ref;
   cb_data.cam = &cam;
 
-  cv::Mat colored_ref_repthmap = rmd::test::Dataset::scaleMat(ref_depthmap);
+  cv::Mat colored_ref_repthmap = rmd::Depthmap::scaleMat(ref_depthmap);
 
   cv::imshow("ref",  ref_img);
   cv::imshow("curr", curr_img);
@@ -101,12 +104,15 @@ TEST(RMDCuTests, epipolarTest)
 
 TEST(RMDCuTests, epipolarMatchTest)
 {
-  const boost::filesystem::path dataset_path("../test_data");
-  const boost::filesystem::path sequence_file_path("../test_data/first_200_frames_traj_over_table_input_sequence.txt");
-
   rmd::PinholeCamera cam(481.2f, -480.0f, 319.5f, 239.5f);
 
-  rmd::test::Dataset dataset(dataset_path.string(), sequence_file_path.string(), cam);
+  rmd::test::Dataset dataset("first_200_frames_traj_over_table_input_sequence.txt");
+  if(!dataset.loadPathFromEnv())
+  {
+    std::cerr << "ERROR: could not retrieve dataset path from the environment variable '"
+              << rmd::test::Dataset::getDataPathEnvVar() <<"'" << std::endl;
+  }
+
   if (!dataset.readDataSequence())
     FAIL() << "could not read dataset";
 

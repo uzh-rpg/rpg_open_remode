@@ -46,7 +46,7 @@ Ubuntu:
     
     sudo apt-get install libopencv-dev libeigen3-dev libboost-filesystem-dev
     
-Install googletest 1.7. Several Ubuntu packages install googletest as a dependency. In order to avoid conflicts with different libray versions, build googletest in $MY_WORKSPACE:
+Install googletest 1.7. Several Ubuntu packages install googletest as a dependency. In order to avoid conflicts with different libray versions, build googletest in `$MY_WORKSPACE`:
     
     cd $MY_WORKSPACE
     git clone https://github.com/google/googletest.git
@@ -59,6 +59,8 @@ Install googletest 1.7. Several Ubuntu packages install googletest as a dependen
     mkdir install
     cp -r include install
     cp build/*.a install
+    
+#### Build without ROS
 
 Clone the REMODE repository:
 
@@ -69,24 +71,63 @@ Build the library and the tests:
 
     cd $MY_WORKSPACE/rpg_open_remode
     mkdir build && cd build
-    cmake -DGTEST_ROOT=$MY_WORKSPACE/googletest/install ..
+    cmake -DGTEST_ROOT=$MY_WORKSPACE/googletest/install -DBUILD_ROS_NODE=OFF ..
     make
     
+#### Build the ROS node (using catkin)
+
+Assuming that the environment variable `MY_CATKIN_WORKSPACE` points to your Catkin workspace, clone the repository:
+
+    cd $MY_CATKIN_WORKSPACE/src
+    git clone https://github.com/uzh-rpg/rpg_open_remode.git
+    
+Build the library, the tests and the ROS node:
+
+    cd ..
+    source devel/setup.sh
+    catkin_make -DGTEST_ROOT=$MY_WORKSPACE/googletest/install
+    
+#### Test
+
 Download the test dataset
 
     cd $MY_WORKSPACE/rpg_open_remode
     wget http://rpg.ifi.uzh.ch/datasets/remode_test_data.zip
     unzip remode_test_data.zip
 
-Run the tests
+Specify the path to the test data by setting the environment variable
+
+    export RMD_TEST_DATA_PATH=$MY_WORKSPACE/rpg_open_remode/test_data
+
+If you built without ROS, just execute
 
     cd $MY_WORKSPACE/rpg_open_remode/build
     ./all_tests
+    
+Otherwise
 
-Run REMODE on the test data
+    cd $MY_CATKIN_WORKSPACE/devel/lib/open_remode
+    ./all_tests
+
+You can now run REMODE on the test data. Specify the path to the test data:
+
+    export RMD_TEST_DATA_PATH=$MY_WORKSPACE/rpg_open_remode/test_data
+
+In case you did not build the ROS node, just execute the following:
 
     cd $MY_WORKSPACE/rpg_open_remode/build
     ./dataset_main
+    
+For the ROS build, a launch file is provided to start the REMODE ROS node. Update your ROS package path and launch the REMODE node:
+
+    source cd $MY_CATKIN_WORKSPACE/devel/setup.sh
+    roslaunch open_remode dataset.launch
+    
+A node is provided to publish the test dataset. Run it by executing
+
+    rosrun open_remode dataset_publisher
+    
+#### CUDA specific topics
     
 If you have more than one CUDA-capable GPUs in your system, you can specify which one to use by passing the `--device=` command-line argument. For instance, to run the example using the GPU identified by ID 1, execute the following:
 
@@ -94,6 +135,8 @@ If you have more than one CUDA-capable GPUs in your system, you can specify whic
     ./dataset_main --device=1
 
 By default, the GPU identified by ID 0 is used.
+
+You can target the compute capability of your CUDA device by specifying `arch=compute_xx,code=sm_x` in the `CUDA_NVCC_FLAGS`.
   
 #### Acknowledgments
 

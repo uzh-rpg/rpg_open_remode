@@ -57,6 +57,10 @@ public:
 
   void outputDepthmap(cv::Mat &depth_32fc1) const;
   void outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, int iterations);
+  size_t getConvergedCount() const;
+  float  getConvergedPercentage() const;
+
+  static cv::Mat scaleMat(const cv::Mat &depthmap);
 
 private:
   void inputImage(const cv::Mat &img_8uc1);

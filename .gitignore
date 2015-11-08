@@ -30,6 +30,9 @@
 # Build folder
 build
 
+# Binaries folder
+bin
+
 # Temp file
 *~
 

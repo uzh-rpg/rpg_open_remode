@@ -54,10 +54,13 @@ class Dataset
 public:
   Dataset(
       const std::string &dataset_path,
-      const std::string &sequence_file_path,
-      const rmd::PinholeCamera &cam);
+      const std::string &sequence_file);
+  Dataset(
+      const std::string &sequence_file);
+  Dataset();
   bool readDataSequence(size_t start, size_t end=0);
   bool readDataSequence();
+  bool readImage(cv::Mat &img, const char *file_name) const;
   bool readImage(cv::Mat &img, const DatasetEntry &entry) const;
   void readCameraPose(rmd::SE3<float> &pose, const DatasetEntry &entry) const;
   bool readDepthmap(
@@ -69,13 +72,16 @@ public:
   std::vector<DatasetEntry>::const_iterator end() const;
   const DatasetEntry & operator()(size_t index) const;
 
-  static cv::Mat scaleMat(const cv::Mat &depthmap);
+  bool loadPathFromEnv();
+  static const char * getDataPathEnvVar();
 
 private:
   std::string dataset_path_;
-  std::string sequence_file_path_;
+  const std::string sequence_file_;
   std::vector<DatasetEntry> dataset_;
-  rmd::PinholeCamera cam_;
+  const rmd::PinholeCamera cam_;
+
+  static constexpr const char *data_path_env_var = "RMD_TEST_DATA_PATH";
 };
 
 } // test namespace
