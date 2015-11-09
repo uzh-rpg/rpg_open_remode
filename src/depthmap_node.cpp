@@ -88,9 +88,11 @@ void rmd::DepthmapNode::denseInputCallback(
   cv::Mat img_8uC1;
   try
   {
-    img_8uC1 = cv_bridge::toCvCopy(
-          dense_input->image,
-          sensor_msgs::image_encodings::MONO8)->image;
+    cv_bridge::CvImageConstPtr cv_img_ptr =
+        cv_bridge::toCvShare(dense_input->image,
+                             dense_input,
+                             sensor_msgs::image_encodings::MONO8);
+    img_8uC1 = cv_img_ptr->image;
   }
   catch (cv_bridge::Exception& e)
   {
