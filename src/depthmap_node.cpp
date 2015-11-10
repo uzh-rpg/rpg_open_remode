@@ -58,17 +58,17 @@ bool rmd::DepthmapNode::init()
                                     cam_fy,
                                     cam_cy));
 
-  if(vk::hasParam("remode/cam_d0") &&
-     vk::hasParam("remode/cam_d1") &&
-     vk::hasParam("remode/cam_d2") &&
-     vk::hasParam("remode/cam_d3") )
+  if(vk::hasParam("remode/cam_k1") &&
+     vk::hasParam("remode/cam_k2") &&
+     vk::hasParam("remode/cam_r1") &&
+     vk::hasParam("remode/cam_r2") )
   {
     depthmap_->initUndistortionMap(
-          vk::getParam<float>("remode/cam_d0"),
-          vk::getParam<float>("remode/cam_d1"),
-          vk::getParam<float>("remode/cam_d2"),
-          vk::getParam<float>("remode/cam_d3"),
-          vk::getParam<float>("remode/cam_d4", 0.0f));
+          vk::getParam<float>("remode/cam_k1"),
+          vk::getParam<float>("remode/cam_k2"),
+          vk::getParam<float>("remode/cam_r1"),
+          vk::getParam<float>("remode/cam_r2"),
+          0.0f);
   }
 
   ref_compl_perc_ = vk::getParam<float>("remode/ref_compl_perc", 10.0f);
