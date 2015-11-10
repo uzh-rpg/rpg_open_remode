@@ -40,11 +40,10 @@ public:
       float cy);
 
   void initUndistortionMap(
-      float d0,
-      float d1,
-      float d2,
-      float d3,
-      float d4);
+      float k1,
+      float k2,
+      float r1,
+      float r2);
 
   bool setReferenceImage(
       const cv::Mat &img_curr,

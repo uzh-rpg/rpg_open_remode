@@ -133,7 +133,7 @@ void seedEpipolarMatchKernel(
       best_ncc = ncc;
     }
   }
-  if(best_ncc < 0.0f)
+  if(best_ncc < 0.5f)
   {
     dev_ptr->convergence->atXY(x, y) = ConvergenceStates::NO_MATCH;
   }

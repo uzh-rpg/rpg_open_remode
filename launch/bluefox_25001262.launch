@@ -1,0 +1,19 @@
+<launch>
+  <node pkg="open_remode" type="depthmap_node" name="remode" clear_params="true" output="screen">
+
+    <param name="cam_width" value="752" />
+    <param name="cam_height" value="480" />
+
+    <param name="cam_fx" value="350.3755718120993" />
+    <param name="cam_cx" value="398.2742873637509" />
+    <param name="cam_fy" value="349.15163791825313" />
+    <param name="cam_cy" value="247.7956472959842" />
+
+    <param name="cam_k1" value="-0.24099444659398922" />
+    <param name="cam_k2" value="0.04694396667448327" />
+    <param name="cam_r1" value="0.0007325506238530427" />
+    <param name="cam_r2" value="0.00044374959782553903" />
+
+    <param name="ref_compl_perc" value="30.0" />
+  </node>   
+</launch>
