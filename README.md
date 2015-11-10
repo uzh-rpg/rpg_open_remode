@@ -37,6 +37,10 @@ The wiki
 https://github.com/uzh-rpg/rpg_open_remode/wiki
 
 contains instructions on how to build and run REMODE.
+
+> __NOTE__: this implementation requires a CUDA capable GPU and the NVIDIA CUDA Toolkit
+
+https://developer.nvidia.com/cuda-zone
   
 #### Acknowledgments
 
