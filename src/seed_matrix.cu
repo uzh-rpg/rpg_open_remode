@@ -97,7 +97,7 @@ bool rmd::SeedMatrix::setReferenceImage(
   // Algorithm parameters
   dev_data_.eta_inlier  = 0.7f;
   dev_data_.eta_outlier = 0.05f;
-  dev_data_.epsilon     = dev_data_.scene.depth_range / 10000.0f;
+  dev_data_.epsilon     = dev_data_.scene.depth_range / 1000.0f;
   // Copy data to device memory
   dev_data_.setDevData();
 

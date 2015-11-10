@@ -140,7 +140,7 @@ void rmd::DepthmapNode::denseInputCallback(
       state_ = rmd::State::TAKE_REFERENCE_FRAME;
 #if 1
       cv::Mat curr_depth;
-      depthmap_->outputDenoisedDepthmap(curr_depth, 0.4f, 200);
+      depthmap_->outputDenoisedDepthmap(curr_depth, 0.5f, 400);
       cv::imshow("curr_depth", rmd::Depthmap::scaleMat(curr_depth));
       cv::waitKey(2);
 #endif
