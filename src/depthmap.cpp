@@ -34,13 +34,12 @@ rmd::Depthmap::Depthmap(
 }
 
 void rmd::Depthmap::initUndistortionMap(
-    float d0,
-    float d1,
-    float d2,
-    float d3,
-    float d4)
+    float k1,
+    float k2,
+    float r1,
+    float r2)
 {
-  cv_D_ = (cv::Mat_<float>(1, 5) << d0, d1, d2, d3, d4);
+  cv_D_ = (cv::Mat_<float>(1, 4) << k1, k2, r1, r2);
   cv::initUndistortRectifyMap(
         cv_K_,
         cv_D_,

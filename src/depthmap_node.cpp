@@ -67,8 +67,7 @@ bool rmd::DepthmapNode::init()
           vk::getParam<float>("remode/cam_k1"),
           vk::getParam<float>("remode/cam_k2"),
           vk::getParam<float>("remode/cam_r1"),
-          vk::getParam<float>("remode/cam_r2"),
-          0.0f);
+          vk::getParam<float>("remode/cam_r2"));
   }
 
   ref_compl_perc_ = vk::getParam<float>("remode/ref_compl_perc", 10.0f);
