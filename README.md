@@ -32,9 +32,9 @@ If you use REMODE in an academic context, please cite the following publication:
     
 #### Install and run REMODE
 
-THe wiki 
+The wiki 
 
-    https://github.com/uzh-rpg/rpg_open_remode/wiki
+https://github.com/uzh-rpg/rpg_open_remode/wiki
 
 contains instructions on how to build and run REMODE.
   
