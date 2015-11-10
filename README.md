@@ -13,6 +13,8 @@ http://youtu.be/QTKd5UWCG0Q
 
 The REMODE implementation in this repository is research code, any fitness for a particular purpose is disclaimed.
 
+The code has been tested in Ubuntu 12.04, 14.04, 15.04, ROS Groovy, ROS Indigo and ROS Jade.
+
 #### Licence
 
 The source code is released under a GPLv3 licence.
