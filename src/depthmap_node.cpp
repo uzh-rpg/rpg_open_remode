@@ -29,7 +29,7 @@ rmd::DepthmapNode::DepthmapNode(ros::NodeHandle &nh)
 {
   state_ = rmd::State::TAKE_REFERENCE_FRAME;
   image_transport::ImageTransport it(nh_);
-  depthmap_publisher_= it.advertise("depth", 10);
+  depthmap_publisher_= it.advertise("remode/depth", 10);
 }
 
 bool rmd::DepthmapNode::init()
