@@ -61,7 +61,7 @@ TEST(deviceImageReduction, sum)
   float cu_sum = img_reducer.sum(d_img);
   sdkStopTimer(&timer);
   t = sdkGetAverageTimerValue(&timer) / 1000.0;
-  printf("CUDA execution time: %f seconds.\n", t);
+  printf("CUDA execution time (including download of result): %f seconds.\n", t);
 
   std::cout << "DEBUG: OpenCV sum=" << static_cast<float>(cv_sum.val[0]) << ", CUDA sum=" << cu_sum << std::endl;
   ASSERT_FLOAT_EQ(cv_sum.val[0], cu_sum);
@@ -104,7 +104,14 @@ TEST(deviceImageReduction, countEqual)
   num_blocks_per_grid.y = 4;
   rmd::ImageReducer<int> img_reducer(num_threads_per_block, num_blocks_per_grid);
 
+  StopWatchInterface * timer = NULL;
+  sdkCreateTimer(&timer);
+  sdkResetTimer(&timer);
+  sdkStartTimer(&timer);
   size_t cu_count = img_reducer.countEqual(d_img, TO_FIND);
+  sdkStopTimer(&timer);
+  t = sdkGetAverageTimerValue(&timer) / 1000.0;
+  printf("CUDA execution time (including download of result): %f seconds.\n", t);
 
   std::cout << "DEBUG: OpenCV count=" << cv_count << ", CUDA count=" << cu_count << std::endl;
   ASSERT_EQ(cv_count, cu_count);
