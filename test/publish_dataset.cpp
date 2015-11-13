@@ -44,7 +44,7 @@ int main(int argc, char **argv)
         "/svo/dense_input",
         1);
 
-  ros::Rate loop_rate(3);
+  ros::Rate loop_rate(10);
   for(const auto data : dataset)
   {
     if(!ros::ok())
