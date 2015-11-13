@@ -59,6 +59,8 @@ public:
   size_t getConvergedCount() const;
   float  getConvergedPercentage() const;
 
+  // Scale depth in [0,1] and cvt to color
+  // only for test and debug
   static cv::Mat scaleMat(const cv::Mat &depthmap);
 
 private:

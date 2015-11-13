@@ -40,7 +40,7 @@ int main(int argc, char **argv)
     std::cerr << "ERROR: could not retrieve dataset path from the environment variable '"
               << rmd::test::Dataset::getDataPathEnvVar() <<"'" << std::endl;
   }
-  if (!dataset.readDataSequence(20, 100))
+  if (!dataset.readDataSequence(0, 100))
   {
     std::cerr << "ERROR: could not read dataset" << std::endl;
     return EXIT_FAILURE;
@@ -60,6 +60,16 @@ int main(int argc, char **argv)
       std::cerr << "ERROR: could not read image " << data.getImageFileName() << std::endl;
       continue;
     }
+
+    cv::Mat depth_32FC1;
+    if(!dataset.readDepthmap(depth_32FC1, data, img.cols, img.rows))
+    {
+      std::cerr << "ERROR: could not read depthmap " << data.getDepthmapFileName() << std::endl;
+      continue;
+    }
+    double min_depth, max_depth;
+    cv::minMaxLoc(depth_32FC1, &min_depth, &max_depth);
+
     rmd::SE3<float> T_world_curr;
     dataset.readCameraPose(T_world_curr, data);
 
@@ -70,7 +80,7 @@ int main(int argc, char **argv)
     // process
     if(first_img)
     {
-      if(depthmap.setReferenceImage(img, T_world_curr.inv(), 0.4f, 1.8f))
+      if(depthmap.setReferenceImage(img, T_world_curr.inv(), min_depth, max_depth))
       {
         first_img = false;
       }

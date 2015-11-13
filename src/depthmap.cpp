@@ -120,6 +120,8 @@ float rmd::Depthmap::getConvergedPercentage() const
   return static_cast<float>(count) / static_cast<float>(width_*height_) * 100.0f;
 }
 
+// Scale depth in [0,1] and cvt to color
+// only for test and debug
 cv::Mat rmd::Depthmap::scaleMat(const cv::Mat &depthmap)
 {
   cv::Mat scaled_depthmap = depthmap.clone();
