@@ -53,10 +53,10 @@ find_package(Boost REQUIRED COMPONENTS system filesystem)
 
 if(BUILD_ROS_NODE)
   find_package(catkin REQUIRED COMPONENTS
-    roscpp roslib cmake_modules svo_msgs cv_bridge vikit_ros)
+    roscpp roslib cmake_modules svo_msgs cv_bridge image_transport vikit_ros)
   catkin_package(
       DEPENDS OpenCV Eigen Boost
-      CATKIN_DEPENDS roscpp roslib svo_msgs vikit_ros
+      CATKIN_DEPENDS roscpp roslib svo_msgs image_transport vikit_ros
       INCLUDE_DIRS include
       LIBRARIES open_remode open_remode_cuda
   )

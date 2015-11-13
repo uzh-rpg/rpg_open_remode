@@ -24,9 +24,12 @@
 #include <rmd/depthmap_node.h>
 #include <rmd/se3.cuh>
 
-rmd::DepthmapNode::DepthmapNode()
+rmd::DepthmapNode::DepthmapNode(ros::NodeHandle &nh)
+  : nh_(nh)
 {
   state_ = rmd::State::TAKE_REFERENCE_FRAME;
+  image_transport::ImageTransport it(nh_);
+  depthmap_publisher_= it.advertise("depth", 10);
 }
 
 bool rmd::DepthmapNode::init()
@@ -137,12 +140,16 @@ void rmd::DepthmapNode::denseInputCallback(
     if(perc_conv > ref_compl_perc_)
     {
       state_ = rmd::State::TAKE_REFERENCE_FRAME;
-#if 1
+
       cv::Mat curr_depth;
       depthmap_->outputDenoisedDepthmap(curr_depth, 0.5f, 400);
-      cv::imshow("curr_depth", rmd::Depthmap::scaleMat(curr_depth));
-      cv::waitKey(2);
-#endif
+
+      cv_bridge::CvImage cv_image;
+      cv_image.header.stamp = ros::Time::now();
+      cv_image.header.frame_id = "depthmap";
+      cv_image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
+      cv_image.image = curr_depth;
+      depthmap_publisher_.publish(cv_image.toImageMsg());
     }
     break;
   }

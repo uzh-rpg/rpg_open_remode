@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
   ros::init(argc, argv, "open_remode");
   ros::NodeHandle nh;
-  rmd::DepthmapNode dm_node;
+  rmd::DepthmapNode dm_node(nh);
   if(!dm_node.init())
   {
     ROS_ERROR("could not initialize DepthmapNode. Shutting down node...");

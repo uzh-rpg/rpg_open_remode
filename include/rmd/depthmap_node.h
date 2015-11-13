@@ -18,9 +18,11 @@
 #ifndef RMD_DEPTHMAP_NODE_H
 #define RMD_DEPTHMAP_NODE_H
 
-#include <svo_msgs/DenseInput.h>
-
 #include <rmd/depthmap.h>
+
+#include <svo_msgs/DenseInput.h>
+#include <image_transport/image_transport.h>
+#include <ros/ros.h>
 
 namespace rmd
 {
@@ -38,7 +40,7 @@ typedef ProcessingStates::State State;
 class DepthmapNode
 {
 public:
-  DepthmapNode();
+  DepthmapNode(ros::NodeHandle &nh);
   bool init();
   void denseInputCallback(
       const svo_msgs::DenseInputConstPtr &dense_input);
@@ -46,6 +48,9 @@ private:
   std::unique_ptr<rmd::Depthmap> depthmap_;
   State state_;
   float ref_compl_perc_;
+
+  ros::NodeHandle &nh_;
+  image_transport::Publisher depthmap_publisher_;
 };
 
 } // rmd namespace
