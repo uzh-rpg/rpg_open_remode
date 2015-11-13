@@ -40,7 +40,7 @@ int main(int argc, char **argv)
         &rmd::DepthmapNode::denseInputCallback,
         &dm_node);
 
-  ros::Rate loop_rate(50);
+  ros::Rate loop_rate(30);
   while(ros::ok())
   {
     ros::spinOnce();
