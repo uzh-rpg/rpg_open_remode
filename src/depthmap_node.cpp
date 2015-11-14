@@ -23,6 +23,7 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
+
 #include <vikit/params_helper.h>
 
 #include <future>
@@ -31,8 +32,6 @@ rmd::DepthmapNode::DepthmapNode(ros::NodeHandle &nh)
   : nh_(nh)
 {
   state_ = rmd::State::TAKE_REFERENCE_FRAME;
-  image_transport::ImageTransport it(nh_);
-  depthmap_publisher_= it.advertise("remode/depth", 10);
 }
 
 bool rmd::DepthmapNode::init()
@@ -77,6 +76,8 @@ bool rmd::DepthmapNode::init()
   }
 
   ref_compl_perc_ = vk::getParam<float>("remode/ref_compl_perc", 10.0f);
+
+  publisher_.reset(new rmd::Publisher(cam_fx, cam_cx, cam_fy, cam_cy, nh_));
 
   return true;
 }
@@ -144,7 +145,7 @@ void rmd::DepthmapNode::denseInputCallback(
     {
       state_ = rmd::State::TAKE_REFERENCE_FRAME;
       std::async(std::launch::async,
-                 &rmd::DepthmapNode::denoiseAndPublishDepth,
+                 &rmd::DepthmapNode::denoiseAndPublishResults,
                  this);
     }
     break;
@@ -154,17 +155,11 @@ void rmd::DepthmapNode::denseInputCallback(
   }
 }
 
-void rmd::DepthmapNode::denoiseAndPublishDepth()
+void rmd::DepthmapNode::denoiseAndPublishResults()
 {
   cv::Mat curr_depth = depthmap_->outputDenoisedDepthmap(0.5f, 200);
-
-  cv_bridge::CvImage cv_image;
-  cv_image.header.stamp = ros::Time::now();
-  cv_image.header.frame_id = "depthmap";
-  cv_image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
   {
     std::unique_lock<std::mutex> lock(depthmap_->getOutputMutex());
-    cv_image.image = curr_depth;
-    depthmap_publisher_.publish(cv_image.toImageMsg());
+    publisher_->publishDepthmap(curr_depth);
   }
 }

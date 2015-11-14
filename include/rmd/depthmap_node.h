@@ -20,8 +20,9 @@
 
 #include <rmd/depthmap.h>
 
+#include <rmd/publisher.h>
+
 #include <svo_msgs/DenseInput.h>
-#include <image_transport/image_transport.h>
 #include <ros/ros.h>
 
 namespace rmd
@@ -45,14 +46,14 @@ public:
   void denseInputCallback(
       const svo_msgs::DenseInputConstPtr &dense_input);
 private:
-  void denoiseAndPublishDepth();
+  void denoiseAndPublishResults();
 
   std::unique_ptr<rmd::Depthmap> depthmap_;
   State state_;
   float ref_compl_perc_;
 
   ros::NodeHandle &nh_;
-  image_transport::Publisher depthmap_publisher_;
+  std::unique_ptr<rmd::Publisher> publisher_;
 };
 
 } // rmd namespace

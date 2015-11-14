@@ -121,6 +121,7 @@ if(BUILD_ROS_NODE)
 add_executable(
   depthmap_node
   src/depthmap_node.cpp
+  src/publisher.cpp
   src/main_ros.cpp
 )
 target_link_libraries(

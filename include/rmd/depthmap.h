@@ -79,6 +79,9 @@ private:
   cv::Mat cv_K_, cv_D_;
   cv::Mat undist_map1_, undist_map2_;
   cv::Mat img_undistorted_32fc1_;
+  cv::Mat img_undistorted_8uc1_;
+  cv::Mat ref_img_undistorted_8uc1_;
+
   bool is_distorted_;
 
   std::unique_ptr<DepthmapDenoiser> denoiser_;

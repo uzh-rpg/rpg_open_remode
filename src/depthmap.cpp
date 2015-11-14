@@ -33,6 +33,9 @@ rmd::Depthmap::Depthmap(
   denoiser_.reset(new rmd::DepthmapDenoiser(width_, height_));
 
   output_depth_32fc1_ = cv::Mat_<float>(height_, width_);
+  img_undistorted_32fc1_.create(height_, width_, CV_32FC1);
+  img_undistorted_8uc1_.create(height_, width_, CV_8UC1);
+  ref_img_undistorted_8uc1_.create(height_, width_, CV_8UC1);
 }
 
 void rmd::Depthmap::initUndistortionMap(
@@ -66,6 +69,7 @@ bool rmd::Depthmap::setReferenceImage(
         T_curr_world,
         min_depth,
         max_depth);
+  img_undistorted_8uc1_.copyTo(ref_img_undistorted_8uc1_);
 }
 
 void rmd::Depthmap::update(
@@ -80,16 +84,15 @@ void rmd::Depthmap::update(
 
 void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
 {
-  cv::Mat img_undistorted_8uc1;
   if(is_distorted_)
   {
-    cv::remap(img_8uc1, img_undistorted_8uc1, undist_map1_, undist_map2_, CV_INTER_LINEAR);
+    cv::remap(img_8uc1, img_undistorted_8uc1_, undist_map1_, undist_map2_, CV_INTER_LINEAR);
   }
   else
   {
-    img_undistorted_8uc1 = img_8uc1;
+    img_undistorted_8uc1_ = img_8uc1;
   }
-  img_undistorted_8uc1.convertTo(img_undistorted_32fc1_, CV_32F, 1.0f/255.0f);
+  img_undistorted_8uc1_.convertTo(img_undistorted_32fc1_, CV_32F, 1.0f/255.0f);
 }
 
 const cv::Mat_<float> rmd::Depthmap::outputDepthmap()
