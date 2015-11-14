@@ -54,8 +54,8 @@ public:
   void update(const cv::Mat &img_curr,
               const SE3<float> &T_curr_world);
 
-  void outputDepthmap(cv::Mat &depth_32fc1) const;
-  void outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, int iterations);
+  const cv::Mat_<float> outputDepthmap();
+  const cv::Mat_<float> outputDenoisedDepthmap(float lambda, int iterations);
   size_t getConvergedCount() const;
   float  getConvergedPercentage() const;
 
@@ -77,6 +77,7 @@ private:
   bool is_distorted_;
 
   std::unique_ptr<DepthmapDenoiser> denoiser_;
+  cv::Mat output_depth_32fc1_;
 };
 
 }

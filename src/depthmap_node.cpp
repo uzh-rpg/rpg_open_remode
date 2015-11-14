@@ -141,8 +141,7 @@ void rmd::DepthmapNode::denseInputCallback(
     {
       state_ = rmd::State::TAKE_REFERENCE_FRAME;
 
-      cv::Mat curr_depth;
-      depthmap_->outputDenoisedDepthmap(curr_depth, 0.5f, 400);
+      cv::Mat curr_depth = depthmap_->outputDenoisedDepthmap(0.5f, 400);
 
       cv_bridge::CvImage cv_image;
       cv_image.header.stamp = ros::Time::now();

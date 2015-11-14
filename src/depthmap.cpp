@@ -31,6 +31,8 @@ rmd::Depthmap::Depthmap(
 {
   cv_K_ = (cv::Mat_<float>(3, 3) << fx, 0.0f, cx, 0.0f, fy, cy, 0.0f, 0.0f, 1.0f);
   denoiser_.reset(new rmd::DepthmapDenoiser(width_, height_));
+
+  output_depth_32fc1_ = cv::Mat_<float>(height_, width_);
 }
 
 void rmd::Depthmap::initUndistortionMap(
@@ -90,23 +92,23 @@ void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
   img_undistorted_8uc1.convertTo(img_undistorted_32fc1_, CV_32F, 1.0f/255.0f);
 }
 
-void rmd::Depthmap::outputDepthmap(cv::Mat &depth_32fc1) const
+const cv::Mat_<float> rmd::Depthmap::outputDepthmap()
 {
-  depth_32fc1.create(height_, width_, CV_32FC1);
-  seeds_.downloadDepthmap(reinterpret_cast<float*>(depth_32fc1.data));
+  seeds_.downloadDepthmap(reinterpret_cast<float*>(output_depth_32fc1_.data));
+  return output_depth_32fc1_;
 }
 
-void rmd::Depthmap::outputDenoisedDepthmap(cv::Mat &depth_32fc1, float lambda, int iterations)
+const cv::Mat_<float> rmd::Depthmap::outputDenoisedDepthmap(float lambda, int iterations)
 {
-  depth_32fc1.create(height_, width_, CV_32FC1);
   denoiser_->denoise(
         seeds_.getMu(),
         seeds_.getSigmaSq(),
         seeds_.getA(),
         seeds_.getB(),
-        reinterpret_cast<float*>(depth_32fc1.data),
+        reinterpret_cast<float*>(output_depth_32fc1_.data),
         lambda,
         iterations);
+  return output_depth_32fc1_;
 }
 
 size_t rmd::Depthmap::getConvergedCount() const

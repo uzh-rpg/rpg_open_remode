@@ -23,6 +23,9 @@
 namespace rmd
 {
 
+namespace denoise
+{
+
 template<typename T>
 inline __device__
 T max(T a, T b)
@@ -37,6 +40,8 @@ T min(T a, T b)
   return a < b ? a : b;
 }
 
+__constant__ struct Size c_img_size;
+
 __global__
 void computeWeightsKernel(denoise::DeviceData *dev_ptr)
 {
@@ -46,7 +51,7 @@ void computeWeightsKernel(denoise::DeviceData *dev_ptr)
   float xx = x+0.5f;
   float yy = y+0.5f;
 
-  if (x < dev_ptr->width && y < dev_ptr->height)
+  if (x < c_img_size.width && y < c_img_size.height)
   {
     const float E_pi = tex2D(a_tex, xx, yy) / (tex2D(a_tex, xx, yy) + tex2D(b_tex, xx, yy));
     dev_ptr->g->atXY(x, y) = max<float>((E_pi*tex2D(sigma_tex, xx, yy)+(1.0f-E_pi)*dev_ptr->large_sigma_sq)/dev_ptr->large_sigma_sq, 1.0f);
@@ -62,10 +67,7 @@ void updateTVL1PrimalDualKernel(denoise::DeviceData *dev_ptr)
   const float xx = x+0.5f;
   const float yy = y+0.5f;
 
-  const int width = dev_ptr->width;
-  const int height = dev_ptr->height;
-
-  if (x < width && y < height)
+  if (x < c_img_size.width && y < c_img_size.height)
   {
     const float noisy_depth = tex2D(mu_tex, xx, yy );
     const float old_u = dev_ptr->u->atXY(x, y);
@@ -74,8 +76,8 @@ void updateTVL1PrimalDualKernel(denoise::DeviceData *dev_ptr)
     const float2 p = dev_ptr->p->atXY(x, y);
     float2 grad_uhead = make_float2(0.0f, 0.0f);
     const float current_u = dev_ptr->u->atXY(x, y);
-    grad_uhead.x = dev_ptr->u_head->atXY(min<int>(width-1, x+1), y)  - current_u;
-    grad_uhead.y = dev_ptr->u_head->atXY(x, min<int>(height-1, y+1)) - current_u;
+    grad_uhead.x = dev_ptr->u_head->atXY(min<int>(c_img_size.width-1, x+1), y)  - current_u;
+    grad_uhead.y = dev_ptr->u_head->atXY(x, min<int>(c_img_size.height-1, y+1)) - current_u;
     const float2 temp_p = g* grad_uhead * dev_ptr->sigma + p;
     const float sqrt_p = sqrt(temp_p.x * temp_p.x + temp_p.y * temp_p.y);
     dev_ptr->p->atXY(x, y) = temp_p / max<float>(1.0f, sqrt_p);
@@ -88,11 +90,11 @@ void updateTVL1PrimalDualKernel(denoise::DeviceData *dev_ptr)
     float2 n_p = dev_ptr->p->atXY(x, max<int>(0, y-1));
     if (x == 0)
       w_p.x = 0.0f;
-    else if (x >= width - 1)
+    else if (x >= c_img_size.width - 1)
       current_p.x = 0.0f;
     if (y == 0)
       n_p.y = 0.0f;
-    else if (y >= height - 1)
+    else if (y >= c_img_size.height - 1)
       current_p.y = 0.0f;
     const float divergence = current_p.x - w_p.x + current_p.y - n_p.y;
 
@@ -114,6 +116,8 @@ void updateTVL1PrimalDualKernel(denoise::DeviceData *dev_ptr)
   }
   __syncthreads();
 }
+
+} // denoise namespace
 
 } // rmd namespace
 
@@ -159,6 +163,9 @@ rmd::DepthmapDenoiser::DepthmapDenoiser(size_t width, size_t height)
   dim_block_.y = 16;
   dim_grid_.x = (width  + dim_block_.x - 1) / dim_block_.x;
   dim_grid_.y = (height + dim_block_.y - 1) / dim_block_.y;
+
+  host_img_size_.width  = width;
+  host_img_size_.height = height;
 }
 
 rmd::DepthmapDenoiser::~DepthmapDenoiser()
@@ -185,7 +192,7 @@ void rmd::DepthmapDenoiser::denoise(
     return;
   }
   host_ptr->lambda = lambda;
-  const cudaError err = cudaMemcpy(
+  cudaError err = cudaMemcpy(
         dev_ptr,
         host_ptr,
         sizeof(*host_ptr),
@@ -198,7 +205,11 @@ void rmd::DepthmapDenoiser::denoise(
   rmd::bindTexture(a_tex, a);
   rmd::bindTexture(b_tex, b);
 
-  rmd::computeWeightsKernel<<<dim_grid_, dim_block_>>>(dev_ptr);
+  err = cudaMemcpyToSymbol(rmd::denoise::c_img_size, &host_img_size_, sizeof(rmd::Size));
+  if(cudaSuccess != err)
+    throw CudaException("DepthmapDenoiser: unable to copy to const memory", err);
+
+  rmd::denoise::computeWeightsKernel<<<dim_grid_, dim_block_>>>(dev_ptr);
   rmd::bindTexture(g_tex, g_);
 
   u_ = mu;
@@ -207,7 +218,7 @@ void rmd::DepthmapDenoiser::denoise(
 
   for(int i = 0; i < iterations; ++i)
   {
-    rmd::updateTVL1PrimalDualKernel<<<dim_grid_, dim_block_>>>(dev_ptr);
+    rmd::denoise::updateTVL1PrimalDualKernel<<<dim_grid_, dim_block_>>>(dev_ptr);
   }
   u_.getDevData(host_denoised);
 }

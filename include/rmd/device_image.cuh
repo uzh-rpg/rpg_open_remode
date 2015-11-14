@@ -25,6 +25,12 @@
 namespace rmd
 {
 
+struct Size
+{
+  int width;
+  int height;
+};
+
 template<typename ElementType>
 struct DeviceImage
 {

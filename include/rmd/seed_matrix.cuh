@@ -100,7 +100,7 @@ private:
   ImageReducer<int> *img_reducer_;
 
   // Image size to be copied to constant memory
-  int host_img_size_xy_[2];
+  Size host_img_size_;
 };
 
 } // rmd namespace

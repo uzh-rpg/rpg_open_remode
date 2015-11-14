@@ -59,8 +59,9 @@ rmd::SeedMatrix::SeedMatrix(
   dev_data_.one_pix_angle = cam.getOnePixAngle();
   dev_data_.width  = width;
   dev_data_.height = height;
-  host_img_size_xy_[0] = width_;
-  host_img_size_xy_[1] = height_;
+  // Device image size
+  host_img_size_.width  = width_;
+  host_img_size_.height = height_;
 
   // Kernel configuration for depth estimation
   dim_block_.x = 16;
@@ -142,7 +143,8 @@ bool rmd::SeedMatrix::update(
 
   // Establish epipolar correspondences
   // call epipolar matching kernel
-  rmd::copyImgSzToConst(host_img_size_xy_);
+  rmd::copyImgSzToConst(&host_img_size_);
+
   rmd::seedEpipolarMatchKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref);
   err = cudaDeviceSynchronize();
   if(cudaSuccess != err)
@@ -150,7 +152,6 @@ bool rmd::SeedMatrix::update(
   rmd::bindTexture(epipolar_matches_tex, epipolar_matches_);
 
   rmd::seedUpdateKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref.inv());
-  cudaDeviceSynchronize();
 
   return true;
 }

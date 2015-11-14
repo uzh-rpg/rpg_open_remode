@@ -28,17 +28,10 @@
 namespace rmd
 {
 
-struct ConstantMemory
+__constant__ Size c_img_size;
+extern "C" void copyImgSzToConst(rmd::Size *h_img_size)
 {
-  int width;
-  int height;
-};
-
-__constant__ ConstantMemory c_img_size;
-
-extern "C" void copyImgSzToConst(int *h_img_size)
-{
-  cudaMemcpyToSymbol(c_img_size, h_img_size, sizeof(h_img_size));
+  cudaMemcpyToSymbol(c_img_size, h_img_size, sizeof(rmd::Size));
 }
 
 __global__

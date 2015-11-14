@@ -48,6 +48,9 @@ private:
 
   dim3 dim_block_;
   dim3 dim_grid_;
+
+  // Image size to be copied to constant memory
+  Size host_img_size_;
 };
 
 } // rmd namespace
