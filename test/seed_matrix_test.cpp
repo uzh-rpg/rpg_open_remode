@@ -121,29 +121,28 @@ TEST(RMDCuTests, seedMatrixInit)
   cv::Mat ocv_sum_templ(ref_img.rows, ref_img.cols, CV_32FC1);
   cv::Mat ocv_const_templ_denom(ref_img.rows, ref_img.cols, CV_32FC1);
 
-  const int side = seeds.getPatchSide();
-  for(size_t y=side; y<ref_img.rows-side/2; ++y)
+  for(size_t y=RMD_CORR_PATCH_SIDE; y<ref_img.rows-RMD_CORR_PATCH_SIDE/2; ++y)
   {
-    for(size_t x=side; x<ref_img.cols-side/2; ++x)
+    for(size_t x=RMD_CORR_PATCH_SIDE; x<ref_img.cols-RMD_CORR_PATCH_SIDE/2; ++x)
     {
       double sum_templ    = 0.0f;
       double sum_templ_sq = 0.0f;
-      for(int patch_y=0; patch_y<side; ++patch_y)
+      for(int patch_y=0; patch_y<RMD_CORR_PATCH_SIDE; ++patch_y)
       {
-        for(int patch_x=0; patch_x<side; ++patch_x)
+        for(int patch_x=0; patch_x<RMD_CORR_PATCH_SIDE; ++patch_x)
         {
-          const double templ = (double) ref_img_flt.at<float>( y-side/2+patch_y, x-side/2+patch_x );
+          const double templ = (double) ref_img_flt.at<float>( y-RMD_CORR_PATCH_SIDE/2+patch_y, x-RMD_CORR_PATCH_SIDE/2+patch_x );
           sum_templ += templ;
           sum_templ_sq += templ*templ;
         }
       }
       ocv_sum_templ.at<float>(y, x) = (float) sum_templ;
-      ocv_const_templ_denom.at<float>(y, x) = (float) ( ((double)(side*side))*sum_templ_sq - sum_templ*sum_templ );
+      ocv_const_templ_denom.at<float>(y, x) = (float) ( ((double)RMD_CORR_PATCH_AREA)*sum_templ_sq - sum_templ*sum_templ );
     }
   }
-  for(size_t r=side; r<ref_img.rows-side/2; ++r)
+  for(size_t r=RMD_CORR_PATCH_SIDE; r<ref_img.rows-RMD_CORR_PATCH_SIDE/2; ++r)
   {
-    for(size_t c=side; c<ref_img.cols-side/2; ++c)
+    for(size_t c=RMD_CORR_PATCH_SIDE; c<ref_img.cols-RMD_CORR_PATCH_SIDE/2; ++c)
     {
       ASSERT_NEAR(ocv_sum_templ.at<float>(r, c), cu_sum_templ.at<float>(r, c), 0.00001f);
       ASSERT_NEAR(ocv_const_templ_denom.at<float>(r, c), cu_const_templ_denom.at<float>(r, c), 0.001f);
@@ -217,15 +216,14 @@ TEST(RMDCuTests, seedMatrixCheck)
   cv::Mat cu_convergence(ref_img.rows, ref_img.cols, CV_32SC1);
   seeds.downloadConvergence(reinterpret_cast<int*>(cu_convergence.data));
 
-  const int side = seeds.getPatchSide();
   for(size_t r=0; r<ref_img.rows; ++r)
   {
     for(size_t c=0; c<ref_img.cols; ++c)
     {
-      if(r>ref_img.rows-side-1
-         || r<side
-         || c>ref_img.cols-side-1
-         || c<side)
+      if(r>ref_img.rows-RMD_CORR_PATCH_SIDE-1
+         || r<RMD_CORR_PATCH_SIDE
+         || c>ref_img.cols-RMD_CORR_PATCH_SIDE-1
+         || c<RMD_CORR_PATCH_SIDE)
       {
         ASSERT_EQ(rmd::ConvergenceStates::BORDER, cu_convergence.at<int>(r, c)) << "(r, c) = (" << r << ", " << c <<")";
       }

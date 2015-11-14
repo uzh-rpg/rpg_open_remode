@@ -36,20 +36,11 @@ struct SceneData
   float sigma_sq_max;
 };
 
-struct CorrPatch
-{
 #ifndef RMD_CORR_PATCH_SIDE
-#define RMD_CORR_PATCH_SIDE 5
+#define RMD_CORR_PATCH_SIDE    5
 #endif
 #define RMD_CORR_PATCH_OFFSET -RMD_CORR_PATCH_SIDE/2
-  CorrPatch()
-    : side(RMD_CORR_PATCH_SIDE)
-    , offset(make_int2(RMD_CORR_PATCH_OFFSET,
-                       RMD_CORR_PATCH_OFFSET))
-  { }
-  const int  side;
-  const int2 offset;
-};
+#define RMD_CORR_PATCH_AREA    RMD_CORR_PATCH_SIDE*RMD_CORR_PATCH_SIDE
 
 // DeviceData struct stores pointers to dev memory.
 // It is allocated and set from host.
@@ -104,7 +95,6 @@ struct DeviceData
   size_t height;
 
   SceneData scene;
-  CorrPatch patch;
 
   // Algorithm parameters
   float eta_inlier;

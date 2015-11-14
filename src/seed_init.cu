@@ -36,16 +36,14 @@ void seedInitKernel(mvs::DeviceData *dev_ptr)
   // Compute template statistics for NCC
   float sum_templ    = 0.0f;
   float sum_templ_sq = 0.0f;
-  const int  &side   = dev_ptr->patch.side;
-  const int2 &offset = dev_ptr->patch.offset;
-  for(int patch_y=0; patch_y<side; ++patch_y)
+  for(int patch_y=0; patch_y<RMD_CORR_PATCH_SIDE; ++patch_y)
   {
-    for(int patch_x=0; patch_x<side; ++patch_x)
+    for(int patch_x=0; patch_x<RMD_CORR_PATCH_SIDE; ++patch_x)
     {
       const float templ = tex2D(
             ref_img_tex,
-            (float)(x+offset.x+patch_x)+0.5f,
-            (float)(y+offset.y+patch_y)+0.5f);
+            (float)(x+RMD_CORR_PATCH_OFFSET+patch_x)+0.5f,
+            (float)(y+RMD_CORR_PATCH_OFFSET+patch_y)+0.5f);
       sum_templ += templ;
       sum_templ_sq += templ*templ;
     }
@@ -53,7 +51,7 @@ void seedInitKernel(mvs::DeviceData *dev_ptr)
   dev_ptr->sum_templ->atXY(x, y) = sum_templ;
 
   dev_ptr->const_templ_denom->atXY(x, y) =
-      (float) ( (double) side*side*sum_templ_sq - (double) sum_templ*sum_templ );
+      (float) ( (double) RMD_CORR_PATCH_AREA*sum_templ_sq - (double) sum_templ*sum_templ );
 
   // Init measurement parameters
   dev_ptr->mu->atXY(x, y) = dev_ptr->scene.avg_depth;

@@ -34,8 +34,8 @@ void seedCheckKernel(mvs::DeviceData *dev_ptr)
   if(x >= dev_ptr->width || y >= dev_ptr->height)
     return;
 
-  if(x > dev_ptr->width-dev_ptr->patch.side-1 || y > dev_ptr->height-dev_ptr->patch.side-1 ||
-     x < dev_ptr->patch.side || y < dev_ptr->patch.side)
+  if(x > dev_ptr->width-RMD_CORR_PATCH_SIDE-1 || y > dev_ptr->height-RMD_CORR_PATCH_SIDE-1 ||
+     x < RMD_CORR_PATCH_SIDE || y < RMD_CORR_PATCH_SIDE)
   {
     dev_ptr->convergence->atXY(x, y) = ConvergenceStates::BORDER;
     return;

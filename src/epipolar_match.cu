@@ -119,10 +119,9 @@ void seedEpipolarMatchKernel(
         sum_img_templ += img*templ;
       }
     }
-#define RMD_CORR_PATCH_AREA RMD_CORR_PATCH_SIDE*RMD_CORR_PATCH_SIDE
     const float ncc_numerator = RMD_CORR_PATCH_AREA*sum_img_templ - sum_img*sum_templ;
     const float ncc_denominator = (RMD_CORR_PATCH_AREA*sum_img_sq - sum_img*sum_img)*const_templ_denom;
-#undef RMD_CORR_PATCH_AREA
+
     const float ncc = ncc_numerator * rsqrtf(ncc_denominator + FLT_MIN);
 
     if(ncc > best_ncc)

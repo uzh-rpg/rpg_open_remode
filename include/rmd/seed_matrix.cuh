@@ -77,7 +77,6 @@ public:
   void downloadConstTemplDenom(float *host_align_row_maj) const;
   void downloadConvergence(int *host_align_row_maj) const;
   void downloadEpipolarMatches(float2 *host_align_row_maj) const;
-  int getPatchSide() const { return dev_data_.patch.side; }
 #endif
 
 private:
