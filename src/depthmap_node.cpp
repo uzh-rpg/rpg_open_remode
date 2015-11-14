@@ -162,6 +162,9 @@ void rmd::DepthmapNode::denoiseAndPublishDepth()
   cv_image.header.stamp = ros::Time::now();
   cv_image.header.frame_id = "depthmap";
   cv_image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
-  cv_image.image = curr_depth;
-  depthmap_publisher_.publish(cv_image.toImageMsg());
+  {
+    std::unique_lock<std::mutex> lock(depthmap_->getOutputMutex());
+    cv_image.image = curr_depth;
+    depthmap_publisher_.publish(cv_image.toImageMsg());
+  }
 }

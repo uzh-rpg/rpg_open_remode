@@ -94,12 +94,14 @@ void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
 
 const cv::Mat_<float> rmd::Depthmap::outputDepthmap()
 {
+  std::unique_lock<std::mutex> lock(output_mutex_);
   seeds_.downloadDepthmap(reinterpret_cast<float*>(output_depth_32fc1_.data));
   return output_depth_32fc1_;
 }
 
 const cv::Mat_<float> rmd::Depthmap::outputDenoisedDepthmap(float lambda, int iterations)
 {
+  std::unique_lock<std::mutex> lock(output_mutex_);
   denoiser_->denoise(
         seeds_.getMu(),
         seeds_.getSigmaSq(),

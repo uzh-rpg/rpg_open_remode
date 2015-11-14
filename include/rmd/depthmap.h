@@ -25,6 +25,8 @@
 #include <rmd/seed_matrix.cuh>
 #include <rmd/depthmap_denoiser.cuh>
 
+#include <mutex>
+
 namespace rmd
 {
 
@@ -63,6 +65,9 @@ public:
   // only for test and debug
   static cv::Mat scaleMat(const cv::Mat &depthmap);
 
+  std::mutex & getOutputMutex()
+  { return output_mutex_; }
+
 private:
   void inputImage(const cv::Mat &img_8uc1);
 
@@ -77,7 +82,9 @@ private:
   bool is_distorted_;
 
   std::unique_ptr<DepthmapDenoiser> denoiser_;
+
   cv::Mat output_depth_32fc1_;
+  std::mutex output_mutex_;
 };
 
 }
