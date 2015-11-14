@@ -22,11 +22,11 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/"
 SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
 
 find_package(CUDA REQUIRED)
-SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3)
+SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3 -use_fast_math)
 
 # Specify compute capability
-#list(APPEND CUDA_NVCC_FLAGS -arch=sm_30)
-#list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30 -use_fast_math)
+list(APPEND CUDA_NVCC_FLAGS -arch=sm_30)
+list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30)
 
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 

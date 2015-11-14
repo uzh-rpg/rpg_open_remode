@@ -18,6 +18,8 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <numeric>
 
 #include <boost/filesystem.hpp>
 #include <opencv2/opencv.hpp>
@@ -40,7 +42,7 @@ int main(int argc, char **argv)
     std::cerr << "ERROR: could not retrieve dataset path from the environment variable '"
               << rmd::test::Dataset::getDataPathEnvVar() <<"'" << std::endl;
   }
-  if (!dataset.readDataSequence(0, 100))
+  if (!dataset.readDataSequence(0, 200))
   {
     std::cerr << "ERROR: could not read dataset" << std::endl;
     return EXIT_FAILURE;
@@ -51,6 +53,10 @@ int main(int argc, char **argv)
 
   bool first_img = true;
   rmd::Depthmap depthmap(width, height, cam.fx, cam.cx, cam.fy, cam.cy);
+
+  // store the timings
+  // update
+  std::vector<double> update_time;
 
   for(const auto data : dataset)
   {
@@ -96,6 +102,7 @@ int main(int argc, char **argv)
       depthmap.update(img, T_world_curr.inv());
       t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
       printf("\nUPDATE execution time: %f seconds.\n", t);
+      update_time.push_back(t);
     }
   }
 
@@ -112,6 +119,20 @@ int main(int argc, char **argv)
   cv::imshow("denoised_result", colored_denoised);
 
   cv::waitKey();
+
+  // time statistics
+  const double time_mean = std::accumulate(update_time.begin(), update_time.end(), 0.0) / static_cast<double>(update_time.size());
+  double time_var = 0.0;
+  for(const auto & t : update_time)
+  {
+    time_var += (t-time_mean)*(t-time_mean);
+  }
+  time_var /= static_cast<double>(update_time.size());
+
+  std::cout << "\n\n";
+  std::cout << "MEAN update time: " << time_mean << std::endl;
+  std::cout << "VAR  update time: " << time_var  << std::endl
+            << "(STDDEV: " << std::sqrt(time_var) << ")" << std::endl;
 
   return EXIT_SUCCESS;
 }
