@@ -142,7 +142,7 @@ bool rmd::SeedMatrix::update(
 
   // Establish epipolar correspondences
   // call epipolar matching kernel
-  rmd::copyImgSzXY2Const(host_img_size_xy_);
+  rmd::copyImgSzToConst(host_img_size_xy_);
   rmd::seedEpipolarMatchKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref);
   err = cudaDeviceSynchronize();
   if(cudaSuccess != err)

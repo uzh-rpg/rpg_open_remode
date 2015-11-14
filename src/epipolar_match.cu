@@ -28,12 +28,17 @@
 namespace rmd
 {
 
-__constant__
-int c_img_size_xy[2];
-
-extern "C" void copyImgSzXY2Const(int *h_img_size_xy)
+struct ConstantMemory
 {
-  cudaMemcpyToSymbol(c_img_size_xy, h_img_size_xy, 2*sizeof(int));
+  int width;
+  int height;
+};
+
+__constant__ ConstantMemory c_img_size;
+
+extern "C" void copyImgSzToConst(int *h_img_size)
+{
+  cudaMemcpyToSymbol(c_img_size, h_img_size, sizeof(h_img_size));
 }
 
 __global__
@@ -44,7 +49,7 @@ void seedEpipolarMatchKernel(
   int x = blockIdx.x * blockDim.x + threadIdx.x;
   int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-  if(x >= c_img_size_xy[0] || y >= c_img_size_xy[1])
+  if(x >= c_img_size.width || y >= c_img_size.height)
     return;
 
   const float xx = x+0.5f;
@@ -90,8 +95,8 @@ void seedEpipolarMatchKernel(
   for(float l = -half_length; l <= half_length; l += 0.7f)
   {
     px_curr = px_mean_curr + l*epi_dir;
-    if( (px_curr.x >= c_img_size_xy[0] - RMD_CORR_PATCH_SIDE)  ||
-        (px_curr.y >= c_img_size_xy[1] - RMD_CORR_PATCH_SIDE) ||
+    if( (px_curr.x >= c_img_size.width - RMD_CORR_PATCH_SIDE)  ||
+        (px_curr.y >= c_img_size.height - RMD_CORR_PATCH_SIDE) ||
         (px_curr.x < RMD_CORR_PATCH_SIDE)                    ||
         (px_curr.y < RMD_CORR_PATCH_SIDE) )
     {
