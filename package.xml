@@ -20,6 +20,7 @@
   <build_depend>cv_bridge</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>vikit_ros</build_depend>
+  <build_depend>pcl_ros</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
@@ -28,5 +29,6 @@
   <run_depend>cv_bridge</run_depend>
   <run_depend>image_transport</run_depend>
   <run_depend>vikit_ros</run_depend>
+  <run_depend>pcl_ros</run_depend>
 
 </package>

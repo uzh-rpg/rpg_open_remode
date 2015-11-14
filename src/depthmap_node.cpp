@@ -143,10 +143,8 @@ void rmd::DepthmapNode::denseInputCallback(
     std::cout << "INFO: percentage of converged measurements: " << perc_conv << "%" << std::endl;
     if(perc_conv > ref_compl_perc_)
     {
-      state_ = rmd::State::TAKE_REFERENCE_FRAME;
-      std::async(std::launch::async,
-                 &rmd::DepthmapNode::denoiseAndPublishResults,
-                 this);
+      state_ = State::TAKE_REFERENCE_FRAME;
+      denoiseAndPublishResults();
     }
     break;
   }
@@ -158,8 +156,12 @@ void rmd::DepthmapNode::denseInputCallback(
 void rmd::DepthmapNode::denoiseAndPublishResults()
 {
   cv::Mat curr_depth = depthmap_->outputDenoisedDepthmap(0.5f, 200);
-  {
-    std::unique_lock<std::mutex> lock(depthmap_->getOutputMutex());
-    publisher_->publishDepthmap(curr_depth);
-  }
+  cv::Mat curr_convergence = depthmap_->outpuConvergenceMap();
+  cv::Mat curr_ref_img = depthmap_->outputReferenceImage().clone();
+
+  std::async(std::launch::async,
+             &rmd::Publisher::publishDepthmapAndPointCloud,
+             publisher_.get(),
+             curr_depth, curr_ref_img, curr_convergence);
+
 }

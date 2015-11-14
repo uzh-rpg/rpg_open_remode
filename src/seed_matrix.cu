@@ -161,6 +161,11 @@ void rmd::SeedMatrix::downloadDepthmap(float *host_depthmap_align_row_maj) const
   mu_.getDevData(host_depthmap_align_row_maj);
 }
 
+void rmd::SeedMatrix::downloadConvergence(int *host_align_row_maj) const
+{
+  convergence_.getDevData(host_align_row_maj);
+}
+
 const rmd::DeviceImage<float> & rmd::SeedMatrix::getMu() const
 {
   return mu_;
@@ -211,10 +216,6 @@ void rmd::SeedMatrix::downloadSumTempl(float *host_align_row_maj) const
 void rmd::SeedMatrix::downloadConstTemplDenom(float *host_align_row_maj) const
 {
   const_templ_denom_.getDevData(host_align_row_maj);
-}
-void rmd::SeedMatrix::downloadConvergence(int *host_align_row_maj) const
-{
-  convergence_.getDevData(host_align_row_maj);
 }
 void rmd::SeedMatrix::downloadEpipolarMatches(float2 *host_align_row_maj) const
 {
