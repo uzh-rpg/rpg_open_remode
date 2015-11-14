@@ -45,6 +45,8 @@ public:
   void denseInputCallback(
       const svo_msgs::DenseInputConstPtr &dense_input);
 private:
+  void denoiseAndPublishDepth();
+
   std::unique_ptr<rmd::Depthmap> depthmap_;
   State state_;
   float ref_compl_perc_;

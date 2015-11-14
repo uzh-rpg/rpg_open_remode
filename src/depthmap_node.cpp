@@ -15,14 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <rmd/depthmap_node.h>
+
+#include <rmd/se3.cuh>
+
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 #include <vikit/params_helper.h>
 
-#include <rmd/depthmap_node.h>
-#include <rmd/se3.cuh>
+#include <future>
 
 rmd::DepthmapNode::DepthmapNode(ros::NodeHandle &nh)
   : nh_(nh)
@@ -140,21 +143,25 @@ void rmd::DepthmapNode::denseInputCallback(
     if(perc_conv > ref_compl_perc_)
     {
       state_ = rmd::State::TAKE_REFERENCE_FRAME;
-
-      cv::Mat curr_depth = depthmap_->outputDenoisedDepthmap(0.5f, 400);
-
-      cv_bridge::CvImage cv_image;
-      cv_image.header.stamp = ros::Time::now();
-      cv_image.header.frame_id = "depthmap";
-      cv_image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
-      cv_image.image = curr_depth;
-      depthmap_publisher_.publish(cv_image.toImageMsg());
+      std::async(std::launch::async,
+                 &rmd::DepthmapNode::denoiseAndPublishDepth,
+                 this);
     }
     break;
   }
   default:
     break;
   }
-
 }
 
+void rmd::DepthmapNode::denoiseAndPublishDepth()
+{
+  cv::Mat curr_depth = depthmap_->outputDenoisedDepthmap(0.5f, 200);
+
+  cv_bridge::CvImage cv_image;
+  cv_image.header.stamp = ros::Time::now();
+  cv_image.header.frame_id = "depthmap";
+  cv_image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
+  cv_image.image = curr_depth;
+  depthmap_publisher_.publish(cv_image.toImageMsg());
+}
