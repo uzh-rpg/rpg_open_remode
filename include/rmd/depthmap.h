@@ -25,8 +25,6 @@
 #include <rmd/seed_matrix.cuh>
 #include <rmd/depthmap_denoiser.cuh>
 
-#include <mutex>
-
 namespace rmd
 {
 
@@ -58,15 +56,15 @@ public:
 
   const cv::Mat_<float> outputDepthmap();
   const cv::Mat_<float> outputDenoisedDepthmap(float lambda, int iterations);
+  const cv::Mat_<int>   outpuConvergenceMap();
+  const cv::Mat         outputReferenceImage();
+
   size_t getConvergedCount() const;
   float  getConvergedPercentage() const;
 
   // Scale depth in [0,1] and cvt to color
   // only for test and debug
   static cv::Mat scaleMat(const cv::Mat &depthmap);
-
-  std::mutex & getOutputMutex()
-  { return output_mutex_; }
 
 private:
   void inputImage(const cv::Mat &img_8uc1);
@@ -87,7 +85,7 @@ private:
   std::unique_ptr<DepthmapDenoiser> denoiser_;
 
   cv::Mat output_depth_32fc1_;
-  std::mutex output_mutex_;
+  cv::Mat output_convergence_int_;
 };
 
 }

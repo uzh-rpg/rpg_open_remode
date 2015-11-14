@@ -58,7 +58,10 @@ public:
   bool update(
       float *host_curr_img_align_row_maj,
       const SE3<float> &T_curr_world);
+
   void downloadDepthmap(float *host_depthmap_align_row_maj) const;
+  void downloadConvergence(int *host_align_row_maj) const;
+
 
   const DeviceImage<float> & getMu() const;
   const DeviceImage<float> & getSigmaSq() const;
@@ -75,7 +78,6 @@ public:
   void downloadB(float *host_align_row_maj) const;
   void downloadSumTempl(float *host_align_row_maj) const;
   void downloadConstTemplDenom(float *host_align_row_maj) const;
-  void downloadConvergence(int *host_align_row_maj) const;
   void downloadEpipolarMatches(float2 *host_align_row_maj) const;
 #endif
 
