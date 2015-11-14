@@ -20,6 +20,7 @@
 #include <opencv2/opencv.hpp>
 #include <rmd/reduction.cuh>
 
+// Test summing an image in device memory
 TEST(deviceImageReduction, sum)
 {
   const size_t w = 752;
@@ -41,9 +42,10 @@ TEST(deviceImageReduction, sum)
 
   // OpenCV execution
   double t = (double)cv::getTickCount();
+  d_img.getDevData(reinterpret_cast<float*>(h_in_img.data));
   cv::Scalar cv_sum = cv::sum(h_in_img);
   t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
-  printf("Opencv execution time: %f seconds.\n", t);
+  printf("Opencv execution time (including download of image from device memory): %f seconds.\n", t);
 
   // CUDA execution
   dim3 num_threads_per_block;
@@ -67,6 +69,7 @@ TEST(deviceImageReduction, sum)
   ASSERT_FLOAT_EQ(cv_sum.val[0], cu_sum);
 }
 
+// Test counting pixels in device memory
 TEST(deviceImageReduction, countEqual)
 {
   const size_t w = 752;
@@ -90,10 +93,11 @@ TEST(deviceImageReduction, countEqual)
 
   // OpenCV execution
   double t = (double)cv::getTickCount();
+  d_img.getDevData(reinterpret_cast<int*>(h_in_img.data));
   cv::Mat mask = h_in_img == TO_FIND;
   size_t cv_count = cv::countNonZero(mask);
   t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
-  printf("Opencv execution time: %f seconds.\n", t);
+  printf("Opencv execution time (including download of image from device memory): %f seconds.\n", t);
 
   // CUDA execution
   dim3 num_threads_per_block;
