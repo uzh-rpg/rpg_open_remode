@@ -23,6 +23,11 @@ SET(CMAKE_BUILD_TYPE Release) # Release, RelWithDebInfo
 
 find_package(CUDA REQUIRED)
 SET(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-O3)
+
+# Specify compute capability
+#list(APPEND CUDA_NVCC_FLAGS -arch=sm_30)
+#list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_30,code=sm_30 -use_fast_math)
+
 SET(CUDA_PROPAGATE_HOST_FLAGS OFF)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")

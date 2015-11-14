@@ -41,9 +41,11 @@ struct CorrPatch
 #ifndef RMD_CORR_PATCH_SIDE
 #define RMD_CORR_PATCH_SIDE 5
 #endif
+#define RMD_CORR_PATCH_OFFSET -RMD_CORR_PATCH_SIDE/2
   CorrPatch()
     : side(RMD_CORR_PATCH_SIDE)
-    , offset(make_int2(-side/2, -side/2))
+    , offset(make_int2(RMD_CORR_PATCH_OFFSET,
+                       RMD_CORR_PATCH_OFFSET))
   { }
   const int  side;
   const int2 offset;

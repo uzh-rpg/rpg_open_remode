@@ -99,6 +99,9 @@ private:
   dim3 dim_grid_;
   // Image reduction to compute seed statistics
   ImageReducer<int> *img_reducer_;
+
+  // Image size to be copied to constant memory
+  int host_img_size_xy_[2];
 };
 
 } // rmd namespace

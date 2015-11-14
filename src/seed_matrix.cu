@@ -16,6 +16,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <rmd/seed_matrix.cuh>
+
 #include <rmd/texture_memory.cuh>
 #include <rmd/helper_vector_types.cuh>
 
@@ -58,6 +59,8 @@ rmd::SeedMatrix::SeedMatrix(
   dev_data_.one_pix_angle = cam.getOnePixAngle();
   dev_data_.width  = width;
   dev_data_.height = height;
+  host_img_size_xy_[0] = width_;
+  host_img_size_xy_[1] = height_;
 
   // Kernel configuration for depth estimation
   dim_block_.x = 16;
@@ -107,6 +110,9 @@ bool rmd::SeedMatrix::setReferenceImage(
 
   rmd::seedInitKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr);
   cudaDeviceSynchronize();
+
+  rmd::bindTexture(sum_templ_tex, sum_templ_, cudaFilterModePoint);
+  rmd::bindTexture(const_templ_denom_tex, const_templ_denom_, cudaFilterModePoint);
   return true;
 }
 
@@ -136,6 +142,7 @@ bool rmd::SeedMatrix::update(
 
   // Establish epipolar correspondences
   // call epipolar matching kernel
+  rmd::copyImgSzXY2Const(host_img_size_xy_);
   rmd::seedEpipolarMatchKernel<<<dim_grid_, dim_block_>>>(dev_data_.dev_ptr, T_curr_ref);
   err = cudaDeviceSynchronize();
   if(cudaSuccess != err)

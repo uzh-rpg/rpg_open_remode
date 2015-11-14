@@ -37,6 +37,10 @@ texture<float2, cudaTextureType2D, cudaReadModeElementType> epipolar_matches_tex
 
 texture<float, cudaTextureType2D, cudaReadModeElementType> g_tex;
 
+// Pre-computed template statistics
+texture<float, cudaTextureType2D, cudaReadModeElementType> sum_templ_tex;
+texture<float, cudaTextureType2D, cudaReadModeElementType> const_templ_denom_tex;
+
 template<typename ElementType>
 inline void bindTexture(
     texture<ElementType, cudaTextureType2D> &tex,

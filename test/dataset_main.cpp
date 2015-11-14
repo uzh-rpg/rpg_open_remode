@@ -92,7 +92,10 @@ int main(int argc, char **argv)
     }
     else
     {
+      double t = (double)cv::getTickCount();
       depthmap.update(img, T_world_curr.inv());
+      t = ((double)cv::getTickCount() - t)/cv::getTickFrequency();
+      printf("\nUPDATE execution time: %f seconds.\n", t);
     }
   }
 
