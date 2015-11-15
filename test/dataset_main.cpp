@@ -107,12 +107,14 @@ int main(int argc, char **argv)
   }
 
   // show depthmap
-  cv::Mat result = depthmap.outputDepthmap();
+  depthmap.downloadDepthmap();
+  cv::Mat result = depthmap.getDepthmap();
   cv::Mat colored = rmd::Depthmap::scaleMat(result);
   cv::imshow("result", colored);
 
   // denoise
-  cv::Mat denoised_result = depthmap.outputDenoisedDepthmap(0.4f, 200);
+  depthmap.downloadDenoisedDepthmap(0.5f, 200);
+  cv::Mat denoised_result = depthmap.getDepthmap();
   cv::Mat colored_denoised = rmd::Depthmap::scaleMat(denoised_result);
   cv::imshow("denoised_result", colored_denoised);
 

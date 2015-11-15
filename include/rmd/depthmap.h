@@ -25,6 +25,8 @@
 #include <rmd/seed_matrix.cuh>
 #include <rmd/depthmap_denoiser.cuh>
 
+#include <mutex>
+
 namespace rmd
 {
 
@@ -54,10 +56,16 @@ public:
   void update(const cv::Mat &img_curr,
               const SE3<float> &T_curr_world);
 
-  const cv::Mat_<float> outputDepthmap();
-  const cv::Mat_<float> outputDenoisedDepthmap(float lambda, int iterations);
-  const cv::Mat_<int>   outpuConvergenceMap();
-  const cv::Mat         outputReferenceImage();
+  void downloadDepthmap();
+  void downloadDenoisedDepthmap(float lambda, int iterations);
+
+  const cv::Mat_<float> getDepthmap() const;
+
+  void downloadConvergenceMap();
+  const cv::Mat_<int> getConvergenceMap() const;
+
+
+  const cv::Mat getReferenceImage() const;
 
   size_t getConvergedCount() const;
   float  getConvergedPercentage() const;
@@ -65,6 +73,21 @@ public:
   // Scale depth in [0,1] and cvt to color
   // only for test and debug
   static cv::Mat scaleMat(const cv::Mat &depthmap);
+
+  float getFx() const
+  { return fx_; }
+
+  float getFy() const
+  { return fy_; }
+
+  float getCx() const
+  { return cx_; }
+
+  float getCy() const
+  { return cy_; }
+
+  std::mutex & getRefImgMutex()
+  { return ref_img_mutex_; }
 
 private:
   void inputImage(const cv::Mat &img_8uc1);
@@ -78,7 +101,9 @@ private:
   cv::Mat undist_map1_, undist_map2_;
   cv::Mat img_undistorted_32fc1_;
   cv::Mat img_undistorted_8uc1_;
+
   cv::Mat ref_img_undistorted_8uc1_;
+  std::mutex ref_img_mutex_;
 
   bool is_distorted_;
 
@@ -86,6 +111,8 @@ private:
 
   cv::Mat output_depth_32fc1_;
   cv::Mat output_convergence_int_;
+
+  const float fx_, fy_, cx_, cy_;
 };
 
 }

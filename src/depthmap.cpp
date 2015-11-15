@@ -17,17 +17,20 @@
 
 #include <rmd/depthmap.h>
 
-rmd::Depthmap::Depthmap(
-    size_t width,
-    size_t height,
-    float fx,
-    float cx,
-    float fy,
-    float cy)
+rmd::Depthmap::Depthmap(size_t width,
+                        size_t height,
+                        float fx,
+                        float cx,
+                        float fy,
+                        float cy)
   : width_(width)
   , height_(height)
   , is_distorted_(false)
   , seeds_(width, height, rmd::PinholeCamera(fx, fy, cx, cy))
+  , fx_(fx)
+  , fy_(fy)
+  , cx_(cx)
+  , cy_(cy)
 {
   cv_K_ = (cv::Mat_<float>(3, 3) << fx, 0.0f, cx, 0.0f, fy, cy, 0.0f, 0.0f, 1.0f);
   denoiser_.reset(new rmd::DepthmapDenoiser(width_, height_));
@@ -65,12 +68,17 @@ bool rmd::Depthmap::setReferenceImage(
 {
   denoiser_->setLargeSigmaSq(max_depth-min_depth);
   inputImage(img_curr);
-  img_undistorted_8uc1_.copyTo(ref_img_undistorted_8uc1_);
-  return seeds_.setReferenceImage(
-        reinterpret_cast<float*>(img_undistorted_32fc1_.data),
-        T_curr_world,
-        min_depth,
-        max_depth);
+  const bool ret = seeds_.setReferenceImage(reinterpret_cast<float*>(img_undistorted_32fc1_.data),
+                                            T_curr_world,
+                                            min_depth,
+                                            max_depth);
+
+  {
+    std::lock_guard<std::mutex> lock(ref_img_mutex_);
+    img_undistorted_8uc1_.copyTo(ref_img_undistorted_8uc1_);
+  }
+
+  return ret;
 }
 
 void rmd::Depthmap::update(
@@ -96,13 +104,12 @@ void rmd::Depthmap::inputImage(const cv::Mat &img_8uc1)
   img_undistorted_8uc1_.convertTo(img_undistorted_32fc1_, CV_32F, 1.0f/255.0f);
 }
 
-const cv::Mat_<float> rmd::Depthmap::outputDepthmap()
+void rmd::Depthmap::downloadDepthmap()
 {
   seeds_.downloadDepthmap(reinterpret_cast<float*>(output_depth_32fc1_.data));
-  return output_depth_32fc1_;
 }
 
-const cv::Mat_<float> rmd::Depthmap::outputDenoisedDepthmap(float lambda, int iterations)
+void rmd::Depthmap::downloadDenoisedDepthmap(float lambda, int iterations)
 {
   denoiser_->denoise(
         seeds_.getMu(),
@@ -112,16 +119,24 @@ const cv::Mat_<float> rmd::Depthmap::outputDenoisedDepthmap(float lambda, int it
         reinterpret_cast<float*>(output_depth_32fc1_.data),
         lambda,
         iterations);
+}
+
+const cv::Mat_<float> rmd::Depthmap::getDepthmap() const
+{
   return output_depth_32fc1_;
 }
 
-const cv::Mat_<int> rmd::Depthmap::outpuConvergenceMap()
+void rmd::Depthmap::downloadConvergenceMap()
 {
   seeds_.downloadConvergence(reinterpret_cast<int*>(output_convergence_int_.data));
+}
+
+const cv::Mat_<int> rmd::Depthmap::getConvergenceMap() const
+{
   return output_convergence_int_;
 }
 
-const cv::Mat rmd::Depthmap::outputReferenceImage()
+const cv::Mat rmd::Depthmap::getReferenceImage() const
 {
   return ref_img_undistorted_8uc1_;
 }

@@ -56,12 +56,12 @@ bool rmd::DepthmapNode::init()
   const float  cam_cx     = vk::getParam<float>("remode/cam_cx");
   const float  cam_cy     = vk::getParam<float>("remode/cam_cy");
 
-  depthmap_.reset(new rmd::Depthmap(cam_width,
-                                    cam_height,
-                                    cam_fx,
-                                    cam_cx,
-                                    cam_fy,
-                                    cam_cy));
+  depthmap_ = std::make_shared<rmd::Depthmap>(cam_width,
+                                              cam_height,
+                                              cam_fx,
+                                              cam_cx,
+                                              cam_fy,
+                                              cam_cy);
 
   if(vk::hasParam("remode/cam_k1") &&
      vk::hasParam("remode/cam_k2") &&
@@ -77,7 +77,7 @@ bool rmd::DepthmapNode::init()
 
   ref_compl_perc_ = vk::getParam<float>("remode/ref_compl_perc", 10.0f);
 
-  publisher_.reset(new rmd::Publisher(cam_fx, cam_cx, cam_fy, cam_cy, nh_));
+  publisher_.reset(new rmd::Publisher(nh_, depthmap_));
 
   return true;
 }
@@ -155,13 +155,10 @@ void rmd::DepthmapNode::denseInputCallback(
 
 void rmd::DepthmapNode::denoiseAndPublishResults()
 {
-  cv::Mat curr_depth = depthmap_->outputDenoisedDepthmap(0.5f, 200);
-  cv::Mat curr_convergence = depthmap_->outpuConvergenceMap();
-  cv::Mat curr_ref_img = depthmap_->outputReferenceImage().clone();
+  depthmap_->downloadDenoisedDepthmap(0.5f, 200);
+  depthmap_->downloadConvergenceMap();
 
   std::async(std::launch::async,
              &rmd::Publisher::publishDepthmapAndPointCloud,
-             publisher_.get(),
-             curr_depth, curr_ref_img, curr_convergence);
-
+             publisher_.get());
 }

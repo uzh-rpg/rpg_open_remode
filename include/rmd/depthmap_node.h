@@ -48,7 +48,7 @@ public:
 private:
   void denoiseAndPublishResults();
 
-  std::unique_ptr<rmd::Depthmap> depthmap_;
+  std::shared_ptr<rmd::Depthmap> depthmap_;
   State state_;
   float ref_compl_perc_;
 

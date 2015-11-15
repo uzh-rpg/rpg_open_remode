@@ -1,6 +1,8 @@
 #ifndef RMD_PUBLISHER_H
 #define RMD_PUBLISHER_H
 
+#include <rmd/depthmap.h>
+
 #include <ros/ros.h>
 #include <opencv2/opencv.hpp>
 #include <image_transport/image_transport.h>
@@ -16,26 +18,19 @@ class Publisher
   typedef pcl::PointCloud<PointType> PointCloud;
 public:
 
-  Publisher(float fx,
-            float cx,
-            float fy,
-            float cy,
-            ros::NodeHandle &nh);
+  Publisher(ros::NodeHandle &nh,
+            std::shared_ptr<rmd::Depthmap> depthmap);
 
-  void publishDepthmap(const cv::Mat &depthmap) const;
+  void publishDepthmap() const;
 
-  void publishPointCloud(const cv::Mat &depthmap,
-                         const cv::Mat &ref_img,
-                         const cv::Mat &convergence) const;
+  void publishPointCloud() const;
 
-  void publishDepthmapAndPointCloud(const cv::Mat &depthmap,
-                                    const cv::Mat &ref_img,
-                                    const cv::Mat &convergence) const;
+  void publishDepthmapAndPointCloud() const;
 
 private:
-  float fx_, cx_, fy_, cy_;
-
   ros::NodeHandle &nh_;
+  std::shared_ptr<rmd::Depthmap> depthmap_;
+
   image_transport::Publisher depthmap_publisher_;
 
   PointCloud::Ptr pc_;
