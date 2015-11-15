@@ -21,12 +21,15 @@ rmd::Publisher::Publisher(ros::NodeHandle &nh,
 void rmd::Publisher::publishDepthmap() const
 {
   cv_bridge::CvImage cv_image;
-  cv_image.header.stamp = ros::Time::now();
   cv_image.header.frame_id = "depthmap";
   cv_image.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
   cv_image.image = depthmap_->getDepthmap();
-  depthmap_publisher_.publish(cv_image.toImageMsg());
-  std::cout << "INFO: publishing depth map" << std::endl;
+  if(nh_.ok())
+  {
+    cv_image.header.stamp = ros::Time::now();
+    depthmap_publisher_.publish(cv_image.toImageMsg());
+    std::cout << "INFO: publishing depth map" << std::endl;
+  }
 }
 
 void rmd::Publisher::publishPointCloud() const
@@ -66,16 +69,20 @@ void rmd::Publisher::publishPointCloud() const
   }
   if (!pc_->empty())
   {
-    uint64_t timestamp;
+    if(nh_.ok())
+    {
+      uint64_t timestamp;
 #if PCL_MAJOR_VERSION == 1 && PCL_MINOR_VERSION >= 7
-    pcl_conversions::toPCL(ros::Time::now(), timestamp);
+      pcl_conversions::toPCL(ros::Time::now(), timestamp);
 #else
-    timestamp = ros::Time::now();
+      timestamp = ros::Time::now();
 #endif
-    pc_->header.frame_id = "/world";
-    pc_->header.stamp = timestamp;
-    pub_pc_.publish(pc_);
-    std::cout << "INFO: publishing pointcloud, " << pc_->size() << " points" << std::endl;
+      pc_->header.frame_id = "/world";
+
+      pc_->header.stamp = timestamp;
+      pub_pc_.publish(pc_);
+      std::cout << "INFO: publishing pointcloud, " << pc_->size() << " points" << std::endl;
+    }
     pc_->clear();
   }
 }

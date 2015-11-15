@@ -14,8 +14,10 @@ namespace rmd
 
 class Publisher
 {
+
   typedef pcl::PointXYZI PointType;
   typedef pcl::PointCloud<PointType> PointCloud;
+
 public:
 
   Publisher(ros::NodeHandle &nh,
@@ -28,6 +30,7 @@ public:
   void publishDepthmapAndPointCloud() const;
 
 private:
+
   ros::NodeHandle &nh_;
   std::shared_ptr<rmd::Depthmap> depthmap_;
 

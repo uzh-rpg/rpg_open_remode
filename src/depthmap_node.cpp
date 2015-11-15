@@ -160,5 +160,5 @@ void rmd::DepthmapNode::denoiseAndPublishResults()
 
   std::async(std::launch::async,
              &rmd::Publisher::publishDepthmapAndPointCloud,
-             publisher_.get());
+             *publisher_);
 }
