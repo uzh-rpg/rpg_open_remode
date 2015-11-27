@@ -70,8 +70,7 @@ void rmd::Publisher::publishPointCloud() const
       {
         const float3 f = normalize( make_float3((x-cx)/fx, (y-cy)/fy, 1.0f) );
         const float3 xyz = T_world_ref * ( f * depth.at<float>(y, x) );
-        if(convergence.at<int>(y, x) != rmd::ConvergenceState::DIVERGED &&
-           convergence.at<int>(y, x) != rmd::ConvergenceState::BORDER)
+        if( rmd::ConvergenceState::CONVERGED == convergence.at<int>(y, x) )
         {
           PointType p;
           p.x = xyz.x;
