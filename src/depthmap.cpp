@@ -76,6 +76,7 @@ bool rmd::Depthmap::setReferenceImage(
   {
     std::lock_guard<std::mutex> lock(ref_img_mutex_);
     img_undistorted_8uc1_.copyTo(ref_img_undistorted_8uc1_);
+    T_world_ref_ = T_curr_world.inv();
   }
 
   return ret;

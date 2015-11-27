@@ -57,6 +57,7 @@ void rmd::Publisher::publishPointCloud() const
     const cv::Mat depth = depthmap_->getDepthmap();
     const cv::Mat convergence = depthmap_->getConvergenceMap();
     const cv::Mat ref_img = depthmap_->getReferenceImage();
+    const rmd::SE3<float> T_world_ref = depthmap_->getT_world_ref();
 
     const float fx = depthmap_->getFx();
     const float fy = depthmap_->getFy();
@@ -67,17 +68,15 @@ void rmd::Publisher::publishPointCloud() const
     {
       for(int x=0; x<depth.cols; ++x)
       {
-        Eigen::Vector3f f((x-cx)/fx, (y-cy)/fy, 1.0);
-        f.normalize();
-        Eigen::Vector3f xyz = f*depth.at<float>(y,x);
-        if(convergence.at<int>(y, x) != rmd::ConvergenceState::DIVERGED &&
-           convergence.at<int>(y, x) != rmd::ConvergenceState::BORDER)
+        const float3 f = normalize( make_float3((x-cx)/fx, (y-cy)/fy, 1.0f) );
+        const float3 xyz = T_world_ref * ( f * depth.at<float>(y, x) );
+        if( rmd::ConvergenceState::CONVERGED == convergence.at<int>(y, x) )
         {
           PointType p;
-          p.x = xyz.x();
-          p.y = xyz.y();
-          p.z = xyz.z();
-          uint8_t intensity = ref_img.at<uint8_t>(y,x);
+          p.x = xyz.x;
+          p.y = xyz.y;
+          p.z = xyz.z;
+          const uint8_t intensity = ref_img.at<uint8_t>(y, x);
           p.intensity = intensity;
           pc_->push_back(p);
         }
@@ -95,12 +94,10 @@ void rmd::Publisher::publishPointCloud() const
       timestamp = ros::Time::now();
 #endif
       pc_->header.frame_id = "/world";
-
       pc_->header.stamp = timestamp;
       pub_pc_.publish(pc_);
       std::cout << "INFO: publishing pointcloud, " << pc_->size() << " points" << std::endl;
     }
-    pc_->clear();
   }
 }
 
