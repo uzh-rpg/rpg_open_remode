@@ -24,6 +24,7 @@
 
 #include <rmd/seed_matrix.cuh>
 #include <rmd/depthmap_denoiser.cuh>
+#include <rmd/se3.cuh>
 
 #include <mutex>
 
@@ -89,6 +90,9 @@ public:
   std::mutex & getRefImgMutex()
   { return ref_img_mutex_; }
 
+  SE3<float> getT_world_ref() const
+  { return T_world_ref_; }
+
 private:
   void inputImage(const cv::Mat &img_8uc1);
 
@@ -103,6 +107,7 @@ private:
   cv::Mat img_undistorted_8uc1_;
 
   cv::Mat ref_img_undistorted_8uc1_;
+  SE3<float> T_world_ref_;
   std::mutex ref_img_mutex_;
 
   bool is_distorted_;
