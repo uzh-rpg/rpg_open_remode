@@ -50,6 +50,39 @@ void mouseCallback(int event, int x, int y, int flags, void *userdata)
     cv::circle(*cb_data.ref_img, cv::Point(x, y), 3, cv::Scalar(255));
     cv::imshow("ref", *cb_data.ref_img);
     cv::circle(*cb_data.curr_img, cv::Point(curr_px.x, curr_px.y), 3, cv::Scalar(255));
+
+    Eigen::Matrix3f K;
+    // Camera intrinsics
+    K << cb_data.cam->fx, 0.0f, cb_data.cam->cx,
+        0.0f, cb_data.cam->fy, cb_data.cam->cy,
+        0.0f, 0.0f, 1.0f;
+    // R_curr_ref
+    Eigen::Matrix3f R;
+    R << cb_data.T_curr_ref->data(0, 0), cb_data.T_curr_ref->data(0, 1), cb_data.T_curr_ref->data(0, 2),
+         cb_data.T_curr_ref->data(1, 0), cb_data.T_curr_ref->data(1, 1), cb_data.T_curr_ref->data(1, 2),
+         cb_data.T_curr_ref->data(2, 0), cb_data.T_curr_ref->data(2, 1), cb_data.T_curr_ref->data(2, 2);
+    // t_x is the Skew-simmetric matrix of t
+    Eigen::Matrix3f t_x;
+    t_x << 0.0f, -cb_data.T_curr_ref->data(2, 3), cb_data.T_curr_ref->data(1, 3),
+        cb_data.T_curr_ref->data(2, 3), 0.0f, -cb_data.T_curr_ref->data(0, 3),
+        -cb_data.T_curr_ref->data(1, 3), cb_data.T_curr_ref->data(0, 3), 0.0f;
+    // F = K^{-T} * t_x * R * K^{-1}
+    Eigen::Matrix3f K_inv = K.inverse();
+    Eigen::Matrix3f F = K_inv.transpose()*t_x*R*K_inv;
+    // Vector of parameters (a, b, c) of the epipolar line in curr image in implicit form ax+by+c=0
+    Eigen::Vector3f l = F * Eigen::Vector3f((float)x, (float)y, 1.0f);
+    const float rows = static_cast<float>(cb_data.curr_img->rows);
+    const float cols = static_cast<float>(cb_data.curr_img->cols);
+    // Clipping to image
+    const float x_min = std::min(cols, std::max(0.0f, -l(2)/l(0))); // x coord of intersection with y=0
+    const float x_max = std::min(cols, std::max(0.0f, (-l(2)-l(1)*rows)/l(0))); // x coord of intersection with y=rows
+    cv::Point p1(x_min, (-l(2)-l(0)*x_min)/l(1)); // y= (-c-ax)/b
+    cv::Point p2(x_max, (-l(2)-l(0)*x_max)/l(1));
+    // Plot clipped epipolar line
+    cv::line(*cb_data.curr_img, p1, p2, cv::Scalar(255), 1);
+    cv::circle(*cb_data.curr_img, p1, 5, cv::Scalar(255));
+    cv::circle(*cb_data.curr_img, p2, 5, cv::Scalar(255));
+
     cv::imshow("curr", *cb_data.curr_img);
   }
 }
