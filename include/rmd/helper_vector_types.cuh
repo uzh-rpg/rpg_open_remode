@@ -21,7 +21,7 @@
 #include <cuda_toolkit/helper_math.h>
 
 template<typename VectorType>
-__device__ __forceinline__
+__device__ __host__ __forceinline__
 float norm(const VectorType & v)
 {
   return sqrtf(dot(v, v));

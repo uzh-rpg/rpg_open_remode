@@ -51,6 +51,7 @@ private:
   std::shared_ptr<rmd::Depthmap> depthmap_;
   State state_;
   float ref_compl_perc_;
+  float max_dist_from_ref_;
 
   ros::NodeHandle &nh_;
   std::unique_ptr<rmd::Publisher> publisher_;

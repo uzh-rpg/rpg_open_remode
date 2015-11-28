@@ -122,6 +122,7 @@ bool rmd::SeedMatrix::update(
     const SE3<float> &T_curr_world)
 {
   const rmd::SE3<float> T_curr_ref = T_curr_world * T_world_ref_;
+  dist_from_ref_ = norm(T_curr_ref.getTranslation());
 
   // Upload current image to device memory
   curr_img_.setDevData(host_curr_img_align_row_maj);
@@ -194,6 +195,11 @@ const rmd::DeviceImage<int> & rmd::SeedMatrix::getConvergence() const
 size_t rmd::SeedMatrix::getConvergedCount() const
 {
   return img_reducer_->countEqual(convergence_, ConvergenceStates::CONVERGED);
+}
+
+float rmd::SeedMatrix::getDistFromRef() const
+{
+  return dist_from_ref_;
 }
 
 #if RMD_BUILD_TESTS

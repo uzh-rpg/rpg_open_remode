@@ -93,6 +93,8 @@ public:
   SE3<float> getT_world_ref() const
   { return T_world_ref_; }
 
+  float getDistFromRef() const;
+
 private:
   void inputImage(const cv::Mat &img_8uc1);
 

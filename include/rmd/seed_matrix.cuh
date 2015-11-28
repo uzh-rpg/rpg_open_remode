@@ -72,6 +72,8 @@ public:
 
   size_t getConvergedCount() const;
 
+  float getDistFromRef() const;
+
 #if RMD_BUILD_TESTS
   void downloadSigmaSq(float *host_align_row_maj) const;
   void downloadA(float *host_align_row_maj) const;
@@ -95,6 +97,7 @@ private:
   DeviceImage<float2> epipolar_matches_;
   mvs::DeviceData dev_data_;
   SE3<float> T_world_ref_;
+  float dist_from_ref_;
   // kernel config
   dim3 dim_block_;
   dim3 dim_grid_;

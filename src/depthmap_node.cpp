@@ -75,7 +75,8 @@ bool rmd::DepthmapNode::init()
           vk::getParam<float>("remode/cam_r2"));
   }
 
-  ref_compl_perc_ = vk::getParam<float>("remode/ref_compl_perc", 10.0f);
+  ref_compl_perc_    = vk::getParam<float>("remode/ref_compl_perc",   10.0f);
+  max_dist_from_ref_ = vk::getParam<float>("remode/max_dist_from_ref", 0.5f);
 
   publisher_.reset(new rmd::Publisher(nh_, depthmap_));
 
@@ -139,9 +140,10 @@ void rmd::DepthmapNode::denseInputCallback(
   case rmd::State::UPDATE:
   {
     depthmap_->update(img_8uC1, T_world_curr.inv());
-    float perc_conv = depthmap_->getConvergedPercentage();
+    const float perc_conv = depthmap_->getConvergedPercentage();
+    const float dist_from_ref = depthmap_->getDistFromRef();
     std::cout << "INFO: percentage of converged measurements: " << perc_conv << "%" << std::endl;
-    if(perc_conv > ref_compl_perc_)
+    if(perc_conv > ref_compl_perc_ || dist_from_ref > max_dist_from_ref_)
     {
       state_ = State::TAKE_REFERENCE_FRAME;
       denoiseAndPublishResults();

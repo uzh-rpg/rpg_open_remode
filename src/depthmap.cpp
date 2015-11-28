@@ -167,3 +167,8 @@ cv::Mat rmd::Depthmap::scaleMat(const cv::Mat &depthmap)
   cv::cvtColor(converted, colored, CV_GRAY2BGR);
   return colored;
 }
+
+float rmd::Depthmap::getDistFromRef() const
+{
+  return seeds_.getDistFromRef();
+}
