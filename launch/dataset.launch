@@ -7,5 +7,6 @@
     <param name="cam_fy" value="-480.0" />
     <param name="cam_cy" value="239.5" />
     <param name="ref_compl_perc" value="30.0" />
+    <param name="publish_conv_every_n" value="2" />
   </node>   
 </launch>

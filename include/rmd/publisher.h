@@ -46,7 +46,7 @@ public:
 
   void publishDepthmapAndPointCloud() const;
 
-  void publishConvergenceMap() const;
+  void publishConvergenceMap();
 
 private:
 
@@ -58,6 +58,8 @@ private:
 
   PointCloud::Ptr pc_;
   ros::Publisher pub_pc_;
+
+  cv::Mat colored_;
 };
 
 } // rmd namespace

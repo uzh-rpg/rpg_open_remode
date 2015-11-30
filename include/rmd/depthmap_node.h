@@ -53,6 +53,8 @@ private:
   State state_;
   float ref_compl_perc_;
   float max_dist_from_ref_;
+  int publish_conv_every_n_;
+  int num_msgs_;
 
   ros::NodeHandle &nh_;
   std::unique_ptr<rmd::Publisher> publisher_;

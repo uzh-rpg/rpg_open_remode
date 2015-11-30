@@ -30,6 +30,7 @@
 
 rmd::DepthmapNode::DepthmapNode(ros::NodeHandle &nh)
   : nh_(nh)
+  , num_msgs_(0)
 {
   state_ = rmd::State::TAKE_REFERENCE_FRAME;
 }
@@ -77,6 +78,7 @@ bool rmd::DepthmapNode::init()
 
   ref_compl_perc_    = vk::getParam<float>("remode/ref_compl_perc",   10.0f);
   max_dist_from_ref_ = vk::getParam<float>("remode/max_dist_from_ref", 0.5f);
+  publish_conv_every_n_ = vk::getParam<float>("remode/publish_conv_every_n", 10);
 
   publisher_.reset(new rmd::Publisher(nh_, depthmap_));
 
@@ -86,12 +88,12 @@ bool rmd::DepthmapNode::init()
 void rmd::DepthmapNode::denseInputCallback(
     const svo_msgs::DenseInputConstPtr &dense_input)
 {
+  num_msgs_ += 1;
   if(!depthmap_)
   {
     ROS_ERROR("depthmap not initialized. Call the DepthmapNode::init() method");
     return;
   }
-
   cv::Mat img_8uC1;
   try
   {
@@ -148,14 +150,15 @@ void rmd::DepthmapNode::denseInputCallback(
       state_ = State::TAKE_REFERENCE_FRAME;
       denoiseAndPublishResults();
     }
-    else
-    {
-      publishConvergenceMap();
-    }
     break;
   }
   default:
     break;
+  }
+  if(publish_conv_every_n_ < num_msgs_)
+  {
+    publishConvergenceMap();
+    num_msgs_ = 0;
   }
 }
 

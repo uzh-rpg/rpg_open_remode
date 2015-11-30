@@ -30,6 +30,7 @@ rmd::Publisher::Publisher(ros::NodeHandle &nh,
   , pc_(new PointCloud)
 {
   depthmap_ = depthmap;
+  colored_.create(depthmap->getHeight(), depthmap_->getWidth(), CV_8UC3);
   image_transport::ImageTransport it(nh_);
   depthmap_publisher_ = it.advertise("remode/depth",       10);
   conv_publisher_     = it.advertise("remode/convergence", 10);
@@ -108,26 +109,25 @@ void rmd::Publisher::publishDepthmapAndPointCloud() const
   publishPointCloud();
 }
 
-void rmd::Publisher::publishConvergenceMap() const
+void rmd::Publisher::publishConvergenceMap()
 {
   std::lock_guard<std::mutex> lock(depthmap_->getRefImgMutex());
 
   const cv::Mat convergence = depthmap_->getConvergenceMap();
   const cv::Mat ref_img = depthmap_->getReferenceImage();
 
-  cv::Mat colored(ref_img.size(), CV_8UC3);
-  cv::cvtColor(ref_img, colored, CV_GRAY2BGR);
-  for (int r = 0; r < colored.rows; r++)
+  cv::cvtColor(ref_img, colored_, CV_GRAY2BGR);
+  for (int r = 0; r < colored_.rows; r++)
   {
-    for (int c = 0; c < colored.cols; c++)
+    for (int c = 0; c < colored_.cols; c++)
     {
       switch(convergence.at<int>(r, c))
       {
       case rmd::ConvergenceState::CONVERGED:
-        colored.at<cv::Vec3b>(r, c)[0] = 255;
+        colored_.at<cv::Vec3b>(r, c)[0] = 255;
         break;
       case rmd::ConvergenceState::DIVERGED:
-        colored.at<cv::Vec3b>(r, c)[2] = 255;
+        colored_.at<cv::Vec3b>(r, c)[2] = 255;
         break;
       default:
         break;
@@ -137,7 +137,7 @@ void rmd::Publisher::publishConvergenceMap() const
   cv_bridge::CvImage cv_image;
   cv_image.header.frame_id = "convergence_map";
   cv_image.encoding = sensor_msgs::image_encodings::BGR8;
-  cv_image.image = colored;
+  cv_image.image = colored_;
   if(nh_.ok())
   {
     cv_image.header.stamp = ros::Time::now();
