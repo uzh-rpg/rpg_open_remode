@@ -47,6 +47,7 @@ public:
       const svo_msgs::DenseInputConstPtr &dense_input);
 private:
   void denoiseAndPublishResults();
+  void publishConvergenceMap();
 
   std::shared_ptr<rmd::Depthmap> depthmap_;
   State state_;

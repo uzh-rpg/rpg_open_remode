@@ -148,6 +148,10 @@ void rmd::DepthmapNode::denseInputCallback(
       state_ = State::TAKE_REFERENCE_FRAME;
       denoiseAndPublishResults();
     }
+    else
+    {
+      publishConvergenceMap();
+    }
     break;
   }
   default:
@@ -162,5 +166,14 @@ void rmd::DepthmapNode::denoiseAndPublishResults()
 
   std::async(std::launch::async,
              &rmd::Publisher::publishDepthmapAndPointCloud,
+             *publisher_);
+}
+
+void rmd::DepthmapNode::publishConvergenceMap()
+{
+  depthmap_->downloadConvergenceMap();
+
+  std::async(std::launch::async,
+             &rmd::Publisher::publishConvergenceMap,
              *publisher_);
 }
