@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SET(PROJECT_NAME open_remode)
+SET(PROJECT_NAME rpg_open_remode)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.3)
 PROJECT(${PROJECT_NAME})
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/CMakeModules/")
@@ -63,7 +63,7 @@ if(BUILD_ROS_NODE)
       DEPENDS OpenCV Eigen Boost
       CATKIN_DEPENDS roscpp roslib svo_msgs image_transport vikit_ros pcl_ros
       INCLUDE_DIRS include
-      LIBRARIES open_remode open_remode_cuda
+      LIBRARIES rpg_open_remode rpg_open_remode_cuda
   )
 else()
   set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
@@ -102,17 +102,17 @@ list(APPEND SOURCE_FILES
 )
 
 CUDA_ADD_LIBRARY(
-    open_remode_cuda
+    rpg_open_remode_cuda
     ${CU_SOURCE_FILES}
 )
 
 ADD_LIBRARY(
-    open_remode
+    rpg_open_remode
     ${SOURCE_FILES}
 )
 
 target_link_libraries(
-    open_remode
+    rpg_open_remode
     ${LINK_LIBS}
 )
 
@@ -126,8 +126,8 @@ add_executable(
 )
 target_link_libraries(
   depthmap_node
-  open_remode
-  open_remode_cuda
+  rpg_open_remode
+  rpg_open_remode_cuda
 )
 # Build a node to publish the dataset
 add_executable(
@@ -150,8 +150,8 @@ add_executable(
 
 target_link_libraries(
     dataset_main
-    open_remode
-    open_remode_cuda
+    rpg_open_remode
+    rpg_open_remode_cuda
 )
 
 # GTest
@@ -169,7 +169,7 @@ list(APPEND GTEST_LINK_LIBS
 )
 
 CUDA_ADD_LIBRARY(
-    open_remode_test
+    rpg_open_remode_test
     test/copy.cu
     test/sobel.cu
 )
@@ -191,9 +191,9 @@ add_executable(
 
 target_link_libraries(
   all_tests
-  open_remode
-  open_remode_cuda
-  open_remode_test
+  rpg_open_remode
+  rpg_open_remode_cuda
+  rpg_open_remode_test
   ${GTEST_LINK_LIBS}
 )
 

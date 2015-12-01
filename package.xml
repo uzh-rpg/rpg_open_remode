@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>open_remode</name>
+  <name>rpg_open_remode</name>
   <version>0.1.0</version>
   <description>
     REgularized MOnocular Depth Estimation

@@ -24,7 +24,7 @@ int main(int argc, char **argv)
   if(!rmd::checkCudaDevice(argc, argv))
     return EXIT_FAILURE;
 
-  ros::init(argc, argv, "open_remode");
+  ros::init(argc, argv, "rpg_open_remode");
   ros::NodeHandle nh;
   rmd::DepthmapNode dm_node(nh);
   if(!dm_node.init())
