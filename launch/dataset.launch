@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="open_remode" type="depthmap_node" name="remode" clear_params="true" output="screen">
+  <node pkg="rpg_open_remode" type="depthmap_node" name="remode" clear_params="true" output="screen">
     <param name="cam_width" value="640" />
     <param name="cam_height" value="480" />
     <param name="cam_fx" value="481.2" />
