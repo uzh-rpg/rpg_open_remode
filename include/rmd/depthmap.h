@@ -95,6 +95,12 @@ public:
 
   float getDistFromRef() const;
 
+  size_t getWidth() const
+  { return width_; }
+
+  size_t getHeight() const
+  { return height_; }
+
 private:
   void inputImage(const cv::Mat &img_8uc1);
 

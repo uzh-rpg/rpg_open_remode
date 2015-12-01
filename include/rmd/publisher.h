@@ -46,15 +46,20 @@ public:
 
   void publishDepthmapAndPointCloud() const;
 
+  void publishConvergenceMap();
+
 private:
 
   ros::NodeHandle &nh_;
   std::shared_ptr<rmd::Depthmap> depthmap_;
 
   image_transport::Publisher depthmap_publisher_;
+  image_transport::Publisher conv_publisher_;
 
   PointCloud::Ptr pc_;
   ros::Publisher pub_pc_;
+
+  cv::Mat colored_;
 };
 
 } // rmd namespace
