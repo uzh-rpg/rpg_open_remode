@@ -46,9 +46,9 @@ https://developer.nvidia.com/cuda-zone
   
 #### Acknowledgments
 
-The author acknowledges the key contributions by Christian Forster and Manuel Werlberger.
+The author acknowledges the key contributions by Christian Forster, Manuel Werlberger and Jeff Delmerico.
 
-Also, thanks to Jeff Delmerico, Michael Gassner and Zichao Zhang for their valuable comments and help.
+Also, thanks to Michael Gassner and Zichao Zhang for their valuable comments and help.
    
 #### Contributing
 
